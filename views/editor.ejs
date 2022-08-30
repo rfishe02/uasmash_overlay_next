@@ -15,8 +15,6 @@
   <link href="https://unpkg.com/primevue/resources/primevue.min.css" rel="stylesheet">
   <link href="https://unpkg.com/primeicons/primeicons.css" rel="stylesheet">
 
-  <link rel="stylesheet" href="/stylesheets/style.css">
-
   <style>
     .p-dropdown {
       height: 40px;
@@ -487,7 +485,26 @@
   const { createApp} = Vue
   const { FilterMatchMode, FilterOperator } = primevue.api;
 
-  createApp({
+  const socket = io("http://" + window.location.hostname + ":3000", {
+    reconnectionDelayMax: 10000,
+    autoConnect: false,
+  })
+
+  socket.on("connect_error", (err) => {
+    //console.log(err instanceof Error)
+    //console.log(err.message)
+    //console.log(err.data)
+  })
+
+  socket.on("connect", () => {
+
+  })
+
+  socket.on("disconnect", () => {
+
+  })
+
+  const editorApp = createApp({
     data() {
       return {
         host: window.location.hostname,
@@ -516,8 +533,8 @@
           versusBanner: { value: null, matchMode: FilterMatchMode.CONTAINS },
         },
         overlayRoom: "",
-        overlayModule: null,
-        socket: null,
+        overlayModule: "",
+        socket: socket,
         scoreOptions: [
           { name: "-", value: "" },
           { name: "0", value: "0" },
@@ -566,7 +583,7 @@
     },
     mounted() {
       this.setInitialState()
-      //importKeyOrGenerate()
+      this.importKeyOrGenerate()
     },
     methods: {
       async setInitialState() {
@@ -627,17 +644,16 @@
       },
       async importKeyOrGenerate() {
 
-        var room = await importRoomKey(<%= user.id %>,"overlay")
+        var room = await this.importRoomKey(<%= user.id %>,"overlay")
         if(room.length == 0) {
-          room = await generateRoomKey(<%= user.id %>,"overlay")
+          room = await this.generateRoomKey(<%= user.id %>,"overlay")
         }
 
         this.overlayRoom = room
-        this.overlayModule = new Module("module/overlay")
+        this.overlayModule = "module/overlay"
 
-        //TODO: Socket io
-        //socket.auth = { room }
-        //socket.connect()
+        this.socket.auth = { room }
+        this.socket.connect()
 
       },
       async importRoomKey(user_id,module_name) {
@@ -692,7 +708,7 @@
       },
       getModuleURL(module, room) {
         if(module != null && room != null) {
-          return module.getURL() + room
+          return this.host +this.port+ "/" + module + "?id=" + room
         } else {
           return ''
         }
@@ -745,25 +761,24 @@
       },
       async submitOverlayForm() {
         try {
-          if (
-            this.teamone != null && this.teamtwo != null &&
+          if ( this.teamone != null && this.teamtwo != null &&
             this.p1score != null && this.p2score != null
           ) {
             const form = {};
-            const teamOne = {};
-            const teamTwo = {};
+            const teamOne = { members: [] };
+            const teamTwo = { members: [] };
 
             teamOne.name = this.getFormattedName(this.teamone)
             teamOne.score = this.getFormattedScore(this.p1score)
 
-            if (this.setselection != null) {
+            if (this.setselection.teamOne != null) {
               teamOne.members = this.setselection.teamOne.members
             }
 
             teamTwo.name = this.getFormattedName(this.teamtwo)
             teamTwo.score = this.getFormattedScore(this.p2score)
 
-            if (this.setselection != null) {
+            if (this.setselection.teamTwo != null) {
               teamTwo.members = this.setselection.teamTwo.members
             }
 
@@ -772,7 +787,7 @@
 
             form["eventheader"] = this.getFormattedEventHeader()
 
-            socket.emit("overlay-update", {
+            this.socket.emit("overlay-update", {
               content: form,
               to: this.overlayRoom,
             })

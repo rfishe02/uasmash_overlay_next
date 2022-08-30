@@ -12,8 +12,9 @@ var SQLiteStore = require('connect-sqlite3')(session);
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-
 var editorRouter = require('./routes/editor');
+var keysRouter = require('./routes/keys');
+var overlayRouter = require('./routes/overlay');
 
 var app = express();
 
@@ -30,7 +31,6 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-
 
 app.use(session({
   secret: process.env.SECRET_KEY,
@@ -62,10 +62,11 @@ passport.deserializeUser(function(user, cb) {
 app.use(passport.initialize());
 app.use(passport.session());
 
-
 app.use('/', indexRouter);
-app.use('/', editorRouter);
+app.use('/editor', editorRouter);
 app.use('/users', usersRouter);
+app.use('/keys', keysRouter);
+app.use('/module', overlayRouter);
 
 app.set('view engine', 'ejs');
 
