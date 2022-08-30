@@ -1,0 +1,810 @@
+<html>
+
+<head>
+  <title>UA Smash Stage Striker</title>
+
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+
+  <link href="https://unpkg.com/primevue@^3/resources/themes/saga-blue/theme.css" rel="stylesheet">
+  <link href="https://unpkg.com/primevue/resources/primevue.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/primeicons/primeicons.css" rel="stylesheet">
+
+  <style>
+    .p-multiselect-panel {
+      overflow: hidden;
+      min-height: 225px;
+      z-index: 2000 !important;
+    }
+
+    .p-multiselect-token-label {
+      /*font-size: 10pt;*/
+    }
+
+    .p-multiselect-item {
+      font-size: 10pt;
+    }
+
+    .list-move, /* apply transition to moving elements */
+    .list-enter-active,
+    .list-leave-active {
+      transition: all 0.3s ease;
+    }
+
+    .list-enter-from,
+    .list-leave-to {
+      opacity: 0;
+      transform: translateX(25px);
+    }
+
+    /* ensure leaving items are taken out of layout flow so that moving
+       animations can be calculated correctly. */
+    .list-leave-active {
+      position: absolute;
+    }
+
+    /* we will explain what these classes do next! */
+    .v-enter-active,
+    .v-leave-active {
+      transition: opacity 0.3s ease;
+    }
+
+    .v-enter-from,
+    .v-leave-to {
+      opacity: 0;
+    }
+
+    body {
+      background-color: #262626;
+      padding: 0px;
+    }
+
+    #app {
+      width: 100%;
+      height: 100%;
+    }
+
+    .stage-card-row {
+      background-color: rgba(255,255,255,0.25);
+      display: block;
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: nowrap;
+    }
+
+    .card-col {
+      max-width: 165px;
+      min-width: 165px;
+      display: inline-block;
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+
+    .card-col .card {
+      height: 200px;
+    }
+
+    .stage-card-title {
+      font-size: 12pt;
+      white-space: normal;
+      margin: 0px;
+    }
+
+    .card-col .row {
+      position: absolute;
+      bottom: 0;
+      padding-bottom: 7px;
+      width: 165px;
+    }
+
+    .card-col .btn {
+      width: 45px;
+      height: 45px;
+      font-size: 14pt;
+    }
+
+    .app-header {
+      color:white;
+      font-size: 14pt;
+    }
+  </style>
+
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js" integrity="sha384-ODmDIVzN+pFdexxHEHFBQH3/9/vQ9uori45z4JjnFsRydbmQbmL5t1tQ0culUzyK" crossorigin="anonymous"></script>
+
+  <script src="https://unpkg.com/vue@3"></script>
+  <script src="https://unpkg.com/primevue/core/core.min.js"></script>
+  <script src="https://unpkg.com/primevue@^3/multiselect/multiselect.min.js"></script>
+
+  <script src="/socket.io/socket.io.js"></script>
+
+</head>
+
+<body>
+  <div id="app">
+
+    <nav class="navbar sticky-top navbar-expand-sm navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand pt-1 pl-2" href="#" disabled>
+          <img
+            src="/fsmsmashlogo.png"
+            alt=""
+            height="30"
+          />
+        </a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNavAltMarkup"
+          aria-controls="navbarNavAltMarkup"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav me-auto m-2">
+            <button
+              class="btn btn-sm btn-light"
+              type="button"
+              style="width: 125px"
+              @click="resetActivityAndReloadStages()"
+            >
+              RESET
+            </button>
+
+            <button
+              class="btn btn-sm btn-dark"
+              type="button"
+              style="width: 125px"
+              @click="toggleStrikerConfig()"
+            >
+              SETTINGS
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </nav>
+
+    <p-dialog
+      v-model:visible="display"
+      position="top"
+      :breakpoints="{ '960px': '75vw', '640px': '90vw' }"
+      :style="{ width: '75vw' }"
+    >
+      <template #header>
+        <h3>Settings</h3>
+      </template>
+
+      <form>
+        <div class="container-fluid">
+
+          <div class="row">
+            <h5 class="mb-3">Module URL</h5>
+            <div class="col-12">
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                  <!-- <RouterLink to="/stage_strikes"><p>Preview</p></RouterLink> -->
+
+                  <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="gen-module-button0" :value="getModuleURL(strikerModule,strikerRoom)">
+                    <!--TODO: Set up regeneration -->
+                    <!--
+                    <button class="btn btn-outline-secondary" type="button" id="gen-module-button0" @click="regenerateRoomKey()">Generate</button>-->
+                  </div>
+
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="row">
+            <h5 class="mb-3">Choose Stages</h5>
+            <div class="col-12 mb-3">
+              <p-multiselect
+                v-model="starterselection"
+                :options="stageList"
+                :filter="true"
+                option-label="stage_name"
+                placeholder="Starter Stages"
+                style="width: 100%"
+                display="chip"
+                :selection-limit="5"
+                :reset-filter-on-hide="true"
+                scroll-height="225px"
+              ></p-multiselect>
+            </div>
+
+            <div class="col-12 mb-3">
+              <p-multiselect
+                v-model="counterpickselection"
+                :options="stageList"
+                :filter="true"
+                option-label="stage_name"
+                placeholder="Counterpick Stages"
+                style="width: 100%"
+                display="chip"
+                :selection-limit="5"
+                :reset-filter-on-hide="true"
+                scroll-height="225px"
+              ></p-multiselect>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-10">
+              <p-button
+                label="Save"
+                class="p-button-primary"
+                style="width: 125px"
+                @click="saveStrikerConfig()"
+              ></p-button>
+              <p-button
+                label="Clear"
+                class="p-button-text"
+                style="width: 125px"
+                @click="clearConfigStageSelections()"
+              ></p-button>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <!--
+	    <template #footer>
+		    <Button label="No" icon="pi pi-times" class="p-button-text"/>
+        <Button label="Yes" icon="pi pi-check" autofocus />
+	    </template>-->
+    </p-dialog>
+
+    <div class="container-md mt-2 mb-2">
+      <div
+        class="row row-cols-2 row-cols-md-4 row-cols-lg-5 rounded"
+        style="overflow-y: auto; overflow-x: hidden"
+      >
+        <transition-group name="list">
+          <template v-for="(item, index) in options" v-bind:key="item">
+            <div
+              class="col p-1"
+              v-if="turns != 0 || item.order != 'COUNTERPICK'"
+            >
+              <div class="card h-100 shadow border-secondary text-center">
+                <div
+                  v-if="item.order == 'STARTER'"
+                  class="card-header border-light p-0"
+                >
+                  <p class="m-1" style="font-size: 8pt">{{ item.order }}</p>
+                </div>
+                <div
+                  v-if="item.order == 'COUNTERPICK'"
+                  class="card-header border-secondary bg-dark text-light p-0"
+                >
+                  <p class="m-1" style="font-size: 8pt">{{ item.order }}</p>
+                </div>
+
+                <img
+                  v-bind:src="getImageURL(item.stage_name) == null ? '' : getImageURL(item.stage_name)"
+                  v-bind:alt="item.stage_name"
+                />
+                <div class="card-body p-1">
+                  <p class="card-title m-1" style="font-size: 10pt">
+                    {{ item.stage_name }}
+                  </p>
+                </div>
+                <div class="card-footer border-light p-2">
+                  <div class="row justify-content-center">
+                    <div class="col">
+                      <button
+                        class="btn btn-light text-primary"
+                        type="button"
+                        @click="pickStage(index, true)"
+                        style="font-size: 16pt"
+                      >
+                        <i class="bi bi-check-circle"></i>
+                      </button>
+                    </div>
+                    <div class="col">
+                      <button
+                        class="btn btn-light text-danger"
+                        type="button"
+                        @click="pickStage(index, false)"
+                        style="font-size: 16pt"
+                      >
+                        <i class="bi bi-x-circle-fill"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
+        </transition-group>
+      </div>
+
+      <template v-for="(record, index) in previous_choices" v-bind:key="record">
+        <p style="color: white; margin-top: 15px">Set {{ index + 1 }}</p>
+        <div class="row row-cols-5 rounded">
+          <template v-for="item in record" v-bind:key="item">
+            <div class="col p-1">
+              <div
+                class="card text-center text-white border-secondary rounded shadow"
+                style="background-color: rgba(0, 0, 0, 1)"
+              >
+                <img
+                  class="rounded"
+                  v-bind:src="
+                    getImageURL(item.stage_name) == null ? '' : getImageURL(item.stage_name)
+                  "
+                  v-bind:alt="item.stage_name"
+                  style="opacity: 0.4"
+                />
+                <div class="card-img-overlay">
+                  <i
+                    v-if="item.choice == 'PICK'"
+                    class="bi bi-check-circle"
+                    style="font-size: 16pt"
+                  ></i>
+                  <i
+                    v-if="item.choice == 'STRIKE'"
+                    class="bi bi-x-circle-fill"
+                    style="font-size: 16pt"
+                  ></i>
+                  <p style="font-size: 10pt">{{ item.stage_name }}</p>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+      </template>
+    </div>
+
+    <div
+      v-if="getNumberOfChoices() > 0"
+      class="row row-cols-5 fixed-bottom"
+      style="
+        background: rgb(255, 255, 255, 0.5);
+        padding-top: 15px;
+        padding-bottom: 15px;
+        padding-left: 25px;
+        padding-right: 25px;
+        display: block;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+      "
+    >
+      <template v-for="(item, index) in choices" v-bind:key="item">
+        <div class="col p-1" style="display: inline-block">
+            <div
+              class="card text-center text-white border-secondary rounded shadow"
+              style="background-color: rgba(0, 0, 0, 1)"
+              @click="undoChoice(index)"
+            >
+              <img
+                class="rounded"
+                v-bind:src="getImageURL(item.stage_name) == null ? '' : getImageURL(item.stage_name)"
+                v-bind:alt="item.stage_name"
+                style="opacity: 0.8"
+              />
+              <div class="card-img-overlay">
+                <i
+                  v-if="item.choice == 'PICK'"
+                  class="bi bi-check-circle"
+                  style="font-size: 16pt"
+                ></i>
+                <i
+                  v-if="item.choice == 'STRIKE'"
+                  class="bi bi-x-circle-fill"
+                  style="font-size: 16pt"
+                ></i>
+                <p style="font-size: 10pt">{{ item.stage_name }}</p>
+              </div>
+            </div>
+        </div>
+      </template>
+
+    </div>
+
+  </div>
+</body>
+
+<script>
+  const { createApp} = Vue
+
+  const socket = io("http://" + window.location.hostname + ":3000", {
+    reconnectionDelayMax: 10000,
+    autoConnect: false,
+  })
+
+  socket.on("connect_error", (err) => {
+    //console.log(err instanceof Error)
+    //console.log(err.message)
+    //console.log(err.data)
+  })
+
+  socket.on("connect", () => {
+
+  })
+
+  socket.on("disconnect", () => {
+
+  })
+
+  const editorApp = createApp({
+    data() {
+      return {
+        host: window.location.hostname,
+        port: ":3000",
+        stage_image_URLs: {},
+        stageList: [],
+        starterselection: [],
+        counterpickselection: [],
+        strikerModule: "",
+        display: false,
+        previous_options: [],
+        options: [],
+        choices: [],
+        previous_choices: [],
+        turns: 0,
+        socket: socket
+      }
+    },
+    mounted() {
+      this.getStageImageURLs()
+      this.loadConfigStageList()
+
+      this.resetOptionsAndChoices()
+      this.loadStageSelectionsFromStorage()
+
+      this.importKeyOrGenerate()
+    },
+    methods: {
+      getNumberOfChoices() {
+        if (this.choices != null) {
+          return this.choices.length;
+        } else {
+          return 0;
+        }
+      },
+      getImageURL(stage_name) {
+        if (this.stage_image_URLs != null) {
+          return this.stage_image_URLs[stage_name];
+        } else {
+          return "";
+        }
+      },
+      async getStageImageURLs() {
+        try {
+
+          const response = await fetch('http://' + this.host + this.port + '/stages', {
+            method: "get",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          if(response.ok) {
+            const results = await response.json()
+            const data = {};
+
+            for (let i = 0; i < results.length; i++) {
+              data[results[i].stage_name] = "/stages/" +results[i].image_url;
+            }
+
+            this.stage_image_URLs = data;
+          }
+        } catch (e) {
+          console.log(e)
+        }
+      },
+      async loadConfigStageList() {
+        try {
+          const response = await fetch('http://' + this.host + this.port + '/stages', {
+            method: "get",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          if(response.ok) {
+            const results = await response.json()
+            const data = [];
+
+            for (let i = 0; i < results.length; i++) {
+              const item = { stage_name: '', order: '', choice: '', playerName: ''};
+              item.stage_name = results[i].stage_name;
+              data.push(item);
+            }
+            this.stageList = data;
+          }
+        } catch (e) {
+          console.log(e)
+        }
+      },
+      pickStage(index, pick) {
+        if (this.options != null && this.options.length > 0) {
+          const stage = this.options.splice(index, 1)[0];
+
+          if (stage != null) {
+            if (this.previous_choices == null) {
+              this.previous_choices = []
+            }
+            if(this.choices == null) {
+              this.choices = []
+            }
+
+            if (pick) {
+              stage.choice = "PICK";
+              this.choices.push(stage);
+
+              const stages = this.choices;
+              this.previous_choices.push(stages);
+              this.submitStageStrikes(stages);
+
+              this.choices = [];
+              this.turns++;
+            } else {
+              stage.choice = "STRIKE";
+              this.choices.push(stage);
+            }
+          }
+        }
+      },
+      undoChoice(index) {
+        if (this.choices != null && this.options != null) {
+          if (this.choices.length > 0) {
+            const stage = this.choices.splice(index, 1)[0];
+            this.options.push(stage);
+          }
+        }
+      },
+      async submitStageStrikes(stages) {
+        try {
+
+          if (this.strikerRoom != null) {
+            const data = [];
+
+            for (let i = 0; i < stages.length; i++) {
+              const strike = {};
+              strike.stage_name = stages[i].stage_name;
+              strike.order = stages[i].order;
+              strike.choice = stages[i].choice;
+              strike.playerName = stages[i].playerName;
+              data.push(strike);
+            }
+
+            socket.emit("striker-update", {
+              content: data,
+              to: this.strikerRoom,
+            });
+          }
+
+        } catch (e) {
+          console.log(e);
+        }
+      },
+      resetOptionsAndChoices() {
+        this.options = [];
+        this.choices = [];
+        this.previous_choices = [];
+        this.turns = 0;
+      },
+      resetActivityAndReloadStages() {
+        this.resetOptionsAndChoices();
+        this.loadStageSelections();
+      },
+      toggleStrikerConfig() {
+        this.display = !this.display;
+      },
+      saveStrikerConfig() {
+        const starterStages = this.starterselection;
+        const counterPicks = this.counterpickselection;
+        const stageSelections = [];
+        const prevSelections = [];
+
+        if (starterStages != null && counterPicks != null) {
+          for (let i = 0; i < starterStages.length; i++) {
+            const item = {};
+            item.stage_name = starterStages[i].stage_name;
+            item.order = "STARTER";
+            item.choice = '';
+            item.playerName = '';
+
+            const prev_item = {};
+            prev_item.stage_name = starterStages[i].stage_name;
+            prev_item.order = "STARTER";
+            prev_item.choice = '';
+            prev_item.playerName = '';
+
+            stageSelections.push(item);
+            prevSelections.push(prev_item);
+          }
+
+          for (let j = 0; j < counterPicks.length; j++) {
+            const item = {};
+            item.stage_name = counterPicks[j].stage_name;
+            item.order = "COUNTERPICK";
+            item.choice = '';
+            item.playerName = '';
+
+            const prev_item = {};
+            prev_item.stage_name = counterPicks[j].stage_name;
+            prev_item.order = "COUNTERPICK";
+            prev_item.choice = '';
+            prev_item.playerName = '';
+
+            stageSelections.push(item);
+            prevSelections.push(prev_item);
+          }
+
+          this.toggleStrikerConfig();
+          this.clearConfigStageSelections();
+          this.resetOptionsAndChoices();
+
+          localStorage.setItem('options', JSON.stringify(stageSelections));
+        }
+        this.options = stageSelections;
+        this.previous_options = prevSelections;
+      },
+      clearConfigStageSelections() {
+        this.starterselection = [];
+        this.counterpickselection = [];
+      },
+      loadStageSelections() {
+        if (this.previous_options != null) {
+          if (this.previous_options.length > 0) {
+            const data = [];
+
+            for (let i = 0; i < this.previous_options.length; i++) {
+              const item = {};
+              item.stage_name = this.previous_options[i].stage_name;
+              item.order = this.previous_options[i].order;
+              item.choice = '';
+              item.playerName = '';
+
+              data.push(item);
+            }
+
+            this.options = data;
+          } else {
+            this.loadStageSelectionsFromStorage();
+          }
+        } else {
+          this.loadStageSelectionsFromStorage();
+        }
+      },
+      loadStageSelectionsFromStorage() {
+        try {
+          const o = localStorage.getItem('options');
+
+          if(o != undefined) {
+            const results = JSON.parse(o)
+            const data = []
+            const prev_data = []
+
+            if (results != null) {
+              for (let i = 0; i < results.length; i++) {
+                const item = {}
+                item.stage_name = results[i].stage_name;
+                item.order = results[i].order;
+                item.choice = '';
+                item.playerName = '';
+
+                const prev_item = {}
+                prev_item.stage_name = results[i].stage_name;
+                prev_item.order = results[i].order;
+                prev_item.choice = '';
+                prev_item.playerName = '';
+
+                data.push(item)
+                prev_data.push(prev_item)
+              }
+            }
+            this.options = data
+            this.previous_options = prev_data
+
+          } else {
+            this.options = []
+            this.previous_options = []
+          }
+
+        } catch (e) {
+          console.log(e)
+        }
+      },
+      async importKeyOrGenerate() {
+
+        var room = await this.importRoomKey(<%= user.id %>,"stage strikes")
+        if(room.length == 0) {
+          room = await this.generateRoomKey(<%= user.id %>,"stage strikes")
+        }
+
+        this.strikerRoom = room
+        this.strikerModule = "module/stage_strikes"
+
+        this.socket.auth = { room }
+        this.socket.connect()
+
+      },
+      async importRoomKey(user_id,module_name) {
+        var key = ""
+        try {
+          const data = { "user_id": user_id, "module_name": module_name }
+          const path = 'http://' + this.host + this.port + '/keys/get_key'
+
+          const response = await fetch(path, {
+            method: "post",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data)
+          })
+
+          if(response.ok) {
+            const results = await response.json()
+            if(results.length > 0) {
+              key = results[0].key_value
+            }
+          }
+
+        } catch(e) {
+          console.log(e)
+        }
+        return key
+      },
+      async generateRoomKey(user_id,module_name) {
+        var key = ""
+        try {
+          const data = { "user_id": user_id, "module_name": module_name }
+          const path = 'http://' + this.host + this.port + '/keys/create_key'
+
+          const response = await fetch(path, {
+            method: "post",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data)
+          })
+
+          if(response.ok) {
+            const results = await response.json()
+            key = results.key_value
+          }
+
+        } catch(e) {
+          console.log(e)
+        }
+        return key
+      },
+      getModuleURL(module, room) {
+        if(module != null && room != null) {
+          return this.host +this.port+ "/" + module + "?id=" + room
+        } else {
+          return ''
+        }
+      },
+    },
+    computed: {
+
+    },
+    components: {
+      "p-dialog": primevue.dialog,
+      "p-button": primevue.button,
+      "p-multiselect": primevue.multiselect
+    },
+  }).use(primevue.config.default).mount('#app')
+
+</script>
+
+</html>

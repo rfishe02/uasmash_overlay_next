@@ -12,9 +12,14 @@ var SQLiteStore = require('connect-sqlite3')(session);
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var editorRouter = require('./routes/editor');
+var stagesRouter = require('./routes/stages');
 var keysRouter = require('./routes/keys');
+
+var editorRouter = require('./routes/editor');
 var overlayRouter = require('./routes/overlay');
+
+var strikerRouter = require('./routes/striker');
+var stageStrikesRouter = require('./routes/stage_strikes');
 
 var app = express();
 
@@ -63,10 +68,17 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/', indexRouter);
+app.use('/stages', stagesRouter);
+
 app.use('/editor', editorRouter);
+app.use('/module', overlayRouter);
+
+app.use('/striker', strikerRouter);
+app.use('/module',stageStrikesRouter)
+
 app.use('/users', usersRouter);
 app.use('/keys', keysRouter);
-app.use('/module', overlayRouter);
+
 
 app.set('view engine', 'ejs');
 
