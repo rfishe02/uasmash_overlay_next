@@ -1,2 +1,1193 @@
+<html>
 
-<p> The editor </p>
+<head>
+  <title>UA Smash Overlay Editor</title>
+
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+
+  <link href="https://unpkg.com/primevue@^3/resources/themes/saga-blue/theme.css" rel="stylesheet">
+  <link href="https://unpkg.com/primevue/resources/primevue.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/primeicons/primeicons.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="/stylesheets/style.css">
+
+  <style>
+    .p-dropdown {
+      height: 40px;
+    }
+
+    .p-dropdown-panel {
+      overflow: hidden;
+      max-height: 250px;
+    }
+
+    .p-inputtext {
+      height: 40px;
+    }
+
+    .p-button {
+      height: 40px;
+    }
+
+    .p-datatable-header {
+      background-color: rgb(245, 245, 245) !important;
+    }
+
+    th {
+      background-color: rgb(245, 245, 245) !important;
+    }
+
+    tr {
+      height: 40px !important;
+    }
+
+    td {
+      font-size: 10pt;
+    }
+
+    .p-column-filter{
+      height: 30px;
+    }
+
+    .p-autocomplete {
+      width: 100%;
+    }
+
+    .p-autocomplete-input {
+      width: 100%;
+    }
+
+    /* we will explain what these classes do next! */
+    .v-enter-active,
+    .v-leave-active {
+      transition: opacity 0.5s ease;
+    }
+
+    .v-enter-from,
+    .v-leave-to {
+      opacity: 0;
+    }
+
+    .preview-boxes {
+      color:white;
+      font-weight: bold;
+      font-size: 12pt;
+      margin-top: 15px;
+      height: 35px;
+    }
+
+    .previewbox {
+      height: 125px;
+      margin-left: 25px;
+      margin-right: 25px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border-radius: 7px 7px 7px 7px;
+    }
+
+    #preview-p1name {
+      background-color:rgba(202, 34, 0, 0.5);
+      border-radius: 25px 0px 0px 25px;
+      text-align:left;
+      padding-top: 7px;
+      padding-bottom: 7px;
+    }
+
+    #preview-p1score {
+      background-color: rgba(0,0,0,0.5);
+      border-radius: 0px 25px 25px 0px;
+      text-align:center;
+      padding-top: 7px;
+      padding-bottom: 7px;
+    }
+
+    #preview-p2score {
+      background-color: rgba(0,0,0,0.5);
+      border-radius: 25px 0px 0px 25px;
+      text-align:center;
+      padding-top: 7px;
+      padding-bottom: 7px;
+    }
+
+    #preview-p2name {
+      background-color: rgba(35, 125, 210,0.5);
+      border-radius: 0px 25px 25px 0px;
+      text-align:right;
+      padding-top: 7px;
+      padding-bottom: 7px;
+    }
+
+    #preview-header {
+      height: 35px;
+      background-color: rgba(0,0,0,0.5);
+      border-radius: 25px 25px 25px 25px;
+      color:white;
+      font-weight: bold;
+      font-size: 12pt;
+      text-align:center;
+      padding-top: 7px;
+      padding-bottom: 7px;
+    }
+
+    body {
+      background-color: rgb(245, 245, 245);
+      padding: 0px;
+    }
+
+    body form {
+      background-color: white;
+      padding-top: 15px;
+      padding-bottom: 15px;
+      padding-left: 20px;
+      padding-right: 20px;
+      border-radius: 7px 7px 7px 7px;
+    }
+
+    li {
+      height: 25px;
+      padding-bottom: 0px;
+      margin-bottom: 0px;
+      margin-right: 5px;
+    }
+
+    li,p {
+      color:white;
+    }
+  </style>
+
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js" integrity="sha384-ODmDIVzN+pFdexxHEHFBQH3/9/vQ9uori45z4JjnFsRydbmQbmL5t1tQ0culUzyK" crossorigin="anonymous"></script>
+
+  <script src="https://unpkg.com/vue@3"></script>
+
+  <script src="https://unpkg.com/primevue/core/core.min.js"></script>
+  <script src="https://unpkg.com/primevue@^3/datatable/datatable.min.js"></script>
+  <script src="https://unpkg.com/primevue@^3/column/column.min.js"></script>
+  <script src="https://unpkg.com/primevue@^3/autocomplete/autocomplete.min.js"></script>
+  <script src="https://unpkg.com/primevue@^3/selectbutton/selectbutton.min.js"></script>
+  <script src="https://unpkg.com/primevue@^3/checkbox/checkbox.min.js"></script>
+
+  <script src="/socket.io/socket.io.js"></script>
+
+</head>
+
+<body>
+  <div id="app">
+
+    <nav class="navbar navbar-expand-md navbar-dark bg-secondary">
+      <div class="container-fluid" style="">
+        <a class="navbar-brand pt-1 pl-2" href="#" disabled>
+          <img src="/fsmsmashlogo.png" alt="" height="30" />
+        </a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNavAltMarkup"
+          aria-controls="navbarNavAltMarkup"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+
+          <!--
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <RouterLink to="/striker"><p>Striker</p></RouterLink>
+            </li>
+          </ul>-->
+
+          <div class="navbar-nav me-auto m-2"></div>
+
+          <!-- TODO: Log out feature. -->
+          <!--
+          <button class="btn btn-light" type="button" @click="logOut">Log Out</button>-->
+
+        </div>
+      </div>
+    </nav>
+
+    <div
+      class="container-fluid"
+      style="padding-bottom: 25px; padding-top: 15px"
+    >
+      <div class="row">
+        <div class="col-12 col-lg-6 pb-3" style="height: 515px">
+          <p-datatable
+            show-gridlines
+            :value="setList"
+            v-model:selection="setselection"
+            selection-mode="single"
+            class="p-datatable-sm border"
+            data-key="id"
+            :scrollable="true"
+            scroll-height="flex"
+            @row-select="onSetSelection()"
+            filter-display="row"
+            v-model:filters="filters2"
+            :loading="loading2"
+            responsive-layout="scroll"
+            :global-filter-fields="['phaseName', 'fullRoundText', 'versusBanner']"
+          >
+            <template #header>
+              <div class="p-inputgroup">
+                <p-dropdown
+                  v-model="tournamentselection"
+                  :options="tournamentList"
+                  option-label="name"
+                  placeholder="Select a Tournament"
+                  @change="importPlayerList()"
+                ></p-dropdown>
+                <p-dropdown
+                  v-model="eventselection"
+                  :options="getEventList(tournamentselection)"
+                  option-label="name"
+                  placeholder="Select an Event"
+                ></p-dropdown>
+                <p-button icon="pi pi-refresh" @click="importSetList()" ></p-button>
+              </div>
+              <!--
+                  <div class="flex justify-content-end">
+                    <span class="p-input-icon-left ">
+                      <i class="pi pi-search" />
+                      <InputText v-model="filters2['global'].value" placeholder="Keyword Search" />
+                    </span>
+                  </div>-->
+            </template>
+            <template #empty> No sets to show. </template>
+            <template #loading> Loading set data. Please wait. </template>
+
+            <p-column header="Bracket" filter-field="phaseName">
+              <template #body="{ data }">
+                {{ data.phaseName }}
+              </template>
+              <template #filter="{ filterModel, filterCallback }">
+                <p-inputtext
+                  type="text"
+                  v-model="filterModel.value"
+                  @input="filterCallback()"
+                  class="p-column-filter"
+                  placeholder="Search Bracket"
+                ></p-inputtext>
+              </template>
+            </p-column>
+
+            <p-column header="Round" filter-field="fullRoundText">
+              <template #body="{ data }">
+                {{ data.fullRoundText }}
+              </template>
+              <template #filter="{ filterModel, filterCallback }">
+                <p-inputtext
+                  type="text"
+                  v-model="filterModel.value"
+                  @input="filterCallback()"
+                  class="p-column-filter"
+                  placeholder="Search Round"
+                ></p-inputtext>
+              </template>
+            </p-column>
+
+            <p-column header="Match" filter-field="versusBanner">
+              <template #body="{ data }">
+                {{ data.versusBanner }}
+              </template>
+              <template #filter="{ filterModel, filterCallback }">
+                <p-inputtext
+                  type="text"
+                  v-model="filterModel.value"
+                  @input="filterCallback()"
+                  class="p-column-filter"
+                  placeholder="Search Match"
+                ></p-inputtext>
+              </template>
+            </p-column>
+          </p-datatable>
+        </div>
+
+        <div class="col-12 col-lg-6">
+          <form class="border" id="overlay-edit" style="margin-bottom: 25px">
+            <div class="row mb-3">
+              <h5>Player Information</h5>
+            </div>
+
+            <div class="row" style="">
+              <div class="col-6 col-md-4 mb-2">
+                <p-autocomplete
+                  v-model="teamone"
+                  :suggestions="filteredPlayers"
+                  @complete="filterPlayers($event)"
+                  option-label="name"
+                  :dropdown="false"
+                  placeholder="Team 1"
+                ></p-autocomplete>
+              </div>
+
+              <div class="col mb-2">
+                <p-selectbutton
+                  v-model="p1score"
+                  :options="scoreOptions"
+                  option-label="name"
+                ></p-selectbutton>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-6 col-md-4 mb-2">
+                <p-autocomplete
+                  v-model="teamtwo"
+                  :suggestions="filteredPlayers"
+                  @complete="filterPlayers($event)"
+                  option-label="name"
+                  :dropdown="false"
+                  placeholder="Team 2"
+                ></p-autocomplete>
+              </div>
+
+              <div class="col">
+                <p-selectbutton
+                  v-model="p2score"
+                  :options="scoreOptions"
+                  option-label="name"
+                ></p-selectbutton>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <h5>Event Banner</h5>
+            </div>
+
+            <div class="row mb-2">
+              <div class="col-6 col-md-4 mb-2">
+                <p-dropdown
+                  class="w-100"
+                  v-model="brackettype"
+                  :options="bracketList"
+                  option-label="name"
+                  placeholder="Bracket Type"
+                ></p-dropdown>
+              </div>
+              <div class="col-6 col-md-4 mb-2">
+                <p-dropdown
+                  class="w-100"
+                  v-model="eventround"
+                  :options="roundList"
+                  option-label="name"
+                  placeholder="Round"
+                ></p-dropdown>
+              </div>
+              <div class="col-6 col-md-4 mb-2">
+                <p-dropdown
+                  class="w-100"
+                  v-model="bestof"
+                  :options="matchList"
+                  option-label="name"
+                  placeholder="Best of"
+                ></p-dropdown>
+              </div>
+
+              <div class="col-12 mb-3">
+                <div class="p-inputgroup">
+                  <span class="p-inputgroup-addon">
+                    <p-checkbox
+                      v-model="typing_header"
+                      :binary="true"
+                    ></p-checkbox>
+                  </span>
+                  <p-inputtext
+                    type="text"
+                    v-model="typed_header"
+                    :disabled="!typing_header"
+                    placeholder="Manual Entry"
+                  ></p-inputtext>
+                </div>
+              </div>
+            </div>
+
+            <div class="row justify-content-between mb-3">
+              <div class="col-6">
+                <p-button
+                  label="Publish"
+                  class="p-button-primary"
+                  style="width: 125px; margin-right: 10px"
+                  @click="submitOverlayForm"
+                ></p-button>
+                <p-button
+                  label="Clear"
+                  class="p-button-text"
+                  style="width: 125px"
+                  @click="clearOverlayForm"
+                ></p-button>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <h5>Module URL</h5>
+            </div>
+
+            <div class = "row">
+              <div class="col-9">
+                <div class="input-group">
+                  <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="gen-module-button0" :value="getModuleURL(overlayModule,overlayRoom)">
+
+                  <!-- TODO: Generate key button -->
+
+                </div>
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+
+      <div class="row justify-content-center previewbox">
+        <div id="preview-p1name" class="col-4 col-lg-3 preview-boxes">
+          {{ getTeamOneName }}
+        </div>
+        <div id="preview-p1score" class="col-1 preview-boxes">
+          {{ getPlayer1Score }}
+        </div>
+        <div class="col-1"></div>
+        <div id="preview-p2score" class="col-1 preview-boxes">
+          {{ getPlayer2Score }}
+        </div>
+        <div id="preview-p2name" class="col-4 col-lg-3 preview-boxes">
+          {{ getTeamOneName }}
+        </div>
+
+        <transition>
+          <div
+            v-if="getEventHeader.length > 2"
+            id="preview-header"
+            class="col-11 col-lg-9"
+          >
+            {{ getEventHeader }}
+          </div>
+        </transition>
+      </div>
+
+    </div>
+
+  </div>
+</body>
+
+<script>
+  const { createApp} = Vue
+  const { FilterMatchMode, FilterOperator } = primevue.api;
+
+  createApp({
+    data() {
+      return {
+        host: window.location.hostname,
+        port: ":3000",
+        typing_header: false,
+        tournamentList: [],
+        setList: [],
+        playerList: [],
+        filteredPlayers: [],
+        tournamentselection: [],
+        eventselection: [],
+        setselection: [],
+        teamone: {name: '', value: ''},
+        teamtwo: {name:'', value: ''},
+        p1score: {name: '', value: ''},
+        p2score: {name: '', value: ''},
+        brackettype: {name: '', value: ''},
+        eventround: {name: '', value: ''},
+        bestof: {name: '', value: ''},
+        typed_header: '',
+        loading2: false,
+        filters2: {
+          global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+          phaseName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+          fullRoundText: { value: null, matchMode: FilterMatchMode.CONTAINS },
+          versusBanner: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        },
+        overlayRoom: "",
+        overlayModule: null,
+        socket: null,
+        scoreOptions: [
+          { name: "-", value: "" },
+          { name: "0", value: "0" },
+          { name: "1", value: "1" },
+          { name: "2", value: "2" },
+          { name: "3", value: "3" },
+          { name: "4", value: "4" },
+        ],
+        bracketList: [
+          { name: "-", value: "" },
+          { name: "Pools", value: "Pools" },
+          { name: "Bracket", value: "Bracket" },
+          { name: "Top 32", value: "Top 32" },
+          { name: "Top 8", value: "Top 8" },
+        ],
+        roundList: [
+          { name: "Round 1", value: "Round 1" },
+          { name: "Round 2", value: "Round 2" },
+          { name: "Round 3", value: "Round 3" },
+          { name: "Round 4", value: "Round 4" },
+          { name: "Round 5", value: "Round 5" },
+          { name: "Winners Round 1", value: "Winners Round 1" },
+          { name: "Winners Round 2", value: "Winners Round 2" },
+          { name: "Winners Round 3", value: "Winners Round 3" },
+          { name: "Winners Round 4", value: "Winners Round 4" },
+          { name: "Winners Round 5", value: "Winners Round 5" },
+          { name: "Winners Quarter-Final", value: "Winners Quarter-Final" },
+          { name: "Winners Semi-Final", value: "Winners Semi-Final" },
+          { name: "Winners Final", value: "Winners Final" },
+          { name: "Losers Round 1", value: "Losers Round 1" },
+          { name: "Losers Round 2", value: "Losers Round 2" },
+          { name: "Losers Round 3", value: "Losers Round 3" },
+          { name: "Losers Round 4", value: "Losers Round 4" },
+          { name: "Losers Round 5", value: "Losers Round 5" },
+          { name: "Losers Quarter-Final", value: "Losers Quarter-Final" },
+          { name: "Losers Semi-Final", value: "Losers Semi-Final" },
+          { name: "Losers Final", value: "Losers Final" },
+          { name: "Grand Final", value: "Grand Final" },
+          { name: "Grand Final Reset", value: "Grand Final Reset" },
+        ],
+        matchList: [
+          { name: "Best of 3", value: "Best of 3" },
+          { name: "Best of 5", value: "Best of 5" },
+        ],
+      }
+    },
+    mounted() {
+      this.setInitialState()
+      //importKeyOrGenerate()
+    },
+    methods: {
+      async setInitialState() {
+        this.tournamentList = await this.queryTournamentsSmashGG()
+      },
+      getEventList(input) {
+        if (input == null) {
+          return []
+        } else if (input.events != null) {
+          return input.events
+        } else {
+          return []
+        }
+      },
+      onSetSelection() {
+        const choice = this.setselection
+        if (choice != null) {
+          this.teamone = { name: choice.teamOne.name, value: choice.teamOne.name }
+          this.teamtwo = { name: choice.teamTwo.name, value: choice.teamTwo.name }
+
+          this.p1score = { name: "0", value: "0" }
+          this.p2score = { name: "0", value: "0" }
+
+          this.brackettype = { name: choice.phaseName, value: choice.phaseName }
+          this.eventround = { name: choice.fullRoundText, value: choice.fullRoundText }
+          this.bestof = { name: "Best of 3", value: "Best of 3" }
+        }
+      },
+      async importSetList() {
+        if (this.eventselection != null) {
+          this.clearOverlayForm()
+          this.setList = await this.querySetsSmashGG(this.eventselection.id)
+        }
+      },
+      async importPlayerList() {
+        if (this.tournamentselection != null) {
+          if (this.tournamentselection.id != null) {
+            this.playerList = await this.queryPlayersSmashGG(this.tournamentselection.id)
+          }
+        }
+      },
+      filterPlayers(event) {
+        const items = this.playerList
+
+        if (items != null) {
+          const query = event.query
+          const _filteredItems = []
+
+          for (let i = 0; i < items.length; i++) {
+            const item = items[i]
+            if (item.name.toLowerCase().indexOf(query.toLowerCase()) === 0) {
+              _filteredItems.push({ name: item.name, value: item.name })
+            }
+          }
+
+          this.filteredPlayers = _filteredItems
+        }
+      },
+      async importKeyOrGenerate() {
+
+        var room = await importRoomKey(<%= user.id %>,"overlay")
+        if(room.length == 0) {
+          room = await generateRoomKey(<%= user.id %>,"overlay")
+        }
+
+        this.overlayRoom = room
+        this.overlayModule = new Module("module/overlay")
+
+        //TODO: Socket io
+        //socket.auth = { room }
+        //socket.connect()
+
+      },
+      async importRoomKey(user_id,module_name) {
+        var key = ""
+        try {
+          const data = { "user_id": user_id, "module_name": module_name }
+          const path = 'http://' + this.host + this.port + '/keys/get_key'
+
+          const response = await fetch(path, {
+            method: "post",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data)
+          })
+
+          if(response.ok) {
+            const results = await response.json()
+            if(results.length > 0) {
+              key = results[0].key_value
+            }
+          }
+
+        } catch(e) {
+          console.log(e)
+        }
+        return key
+      },
+      async generateRoomKey(user_id,module_name) {
+        var key = ""
+        try {
+          const data = { "user_id": user_id, "module_name": module_name }
+          const path = 'http://' + this.host + this.port + '/keys/create_key'
+
+          const response = await fetch(path, {
+            method: "post",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data)
+          })
+
+          if(response.ok) {
+            const results = await response.json()
+            key = results.key_value
+          }
+
+        } catch(e) {
+          console.log(e)
+        }
+        return key
+      },
+      getModuleURL(module, room) {
+        if(module != null && room != null) {
+          return module.getURL() + room
+        } else {
+          return ''
+        }
+      },
+      getFormattedName(data) {
+        if (data == null) {
+          return ""
+        } else if (typeof data == "string") {
+          return data
+        } else {
+          return data.value
+        }
+      },
+      getFormattedScore(score) {
+        if (score == null) {
+          return ""
+        } else {
+          return score.value
+        }
+      },
+      getFormattedEventHeader() {
+        let generatedHeader = ""
+
+        if (
+          this.brackettype != null && this.eventround != null && this.bestof != null && this.typed_header != null
+        ) {
+          const bracket = this.brackettype.value == null ? "" : this.brackettype.value;
+          const event = this.eventround.value == null ? "" : this.eventround.value;
+          const best = this.bestof.value == null ? "" : this.bestof.value;
+
+          if (this.typing_header) {
+            generatedHeader = this.typed_header;
+          } else {
+            if (bracket.length > 0 && event.length > 0) {
+              generatedHeader = bracket + " " + event
+            } else if (bracket.length > 0) {
+              generatedHeader = bracket
+            } else if (event.length > 0) {
+              generatedHeader = event
+            }
+
+            if (generatedHeader.length > 0 && best.length > 0) {
+              generatedHeader = generatedHeader + " - " + best
+            } else if (best.length > 0) {
+              generatedHeader = best
+            }
+          }
+        }
+        return generatedHeader
+      },
+      async submitOverlayForm() {
+        try {
+          if (
+            this.teamone != null && this.teamtwo != null &&
+            this.p1score != null && this.p2score != null
+          ) {
+            const form = {};
+            const teamOne = {};
+            const teamTwo = {};
+
+            teamOne.name = this.getFormattedName(this.teamone)
+            teamOne.score = this.getFormattedScore(this.p1score)
+
+            if (this.setselection != null) {
+              teamOne.members = this.setselection.teamOne.members
+            }
+
+            teamTwo.name = this.getFormattedName(this.teamtwo)
+            teamTwo.score = this.getFormattedScore(this.p2score)
+
+            if (this.setselection != null) {
+              teamTwo.members = this.setselection.teamTwo.members
+            }
+
+            form["teamOne"] = teamOne
+            form["teamTwo"] = teamTwo
+
+            form["eventheader"] = this.getFormattedEventHeader()
+
+            socket.emit("overlay-update", {
+              content: form,
+              to: this.overlayRoom,
+            })
+
+          } else {
+            // TODO: throw error?
+          }
+        } catch (e) {
+          console.log(e)
+        }
+      },
+      clearOverlayForm() {
+        this.teamone = { name: "", value: "" }
+        this.teamtwo = { name: "", value: "" }
+        this.p1score = { name: "", value: "" }
+        this.p2score = { name: "", value: "" }
+
+        this.brackettype = { name: "", value: "" }
+        this.eventround = { name: "", value: "" }
+        this.bestof = { name: "", value: "" }
+        this.typed_header = ""
+      },
+      async queryTournamentsSmashGG() {
+        const tournamentQueryData = []
+
+        try {
+          const distanceFrom = "35.3815365, -94.3746986"
+          const distance = "10mi"
+          const afterDate = Math.floor(Date.now() / 1000) - 604800//000
+          const query = `
+          query LocalTournaments($distanceFrom: String, $distance: String, $afterDate: Timestamp) {
+            tournaments(
+              query: {
+            		filter: {
+                  afterDate:$afterDate
+                  location:{
+                    distanceFrom: $distanceFrom
+                    distance: $distance
+                  }
+              	}
+            }) {
+              nodes {
+                id
+                slug
+                name
+                venueAddress
+                city
+                addrState
+                postalCode
+                startAt
+                numAttendees
+                events {
+                  id
+                  name
+                }
+              }
+            }
+          }`
+
+          const response = await fetch(
+            "https://api.start.gg/gql/alpha", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              Authorization: "Bearer <%= apiKey %>",
+
+
+            },
+            body: JSON.stringify({
+              query,
+              variables: {
+                distanceFrom: distanceFrom,
+                distance: distance,
+                afterDate: afterDate,
+              },
+            }),
+          })
+
+          if(response.ok) {
+            const data = await response.json()
+
+            if (data.data != null) {
+              if (data.data.tournaments != null) {
+                if (data.data.tournaments.nodes != null) {
+                  data.data.tournaments.nodes.forEach((tournament) => {
+                    const item = {}
+                    item.id = tournament.id
+                    item.name = tournament.name
+                    item.slug = tournament.slug
+                    item.address = tournament.venueAddress
+
+                    item.events = []
+                    if (tournament.events != null) {
+                      tournament.events.forEach((event) => {
+                        const e = {}
+                        e.id = event.id
+                        e.name = event.name
+                        item.events.push(e)
+                      });
+                    }
+                    tournamentQueryData.push(item)
+                  });
+                }
+              }
+            }
+          }
+
+        } catch(e) {
+            console.log(e)
+        }
+        return tournamentQueryData
+      },
+      async queryPlayersSmashGG(queryID) {
+        const playerQueryData = []
+
+        try {
+          const query = `
+          query TournamentParticipants($tourneyID: ID) {
+            tournament(id: $tourneyID){
+              id
+              name
+              numAttendees
+              participants (query: {
+                perPage: 100
+              }) {
+                nodes {
+                  id
+                  gamerTag
+                  user {
+                    id
+                    genderPronoun
+                    authorizations {
+                      id
+                      externalUsername
+                      type
+                    }
+                  }
+                }
+              }
+            }
+          }`
+
+          const response = await fetch("https://api.start.gg/gql/alpha", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              Authorization: "Bearer <%= apiKey %>",
+            },
+            body: JSON.stringify({
+              query,
+              variables: { tourneyID: queryID },
+            }),
+          })
+
+          if(response.ok) {
+            const data = await response.json()
+
+            if (data.data != null) {
+              if (data.data.tournament != null) {
+                if (data.data.tournament.participants != null) {
+
+                  const nodes = data.data.tournament.participants.nodes;
+                  if (nodes != null) {
+
+                    nodes.forEach((player) => {
+
+                      const item = {}
+                      item.name = player.gamerTag
+                        .slice(
+                          player.gamerTag.indexOf("| ") + 1,
+                          player.gamerTag.length
+                        )
+                        .trim()
+
+                      if (player.user != null) {
+                        item.id = player.user.id
+                        item.socials = []
+
+                        if (player.user.authorizations != null) {
+                          player.user.authorizations.forEach((social) => {
+                            const account = {}
+                            account.username = social.externalUsername
+                            account.type = social.type
+                            item.socials.push(account)
+                          });
+                        }
+                        item.genderPronoun = player.user.genderPronoun
+                      }
+
+                      playerQueryData.push(item)
+                    });
+
+                  }
+
+                }
+              }
+            }
+          }
+
+        } catch(e) {
+            console.log(e)
+        }
+
+        return playerQueryData
+      },
+      async querySetsSmashGG(id){
+        const setQueryData = []
+        try {
+          const query = `
+          query MyQuery($eventID: ID) {
+          	event(id: $eventID){
+          		id
+          		name
+            	sets (sortType:MAGIC,
+                perPage: 24,
+              	filters: {
+                  hideEmpty:true
+                }
+              ) {
+          	    nodes {
+                  id
+          	    	startedAt
+          	    	completedAt
+          	    	round
+          	    	fullRoundText
+          	    	setGamesType
+          	    	totalGames
+          	    	phaseGroup {
+          	      	phase {
+           		     		name
+           		   		}
+            	  	}
+             	 		slots {
+              			entrant {
+               				name
+                  		participants {
+                        id
+                    		gamerTag
+                    		user {
+                          id
+                          genderPronoun
+                    			authorizations {
+                      			externalUsername
+                        		type
+                      		}
+                      	}
+                  		}
+                		}
+              		}
+            		}
+          		}
+          	}
+          }`
+
+          const response = await fetch("https://api.start.gg/gql/alpha", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              Authorization: "Bearer <%= apiKey %>",
+            },
+            body: JSON.stringify({
+              query,
+              variables: { eventID: id },
+            }),
+          })
+
+          if(response.ok) {
+            const data = await response.json()
+
+            if (data.data != null) {
+              if (data.data.event != null) {
+                if (data.data.event.sets != null) {
+                  if (data.data.event.sets.nodes != null) {
+                    data.data.event.sets.nodes.forEach((node) => {
+                      const s = {}
+                      s.fullRoundText = node.fullRoundText
+                      s.totalGames = node.totalGames
+                      s.id = node.id
+
+                      if (node.phaseGroup != null) {
+                        if (node.phaseGroup.phase != null) {
+                          s.phaseName = node.phaseGroup.phase.name
+                        }
+                      }
+
+                      if (node.slots != null) {
+                        if (node.slots[0] != null) {
+                          if (node.slots[0].entrant != null) {
+                            s.teamOne = {};
+                            s.teamOne.name = node.slots[0].entrant.name
+                              .slice(
+                                node.slots[0].entrant.name.indexOf("| ") + 1,
+                                node.slots[0].entrant.name.length
+                              )
+                              .trim()
+                            s.versusBanner = s.teamOne.name
+
+                            s.teamOne.members = []
+
+                            if (node.slots[0].entrant.participants != null) {
+                              node.slots[0].entrant.participants.forEach(
+                                (party) => {
+                                  const p = {}
+                                  p.id = party.id
+                                  p.name = party.gamerTag
+
+                                  if (party.user != null) {
+                                    p.genderPronoun = party.user.genderPronoun;
+                                    p.socials = [];
+                                    if (party.user.authorizations != null) {
+                                      party.user.authorizations.forEach(
+                                        (auth) => {
+                                          const s = {}
+                                          s.username = auth.externalUsername
+                                          s.type = auth.type
+                                          p.socials.push(s)
+                                        }
+                                      );
+                                    }
+                                  }
+                                  s.teamOne.members.push(p)
+                                }
+                              );
+                            }
+                          }
+                        }
+
+                        if (node.slots[1] != null) {
+                          if (node.slots[1].entrant != null) {
+                            s.teamTwo = {};
+                            s.teamTwo.name = node.slots[1].entrant.name
+                              .slice(
+                                node.slots[1].entrant.name.indexOf("| ") + 1,
+                                node.slots[1].entrant.name.length
+                              )
+                              .trim();
+                            s.versusBanner += " vs " + s.teamTwo.name
+
+                            s.teamTwo.members = []
+
+                            if (node.slots[1].entrant.participants != null) {
+                              node.slots[1].entrant.participants.forEach(
+                                (party) => {
+                                  const p = {}
+                                  p.id = party.id
+                                  p.name = party.gamerTag
+
+                                  if (party.user != null) {
+                                    p.genderPronoun = party.user.genderPronoun;
+                                    p.socials = []
+                                    if (party.user.authorizations != null) {
+                                      party.user.authorizations.forEach(
+                                        (auth) => {
+                                          const s = {}
+                                          s.username = auth.externalUsername
+                                          s.type = auth.type
+                                          p.socials.push(s)
+                                        }
+                                      );
+                                    }
+                                  }
+                                  s.teamTwo.members.push(p)
+                                }
+                              );
+                            }
+                          }
+                        }
+                      }
+                      setQueryData.push(s)
+                    });
+                  }
+                }
+              }
+            }
+          }
+
+        } catch(e) {
+            console.log(e)
+        }
+
+        return setQueryData
+      },
+    },
+    computed: {
+      getTeamOneName() {
+        return this.getFormattedName(this.teamone)
+      },
+      getTeamTwoName() {
+        return this.getFormattedName(this.teamtwo)
+      },
+      getPlayer1Score() {
+        return this.getFormattedScore(this.p1score)
+      },
+      getPlayer2Score() {
+        return this.getFormattedScore(this.p2score)
+      },
+      getEventHeader() {
+        return this.getFormattedEventHeader()
+      }
+    },
+    components: {
+      "p-datatable": primevue.datatable,
+      "p-column": primevue.column,
+      "p-dropdown": primevue.dropdown,
+      "p-button": primevue.button,
+      "p-autocomplete": primevue.autocomplete,
+      "p-selectbutton": primevue.selectbutton,
+      "p-checkbox": primevue.checkbox,
+      "p-inputtext": primevue.inputtext,
+    },
+  }).use(primevue.config.default).mount('#app')
+
+</script>
+
+</html>

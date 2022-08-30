@@ -17,6 +17,14 @@ var editorRouter = require('./routes/editor');
 
 var app = express();
 
+app.use(
+  cors({
+    "origin": ["http://localhost:3000"],
+    "methods": "GET,POST",
+    credentials: true
+  })
+)
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(cookieParser());
@@ -33,7 +41,8 @@ app.use(session({
   cookie: {
     secure: process.env.NODE_ENV !== "development",
     httpOnly: true,
-    maxAge: (86400 * 1000)
+    maxAge: (86400 * 1000),
+    sameSite: 'strict'
   },
 }));
 

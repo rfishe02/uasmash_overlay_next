@@ -1,7 +1,7 @@
 
 require('dotenv').config()
 
-const User = require('../models/user')
+const User = require('../modules/user')
 const db = require('../bin/db')
 
 const passport = require('passport');
