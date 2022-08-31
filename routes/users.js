@@ -14,7 +14,10 @@ router.post(
     res
     .status(200)
     .json({
-      user: {id: req.user.id, name: req.user.name},
+      user: {
+        id: req.user.id,
+        name: req.user.name,
+      },
       message: 'Signup successful'
     });
 
@@ -41,8 +44,10 @@ router.post(
 
               return res
               .status(200)
-              .json({ user: user, message: "Login successful" });
-
+              .json({
+                user: user,
+                message: "Login successful"
+              });
             }
           );
 

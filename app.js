@@ -11,6 +11,7 @@ var session = require('express-session');
 var SQLiteStore = require('connect-sqlite3')(session);
 
 var indexRouter = require('./routes/index');
+
 var usersRouter = require('./routes/users');
 var stagesRouter = require('./routes/stages');
 var keysRouter = require('./routes/keys');
@@ -44,10 +45,11 @@ app.use(session({
   saveUninitialized: false,
   store: new SQLiteStore({ db: 'sessions.db', dir: './var/db' }),
   cookie: {
-    secure: process.env.NODE_ENV !== "development",
+    //secure: process.env.NODE_ENV !== "development",
+    secure: false,
     httpOnly: true,
+    SameSite: 'strict',
     maxAge: (86400 * 1000),
-    sameSite: 'strict'
   },
 }));
 

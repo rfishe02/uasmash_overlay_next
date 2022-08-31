@@ -37,8 +37,8 @@
 <body>
   <div id="app">
 
-    <nav class="navbar sticky-top navbar-expand-sm navbar-dark bg-dark">
-      <div class="container-fluid">
+    <nav class="navbar navbar-expand-sm navbar-dark">
+      <div class="container-fluid" style="margin-top: 75px;">
         <a class="navbar-brand pt-1 pl-2" href="#" disabled>
           <img
             src="/fsmsmashlogo.png"
@@ -176,64 +176,61 @@
     </p-dialog>
 
     <div class="container-md mt-2 mb-2">
-      <div
-        class="row row-cols-2 row-cols-md-4 row-cols-lg-5 rounded"
-        style="overflow-y: auto; overflow-x: hidden"
-      >
+      <div class="row row-cols-2 row-cols-sm-4 row-cols-lg-5 rounded" style="overflow-y: auto; overflow-x: hidden">
+
         <transition-group name="list">
           <template v-for="(item, index) in options" v-bind:key="item">
-            <div
-              class="col p-1"
-              v-if="turns != 0 || item.order != 'COUNTERPICK'"
-            >
-              <div class="card h-100 shadow border-secondary text-center">
-                <div
-                  v-if="item.order == 'STARTER'"
-                  class="card-header border-light p-0"
-                >
-                  <p class="m-1" style="font-size: 8pt">{{ item.order }}</p>
-                </div>
-                <div
-                  v-if="item.order == 'COUNTERPICK'"
-                  class="card-header border-secondary bg-dark text-light p-0"
-                >
-                  <p class="m-1" style="font-size: 8pt">{{ item.order }}</p>
-                </div>
 
-                <img
-                  v-bind:src="getImageURL(item.stage_name) == null ? '' : getImageURL(item.stage_name)"
-                  v-bind:alt="item.stage_name"
-                />
-                <div class="card-body p-1">
-                  <p class="card-title m-1" style="font-size: 10pt">
-                    {{ item.stage_name }}
-                  </p>
-                </div>
+            <div class="col p-1" v-if="turns != 0 || item.order != 'COUNTERPICK'">
+              <div class="card shadow border-secondary text-center">
+
+                <card-header :item="item" :url="getImageURL(item.stage_name)"></card-header>
+                <card-body :item="item"></card-body>
+
                 <div class="card-footer border-light p-2">
                   <div class="row justify-content-center">
                     <div class="col">
-                      <button
-                        class="btn btn-light text-primary"
-                        type="button"
-                        @click="pickStage(index, true)"
-                        style="font-size: 16pt"
-                      >
+                      <button class="btn btn-light text-primary" type="button" @click="pickStage(index, true)" style="font-size: 16pt">
                         <i class="bi bi-check-circle"></i>
                       </button>
                     </div>
                     <div class="col">
-                      <button
-                        class="btn btn-light text-danger"
-                        type="button"
-                        @click="pickStage(index, false)"
-                        style="font-size: 16pt"
-                      >
+                      <button class="btn btn-light text-danger" type="button" @click="pickStage(index, false)" style="font-size: 16pt">
                         <i class="bi bi-x-circle-fill"></i>
                       </button>
                     </div>
                   </div>
                 </div>
+
               </div>
+            </div>
+
+          </template>
+        </transition-group>
+      </div>
+
+      <div class="row row-cols-2 row-cols-sm-4 row-cols-lg-5 rounded" style="overflow-y: auto; overflow-x: hidden">
+        <transition-group name="list">
+          <template v-for="(item, index) in choices" v-bind:key="item">
+            <div class="col p-1">
+
+              <div class="card h-100 shadow border-secondary bg-secondary text-light text-center">
+
+                <card-header :item="item" :url="getImageURL(item.stage_name)"></card-header>
+                <card-body :item="item"></card-body>
+
+                <div class="card-footer border-dark p-2">
+                  <div class="row justify-content-center">
+                    <div class="col">
+                      <button class="btn btn-dark text-light" type="button" @click="undoChoice(index)" style="font-size: 16pt">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
             </div>
           </template>
         </transition-group>
@@ -241,44 +238,20 @@
 
       <template v-for="(record, index) in previous_choices" v-bind:key="record">
         <p style="color: white; margin-top: 15px">Set {{ index + 1 }}</p>
-        <div class="row row-cols-5 rounded">
+        <div class="row row-cols-2 row-cols-sm-4 row-cols-lg-5 rounded">
           <template v-for="item in record" v-bind:key="item">
             <div class="col p-1">
-              <div
-                class="card text-center text-white border-secondary rounded shadow"
-                style="background-color: rgba(0, 0, 0, 1)"
-              >
-                <img
-                  class="rounded"
-                  v-bind:src="
-                    getImageURL(item.stage_name) == null ? '' : getImageURL(item.stage_name)
-                  "
-                  v-bind:alt="item.stage_name"
-                  style="opacity: 0.4"
-                />
-                <div class="card-img-overlay">
-                  <i
-                    v-if="item.choice == 'PICK'"
-                    class="bi bi-check-circle"
-                    style="font-size: 16pt"
-                  ></i>
-                  <i
-                    v-if="item.choice == 'STRIKE'"
-                    class="bi bi-x-circle-fill"
-                    style="font-size: 16pt"
-                  ></i>
-                  <p style="font-size: 10pt">{{ item.stage_name }}</p>
-                </div>
-              </div>
+              <stage-card :item="item" :url="getImageURL(item.stage_name)"> </stage-card>
             </div>
           </template>
         </div>
       </template>
     </div>
 
+    <!--
     <div
       v-if="getNumberOfChoices() > 0"
-      class="row row-cols-5 fixed-bottom"
+      class="row row-cols-2 row-cols-sm-4 row-cols-lg-5 sticky-bottom"
       style="
         background: rgb(255, 255, 255, 0.5);
         padding-top: 15px;
@@ -320,13 +293,15 @@
             </div>
         </div>
       </template>
-
-    </div>
+    </div>-->
 
   </div>
 </body>
 
-<script>
+<script type="module">
+  import CardHeader from '/javascripts/CardHeader.js'
+  import CardBody from '/javascripts/CardBody.js'
+  import StageCard from '/javascripts/StageCard.js'
   const { createApp} = Vue
 
   const socket = io("http://" + window.location.hostname + ":3000", {
@@ -385,7 +360,7 @@
         }
       },
       getImageURL(stage_name) {
-        if (this.stage_image_URLs != null) {
+        if (this.stage_image_URLs != null && stage_name != null) {
           return this.stage_image_URLs[stage_name];
         } else {
           return "";
@@ -440,6 +415,7 @@
         }
       },
       pickStage(index, pick) {
+
         if (this.options != null && this.options.length > 0) {
           const stage = this.options.splice(index, 1)[0];
 
@@ -467,6 +443,7 @@
             }
           }
         }
+
       },
       undoChoice(index) {
         if (this.choices != null && this.options != null) {
@@ -708,7 +685,10 @@
     components: {
       "p-dialog": primevue.dialog,
       "p-button": primevue.button,
-      "p-multiselect": primevue.multiselect
+      "p-multiselect": primevue.multiselect,
+      CardHeader,
+      CardBody,
+      StageCard
     },
   }).use(primevue.config.default).mount('#app')
 

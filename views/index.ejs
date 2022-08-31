@@ -18,22 +18,24 @@
     .list-move,
     .list-enter-active,
     .list-leave-active {
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
     }
 
     .list-enter-from {
       opacity: 0;
-      transform: translateX(300px);
+      transform: translateX(5px);
     }
 
     .list-leave-to {
       opacity: 0;
-      transform: translateX(-300px);
+      transform: translateX(-5px);
     }
 
     .list-leave-active {
       position: absolute;
     }
+
+
   </style>
 
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -51,51 +53,37 @@
     <div class="container">
       <div class="row justify-content-center" style="padding-top: 125px;">
 
-        <transition-group name="list">
+        <div class="col-6">
 
-          <div class="col-6" v-if="!showSignUpForm">
-            <form>
-              <h4>Log In</h4>
-              <br>
+          <div class="card text-center p-0">
+            <div class="card-body">
 
-              <div class="mb-3">
-                <label for="exampleFormControlInput1" class="form-label">Username</label>
-                <input v-model="username" type="text" class="form-control" id="exampleFormControlInput1" placeholder="">
+              <div class="row justify-content-center">
+                <div class="col-10" >
+                  <form>
+                    <div class="mb-3">
+                      <label for="exampleFormControlInput1" class="form-label">Username</label>
+                      <input v-model="username" type="text" class="form-control" id="exampleFormControlInput1" placeholder="">
+                    </div>
+                    <div class="mb-3">
+                      <label for="exampleFormControlInput2" class="form-label">Password</label>
+                      <input v-model="password" type="password" class="form-control" id="exampleFormControlInput2" placeholder="">
+                    </div>
+
+                    <button style="width: 100px;" type="submit" class="btn btn-primary" @click.prevent="submitLogInForm">
+                      Log In
+                    </button>
+                    <button style="width: 100px;" type="submit" class="btn btn-link" @click.prevent="submitSignUpForm">
+                      Sign Up
+                    </button>
+                  </form>
+                </div>
               </div>
 
-              <div class="mb-3">
-                <label for="exampleFormControlInput2" class="form-label">Password</label>
-                <input v-model="password" type="password" class="form-control" id="exampleFormControlInput2" placeholder="">
-              </div>
-
-              <button type="submit" class="btn btn-primary" @click.prevent="submitLogInForm">Log In</button>
-              <button type="button" class="btn btn-link" @click="toggleSignUpForm">Sign Up</button>
-
-            </form>
+            </div>
           </div>
 
-          <div class="col-6" v-if="showSignUpForm">
-            <form>
-              <h4>Sign Up</h4>
-              <br>
-
-              <div class="mb-3">
-                <label for="exampleFormControlInput3" class="form-label">Username</label>
-                <input v-model="username" type="text" class="form-control" id="exampleFormControlInput3" placeholder="">
-              </div>
-
-              <div class="mb-3">
-                <label for="exampleFormControlInput5" class="form-label">Password</label>
-                <input v-model="password" type="password" class="form-control" id="exampleFormControlInput5" placeholder="">
-              </div>
-
-              <button type="submit" class="btn btn-primary" @click.prevent="submitSignUpForm">Sign Up</button>
-              <button type="button" class="btn btn-link" @click="toggleSignUpForm">Log In</button>
-
-            </form>
-          </div>
-
-        </transition-group>
+        </div>
 
       </div>
     </div>
@@ -113,10 +101,14 @@
         port: ":3000",
         username: "",
         password: "",
+        accesstype: 2,
         showSignUpForm: false,
       }
     },
     methods: {
+      changeTab() {
+        console.log(event)
+      },
       toggleSignUpForm() {
         this.showSignUpForm = !this.showSignUpForm
       },
@@ -124,13 +116,12 @@
         if(this.username != null && this.password != null) {
           if(this.username.length > 0  && this.password.length > 0) {
 
-            const data = { "username": this.username, "password": this.password };
+            const data = {"username": this.username,"password": this.password};
             const path = 'http://' + this.host + this.port
 
             console.log(path)
 
             try {
-
               const response = await fetch(path + '/users/login', {
                 method: "post",
                 headers: {
@@ -140,11 +131,8 @@
               });
 
               if(response.status == 200) {
-                // TODO: Error checking
-
                 window.location.href = path + '/editor'
               }
-
             } catch (e) {
               console.log(e)
             }
@@ -158,8 +146,10 @@
         if(this.username != null && this.password != null) {
           if(this.username.length > 0  && this.password.length > 0) {
 
-            const data = { "username": this.username, "password": this.password };
+            const data = {"username": this.username,"password": this.password};
             const path = 'http://' + this.host + this.port
+
+            console.log(path)
 
             try {
               const response = await fetch(path + '/users/signup', {
@@ -171,13 +161,10 @@
               });
 
               if(response.status == 200) {
-                // TODO: Error checking
-
-                window.location.href = path + '/editor'
+                window.location.href = 'http://' + this.host + this.port + '/'
               }
 
             } catch (e) {
-
               console.log(e)
             }
 

@@ -1,7 +1,7 @@
 class User {
-  constructor() {
-    this.id = null
-    this.name = null
+  constructor(id, name) {
+    this.id = id
+    this.name = name
   }
 }
 
