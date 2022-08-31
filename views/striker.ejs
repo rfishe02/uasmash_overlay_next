@@ -182,13 +182,14 @@
           <template v-for="(item, index) in options" v-bind:key="item">
 
             <div class="col p-1" v-if="turns != 0 || item.order != 'COUNTERPICK'">
-              <div class="card shadow border-secondary text-center">
+              <div class="card shadow text-center border-secondary " :class="{ 'bg-secondary text-light' : item.choice == 'STRIKE' }"
+              >
 
                 <card-header :item="item" :url="getImageURL(item.stage_name)"></card-header>
                 <card-body :item="item"></card-body>
 
-                <div class="card-footer border-light p-2">
-                  <div class="row justify-content-center">
+                <div class="card-footer p-2" :class="{ 'border-light': item.choice == '', 'border-dark' : item.choice == 'STRIKE' }">
+                  <div class="row justify-content-center" v-if="item.choice == ''">
                     <div class="col">
                       <button class="btn btn-light text-primary" type="button" @click="pickStage(index, true)" style="font-size: 16pt">
                         <i class="bi bi-check-circle"></i>
@@ -200,6 +201,15 @@
                       </button>
                     </div>
                   </div>
+
+                  <div class="row justify-content-center" v-if="item.choice == 'STRIKE'">
+                    <div class="col">
+                      <button class="btn btn-dark text-light" type="button" @click="undoChoice(item.stage_name)" style="font-size: 16pt">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </div>
+                  </div>
+
                 </div>
 
               </div>
@@ -209,12 +219,13 @@
         </transition-group>
       </div>
 
+      <!--
       <div class="row row-cols-2 row-cols-sm-4 row-cols-lg-5 rounded" style="overflow-y: auto; overflow-x: hidden">
         <transition-group name="list">
           <template v-for="(item, index) in choices" v-bind:key="item">
             <div class="col p-1">
 
-              <div class="card h-100 shadow border-secondary bg-secondary text-light text-center">
+              <div class="card shadow border-secondary bg-secondary text-light text-center">
 
                 <card-header :item="item" :url="getImageURL(item.stage_name)"></card-header>
                 <card-body :item="item"></card-body>
@@ -234,7 +245,7 @@
             </div>
           </template>
         </transition-group>
-      </div>
+      </div>-->
 
       <template v-for="(record, index) in previous_choices" v-bind:key="record">
         <p style="color: white; margin-top: 15px">Set {{ index + 1 }}</p>
@@ -339,7 +350,8 @@
         choices: [],
         previous_choices: [],
         turns: 0,
-        socket: socket
+        socket: socket,
+        davesRule: true,
       }
     },
     mounted() {
@@ -417,39 +429,54 @@
       pickStage(index, pick) {
 
         if (this.options != null && this.options.length > 0) {
-          const stage = this.options.splice(index, 1)[0];
+          const stage = this.options[index];
 
           if (stage != null) {
-            if (this.previous_choices == null) {
-              this.previous_choices = []
-            }
-            if(this.choices == null) {
-              this.choices = []
-            }
+            const s = {}
+            s.stage_name = stage.stage_name;
+            s.order = stage.order;
+            s.choice = stage.choice;
+            s.playerName = stage.playerName;
 
             if (pick) {
-              stage.choice = "PICK";
-              this.choices.push(stage);
+              if(this.davesRule) {
+                this.options.splice(index, 1)[0];;
+              }
+
+              s.choice = "PICK"
+              this.choices.push(s);
 
               const stages = this.choices;
               this.previous_choices.push(stages);
               this.submitStageStrikes(stages);
 
+              for (const option of this.options) {
+                option.choice = ''
+              }
               this.choices = [];
               this.turns++;
+
             } else {
               stage.choice = "STRIKE";
-              this.choices.push(stage);
+              s.choice = "STRIKE";
+              this.choices.push(s);
             }
           }
         }
 
       },
-      undoChoice(index) {
+      undoChoice(stage_name) {
         if (this.choices != null && this.options != null) {
           if (this.choices.length > 0) {
-            const stage = this.choices.splice(index, 1)[0];
-            this.options.push(stage);
+            const indexOfChoice = this.choices.findIndex(x => x.stage_name == stage_name);
+            if(indexOfChoice > -1) {
+              this.choices.splice(indexOfChoice, 1);
+            }
+
+            const itemInOptions = this.options.find(x => x.stage_name == stage_name)
+            if(itemInOptions != undefined) {
+              itemInOptions.choice = ''
+            }
           }
         }
       },
