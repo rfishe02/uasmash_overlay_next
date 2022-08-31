@@ -219,34 +219,6 @@
         </transition-group>
       </div>
 
-      <!--
-      <div class="row row-cols-2 row-cols-sm-4 row-cols-lg-5 rounded" style="overflow-y: auto; overflow-x: hidden">
-        <transition-group name="list">
-          <template v-for="(item, index) in choices" v-bind:key="item">
-            <div class="col p-1">
-
-              <div class="card shadow border-secondary bg-secondary text-light text-center">
-
-                <card-header :item="item" :url="getImageURL(item.stage_name)"></card-header>
-                <card-body :item="item"></card-body>
-
-                <div class="card-footer border-dark p-2">
-                  <div class="row justify-content-center">
-                    <div class="col">
-                      <button class="btn btn-dark text-light" type="button" @click="undoChoice(index)" style="font-size: 16pt">
-                        <i class="bi bi-arrow-counterclockwise"></i>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-            </div>
-          </template>
-        </transition-group>
-      </div>-->
-
       <template v-for="(record, index) in previous_choices" v-bind:key="record">
         <p style="color: white; margin-top: 15px">Set {{ index + 1 }}</p>
         <div class="row row-cols-2 row-cols-sm-4 row-cols-lg-5 rounded">
@@ -258,53 +230,6 @@
         </div>
       </template>
     </div>
-
-    <!--
-    <div
-      v-if="getNumberOfChoices() > 0"
-      class="row row-cols-2 row-cols-sm-4 row-cols-lg-5 sticky-bottom"
-      style="
-        background: rgb(255, 255, 255, 0.5);
-        padding-top: 15px;
-        padding-bottom: 15px;
-        padding-left: 25px;
-        padding-right: 25px;
-        display: block;
-        overflow-x: auto;
-        overflow-y: hidden;
-        white-space: nowrap;
-      "
-    >
-      <template v-for="(item, index) in choices" v-bind:key="item">
-        <div class="col p-1" style="display: inline-block">
-            <div
-              class="card text-center text-white border-secondary rounded shadow"
-              style="background-color: rgba(0, 0, 0, 1)"
-              @click="undoChoice(index)"
-            >
-              <img
-                class="rounded"
-                v-bind:src="getImageURL(item.stage_name) == null ? '' : getImageURL(item.stage_name)"
-                v-bind:alt="item.stage_name"
-                style="opacity: 0.8"
-              />
-              <div class="card-img-overlay">
-                <i
-                  v-if="item.choice == 'PICK'"
-                  class="bi bi-check-circle"
-                  style="font-size: 16pt"
-                ></i>
-                <i
-                  v-if="item.choice == 'STRIKE'"
-                  class="bi bi-x-circle-fill"
-                  style="font-size: 16pt"
-                ></i>
-                <p style="font-size: 10pt">{{ item.stage_name }}</p>
-              </div>
-            </div>
-        </div>
-      </template>
-    </div>-->
 
   </div>
 </body>
