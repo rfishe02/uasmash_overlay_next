@@ -4,7 +4,7 @@
   <title>UA Smash Stage Striker</title>
 
   <!-- Required meta tags -->
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Bootstrap CSS -->
@@ -309,7 +309,7 @@
           const response = await fetch('http://' + this.host + this.port + '/stages', {
             method: "get",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": "application/json; charset=UTF-8",
             },
           });
 
@@ -318,10 +318,11 @@
             const data = {};
 
             for (let i = 0; i < results.length; i++) {
-              data[results[i].stage_name] = "/stages/" +results[i].image_url;
+              data[results[i].stage_name] = "/stages/" + results[i].image_url;
             }
 
             this.stage_image_URLs = data;
+            console.log(data)
           }
         } catch (e) {
           console.log(e)
@@ -332,7 +333,7 @@
           const response = await fetch('http://' + this.host + this.port + '/stages', {
             method: "get",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": "application/json; charset=UTF-8",
             },
           });
 
@@ -344,8 +345,10 @@
               const item = { stage_name: '', order: '', choice: '', playerName: ''};
               item.stage_name = results[i].stage_name;
               data.push(item);
+              console.log(results[i].stage_name)
             }
             this.stageList = data;
+            console.log(data)
           }
         } catch (e) {
           console.log(e)
@@ -582,7 +585,7 @@
           const response = await fetch(path, {
             method: "post",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": "application/json; charset=UTF-8",
             },
             body: JSON.stringify(data)
           })
@@ -608,7 +611,7 @@
           const response = await fetch(path, {
             method: "post",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": "application/json; charset=UTF-8",
             },
             body: JSON.stringify(data)
           })

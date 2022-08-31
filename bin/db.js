@@ -15,6 +15,8 @@ const pool = mariadb.createPool({
   user: process.env.MYSQL_USER,
   password: process.env.MYSQL_PASSWORD,
   database: process.env.MYSQL_DATABASE,
+  charset: "utf8mb4",
+  collation: "utf8mb4_unicode_ci"
 })
 
 // Expose a method to establish connection with MariaDB SkySQL
