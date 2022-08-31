@@ -69,34 +69,7 @@
 
           <template v-for="item in strikeList" v-bind:key="item">
             <div class="col p-1 mb-2" style="max-width: 225px">
-              <div
-                class="card text-center text-white rounded shadow"
-                style="background-color: rgba(0, 0, 0, 0.8); border: 0px"
-              >
-                <img
-                  class="rounded"
-                  v-bind:src="
-                    getImageURL(item.stage_name) == null ? '' : getImageURL(item.stage_name)
-                  "
-                  alt=""
-                  style="opacity: 0.8"
-                />
-                <div class="card-img-overlay">
-                  <i
-                    v-if="item.choice == 'PICK'"
-                    class="bi bi-check-circle"
-                    style="font-size: 24pt"
-                  ></i>
-                  <i
-                    v-if="item.choice == 'STRIKE'"
-                    class="bi bi-x-circle-fill"
-                    style="font-size: 24pt"
-                  ></i>
-                  <p style="font-size: 12pt; font-weight: bold">
-                    {{ item.stage_name }}
-                  </p>
-                </div>
-              </div>
+              <stage-card :item="item" :url="getImageURL(item.stage_name)"> </stage-card>
             </div>
           </template>
         </div>
@@ -106,8 +79,9 @@
   </div>
 </body>
 
-<script>
+<script  type="module">
   const { createApp} = Vue
+  import StageCard from '/javascripts/StageCard.js'
 
   const socket = io("http://" + window.location.hostname + ":3000", {
     reconnectionDelayMax: 10000,
@@ -204,7 +178,7 @@
 
     },
     components: {
-
+      StageCard
     },
   }).mount('#app')
 
