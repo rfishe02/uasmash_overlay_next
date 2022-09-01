@@ -1,8 +1,14 @@
 .p-dropdown {
   height: 40px;
+  width: 100%;
 }
 
 .p-dropdown-item {
+  height: 40px;
+  font-size: 12pt;
+}
+
+.p-autocomplete-item {
   height: 40px;
   font-size: 12pt;
 }

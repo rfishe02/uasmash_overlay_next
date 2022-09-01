@@ -30,6 +30,11 @@
   <script src="https://unpkg.com/primevue/core/core.min.js"></script>
   <script src="https://unpkg.com/primevue@^3/multiselect/multiselect.min.js"></script>
 
+  <script src="https://unpkg.com/primevue@^3/datatable/datatable.min.js"></script>
+  <script src="https://unpkg.com/primevue@^3/column/column.min.js"></script>
+  <script src="https://unpkg.com/primevue@^3/dataview/dataview.min.js"></script>
+  <script src="https://unpkg.com/primevue@^3/dataviewlayoutoptions/dataviewlayoutoptions.min.js"></script>
+
   <script src="/socket.io/socket.io.js"></script>
 
 </head>
@@ -84,40 +89,29 @@
       </div>
     </nav>
 
-    <p-dialog
-      v-model:visible="display"
-      position="top"
-      :breakpoints="{ '960px': '75vw', '640px': '90vw' }"
-      :style="{ width: '75vw' }"
-    >
-      <template #header>
-        <h3>Settings</h3>
-      </template>
-
-      <form>
+    <p-dialog header="Settings" v-model:visible="display" :modal="true" :breakpoints="{ '960px': '75vw', '640px': '90vw' }" :style="{ width: '75vw' }">
+      <form class="mt-3">
         <div class="container-fluid">
 
-          <div class="row">
-            <h5 class="mb-3">Module URL</h5>
+          <div class="row mb-3">
+            <h5>Module URL</h5>
+          </div>
+
+          <div class="row mb-3">
             <div class="col-12">
-              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                  <!-- <RouterLink to="/stage_strikes"><p>Preview</p></RouterLink> -->
-
-                  <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="gen-module-button0" :value="getModuleURL(strikerModule,strikerRoom)">
-                    <!--TODO: Set up regeneration -->
-                    <!--
-                    <button class="btn btn-outline-secondary" type="button" id="gen-module-button0" @click="regenerateRoomKey()">Generate</button>-->
-                  </div>
-
-                </li>
-              </ul>
+              <div class="p-inputgroup">
+                <p-inputtext type="text" :value="getModuleURL"></p-inputtext>
+                <p-button icon="pi pi-refresh" @click="regenerateKey()" ></p-button>
+              </div>
             </div>
           </div>
 
-          <div class="row">
-            <h5 class="mb-3">Choose Stages</h5>
+          <div class="row mb-3">
+            <h5>Choose Stages</h5>
+          </div>
+
+          <div class="row row-cols-5 mb-3">
+
             <div class="col-12 mb-3">
               <p-multiselect
                 v-model="starterselection"
@@ -132,7 +126,6 @@
                 scroll-height="225px"
               ></p-multiselect>
             </div>
-
             <div class="col-12 mb-3">
               <p-multiselect
                 v-model="counterpickselection"
@@ -147,32 +140,23 @@
                 scroll-height="225px"
               ></p-multiselect>
             </div>
+
           </div>
 
-          <div class="row">
+          <div class="row mb-3">
             <div class="col-10">
-              <p-button
-                label="Save"
-                class="p-button-primary"
-                style="width: 125px"
-                @click="saveStrikerConfig()"
-              ></p-button>
-              <p-button
-                label="Clear"
-                class="p-button-text"
-                style="width: 125px"
-                @click="clearConfigStageSelections()"
-              ></p-button>
+              <p-button label="Save" class="p-button-primary" style="width: 125px" @click="saveStrikerConfig()"></p-button>
+              <p-button label="Clear" class="p-button-text" style="width: 125px" @click="clearConfigStageSelections()"></p-button>
             </div>
           </div>
+
         </div>
       </form>
-
       <!--
-	    <template #footer>
-		    <Button label="No" icon="pi pi-times" class="p-button-text"/>
-        <Button label="Yes" icon="pi pi-check" autofocus />
-	    </template>-->
+      <template #footer>
+          <p-button label="No" icon="pi pi-times" @click="closeBasic" class="p-button-text"></p-button>
+          <p-button label="Yes" icon="pi pi-check" @click="closeBasic" autofocus></p-button>
+      </template>-->
     </p-dialog>
 
     <div class="container-md mt-2 mb-2">
@@ -287,6 +271,7 @@
         starterselection: [],
         counterpickselection: [],
         strikerModule: "",
+        strikerRoom: "",
         display: false,
         previous_options: [],
         options: [],
@@ -314,8 +299,8 @@
           this.strikerRoom = room
           this.strikerModule = "module/stage_strikes"
 
-          this.socket.auth = { room }
           this.socket.connect()
+          this.socket.emit("subscribe",room)
         }
       })
     },
@@ -619,21 +604,37 @@
 
         return room;
       },
-      getModuleURL(module, room) {
-        if(module != null && room != null) {
-          return this.host +this.port+ "/" + module + "?id=" + room
-        } else {
-          return ''
+      async regenerateKey() {
+        var room = room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/keys/update_key',<%= user.id %>,"stage strikes")
+
+        if(room.length > 0) {
+          await this.socket.emit("unsubscribe",this.strikerRoom)
+
+          this.strikerRoom = room
+          this.socket.emit("subscribe",this.strikerRoom)
         }
       },
     },
     computed: {
-
+      getModuleURL() {
+        if(this.strikerRoom != null && this.strikerModule != null) {
+          return this.host +this.port+ "/" + this.strikerModule + "?id=" + this.strikerRoom
+        } else {
+          return ''
+        }
+      }
     },
     components: {
       "p-dialog": primevue.dialog,
       "p-button": primevue.button,
       "p-multiselect": primevue.multiselect,
+      "p-inputtext": primevue.inputtext,
+
+      "p-datatable": primevue.datatable,
+      "p-column": primevue.column,
+      "p-dataview": primevue.dataview,
+      "p-dataviewlayoutoptions": primevue.dataviewlayoutoptions,
+
       CardHeader,
       CardBody,
       StageCard

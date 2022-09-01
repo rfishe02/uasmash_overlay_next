@@ -137,8 +137,8 @@
       const room = urlParams.get('id')
 
       if(room != null) {
-        this.socket.auth = { room }
         this.socket.connect()
+        this.socket.emit("subscribe",room)
       }
     },
     methods: {

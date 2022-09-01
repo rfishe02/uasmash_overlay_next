@@ -17,10 +17,6 @@
 
   <link rel="stylesheet" href="/stylesheets/editor.css">
 
-  <style>
-
-  </style>
-
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
@@ -72,8 +68,7 @@
           <div class="navbar-nav me-auto m-2"></div>
 
           <!-- TODO: Log out feature. -->
-          <!--
-          <button class="btn btn-light" type="button" @click="logOut">Log Out</button>-->
+          <!--<button class="btn btn-light" type="button" @click="logOut">Log Out</button>-->
 
         </div>
       </div>
@@ -192,8 +187,8 @@
                   :dropdown="false"
                   placeholder="Team 1"
                 ></p-autocomplete>
-              </div>
 
+              </div>
               <div class="col mb-2">
                 <p-selectbutton
                   v-model="p1score"
@@ -214,7 +209,6 @@
                   placeholder="Team 2"
                 ></p-autocomplete>
               </div>
-
               <div class="col">
                 <p-selectbutton
                   v-model="p2score"
@@ -308,11 +302,12 @@
 
             <div class = "row">
               <div class="col-9">
-                <div class="input-group">
-                  <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="gen-module-button0" :value="getModuleURL(overlayModule,overlayRoom)">
-
-                  <!-- TODO: Generate key button -->
-
+                <div class="p-inputgroup">
+                  <p-inputtext
+                  type="text"
+                  :value="getModuleURL"
+                  > </p-inputtext>
+                  <p-button icon="pi pi-refresh" @click="regenerateKey()" ></p-button>
                 </div>
               </div>
             </div>
@@ -322,31 +317,13 @@
 
       </div>
 
-      <div class="row justify-content-center previewbox">
-        <div id="preview-p1name" class="col-4 col-lg-3 preview-boxes">
-          {{ getTeamOneName }}
-        </div>
-        <div id="preview-p1score" class="col-1 preview-boxes">
-          {{ getPlayer1Score }}
-        </div>
-        <div class="col-1"></div>
-        <div id="preview-p2score" class="col-1 preview-boxes">
-          {{ getPlayer2Score }}
-        </div>
-        <div id="preview-p2name" class="col-4 col-lg-3 preview-boxes">
-          {{ getTeamTwoName }}
-        </div>
-
-        <transition>
-          <div
-            v-if="getEventHeader.length > 2"
-            id="preview-header"
-            class="col-11 col-lg-9"
-          >
-            {{ getEventHeader }}
-          </div>
-        </transition>
-      </div>
+      <preview-header
+      :team-one="getTeamOneName"
+      :team-two="getTeamTwoName"
+      :score-one="getPlayer1Score"
+      :score-two="getPlayer2Score"
+      :event-header="getEventHeader"
+      > </preview-header>
 
     </div>
 
@@ -355,6 +332,7 @@
 
 <script type="module">
   import KeyManager from '/javascripts/KeyManager.js'
+  import PreviewHeader from '/javascripts/PreviewHeader.js'
 
   const { createApp} = Vue
   const { FilterMatchMode, FilterOperator } = primevue.api;
@@ -385,11 +363,9 @@
   })
 
   addEventListener('pageshow', (event) => {
-
     if(event.persisted) {
       socket.connect()
     }
-
   })
 
   const editorApp = createApp({
@@ -477,8 +453,8 @@
           this.overlayRoom = room
           this.overlayModule = "module/overlay"
 
-          socket.auth = { room }
-          socket.connect()
+          this.socket.connect()
+          this.socket.emit("subscribe",room)
         }
       })
 
@@ -594,15 +570,16 @@
           room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/keys/create_key',<%= user.id %>,"overlay")
         }
 
-        console.log("import key or generate")
-
         return room;
       },
-      getModuleURL(module, room) {
-        if(module != null && room != null) {
-          return this.host +this.port+ "/" + module + "?id=" + room
-        } else {
-          return ''
+      async regenerateKey() {
+        var room = room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/keys/update_key',<%= user.id %>,"overlay")
+
+        if(room.length > 0) {
+          await this.socket.emit("unsubscribe",this.overlayRoom)
+
+          this.overlayRoom = room
+          this.socket.emit("subscribe",this.overlayRoom)
         }
       },
       getFormattedName(data) {
@@ -611,7 +588,7 @@
         } else if (typeof data == "string") {
           return data
         } else {
-          return data.value
+          return data.name
         }
       },
       getFormattedScore(score) {
@@ -720,6 +697,14 @@
       },
       getEventHeader() {
         return this.getFormattedEventHeader()
+      },
+      getModuleURL() {
+        if(this.overlayRoom != null && this.overlayModule != null) {
+          return this.host +this.port+ "/" + this.overlayModule + "?id=" + this.overlayRoom
+        } else {
+          return ''
+        }
+        console.log("here")
       }
     },
     components: {
@@ -731,7 +716,8 @@
       "p-selectbutton": primevue.selectbutton,
       "p-checkbox": primevue.checkbox,
       "p-inputtext": primevue.inputtext,
-      "p-togglebutton": primevue.togglebutton
+      "p-togglebutton": primevue.togglebutton,
+      PreviewHeader
     },
   }).use(primevue.config.default).mount('#app')
 

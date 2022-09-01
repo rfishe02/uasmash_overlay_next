@@ -49,6 +49,6 @@ export default {
       console.log(e)
     }
     return key
-  }
+  },
 
 }

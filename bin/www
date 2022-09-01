@@ -36,40 +36,53 @@ const io = new Server(server, {
 
 io.use((socket, next) => {
 
+  /*
   const room = socket.handshake.auth.room;
   if (!room) {
     return next(new Error("invalid room"));
   }
-
   socket.room = room;
+  next();*/
+
+  // TODO: passport authentication
+
   next();
 
 });
 
 io.on("connection", (socket) => {
 
-   console.log(socket.id+" connected");
-   socket.join(socket.room);
+  console.log(socket.id+" connected");
 
-   socket.on("overlay-update", ({ content, to }, callback) => {
-     socket.to(to).emit("overlay-push", {
-       content,
-       from: socket.id,
-     });
+  socket.on("subscribe", (room) => {
+    socket.join(room);
+    console.log(socket.id+' join '+room);
+  });
 
-     callback("200");
+  socket.on("unsubscribe", (room) => {
+    socket.leave(room);
+    console.log(socket.id+' leave '+room);
+  });
+
+  socket.on("overlay-update", ({ content, to }, callback) => {
+   socket.to(to).emit("overlay-push", {
+     content,
+     from: socket.id,
    });
 
-   socket.on("striker-update", ({ content, to }) => {
-    socket.to(to).emit("striker-push", {
-      content,
-      from: socket.id,
-    });
-   });
+   callback("200");
+  });
 
-   socket.on("disconnect", (reason) => {
-     console.log(socket.id+" disconnected: "+reason);
-   });
+  socket.on("striker-update", ({ content, to }) => {
+  socket.to(to).emit("striker-push", {
+    content,
+    from: socket.id,
+  });
+  });
+
+  socket.on("disconnect", (reason) => {
+   console.log(socket.id+" disconnected: "+reason);
+  });
 
 });
 
