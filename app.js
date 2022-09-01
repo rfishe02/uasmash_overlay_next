@@ -41,6 +41,8 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+
 app.use(session({
   secret: process.env.SECRET_KEY,
   name: 'uaoverlay_webapp',
@@ -48,13 +50,14 @@ app.use(session({
   saveUninitialized: false,
   store: new SQLiteStore({ db: 'sessions.db', dir: './var/db' }),
   cookie: {
-    //secure: process.env.NODE_ENV !== "development",
     secure: false,
     httpOnly: true,
     SameSite: 'strict',
     maxAge: (86400 * 1000),
   },
 }));
+
+//secure: process.env.NODE_ENV !== "development",
 
 passport.serializeUser(function(user, cb) {
   process.nextTick(function() {
