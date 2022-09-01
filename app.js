@@ -22,6 +22,8 @@ var overlayRouter = require('./routes/overlay');
 var strikerRouter = require('./routes/striker');
 var stageStrikesRouter = require('./routes/stage_strikes');
 
+var smashGGRouter = require('./routes/smashgg');
+
 var app = express();
 
 app.use(
@@ -81,6 +83,7 @@ app.use('/module',stageStrikesRouter)
 app.use('/users', usersRouter);
 app.use('/keys', keysRouter);
 
+app.use('/smashgg',smashGGRouter)
 
 app.set('view engine', 'ejs');
 

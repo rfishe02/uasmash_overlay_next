@@ -182,14 +182,14 @@
           <template v-for="(item, index) in options" v-bind:key="item">
 
             <div class="col p-1" v-if="turns != 0 || item.order != 'COUNTERPICK'">
-              <div class="card shadow text-center border-secondary " :class="{ 'bg-secondary text-light' : item.choice == 'STRIKE' }"
+              <div class="card shadow text-center border-secondary " :class="{ 'bg-secondary text-light' : item.choice == Choice.Strike }"
               >
 
                 <card-header :item="item" :url="getImageURL(item.stage_name)"></card-header>
                 <card-body :item="item"></card-body>
 
-                <div class="card-footer p-2" :class="{ 'border-light': item.choice == '', 'border-dark' : item.choice == 'STRIKE' }">
-                  <div class="row justify-content-center" v-if="item.choice == ''">
+                <div class="card-footer p-2" :class="{ 'border-light': item.choice == Choice.None, 'border-dark' : item.choice == Choice.Strike }">
+                  <div class="row justify-content-center" v-if="item.choice == Choice.None">
                     <div class="col">
                       <button class="btn btn-light text-primary" type="button" @click="pickStage(index, true)" style="font-size: 16pt">
                         <i class="bi bi-check-circle"></i>
@@ -202,7 +202,7 @@
                     </div>
                   </div>
 
-                  <div class="row justify-content-center" v-if="item.choice == 'STRIKE'">
+                  <div class="row justify-content-center" v-if="item.choice == Choice.Strike">
                     <div class="col">
                       <button class="btn btn-dark text-light" type="button" @click="undoChoice(item.stage_name)" style="font-size: 16pt">
                         <i class="bi bi-arrow-counterclockwise"></i>
@@ -238,6 +238,10 @@
   import CardHeader from '/javascripts/CardHeader.js'
   import CardBody from '/javascripts/CardBody.js'
   import StageCard from '/javascripts/StageCard.js'
+
+  import Stage from '/javascripts/Stage.js'
+  import KeyManager from '/javascripts/KeyManager.js'
+
   const { createApp} = Vue
 
   const socket = io("http://" + window.location.hostname + ":3000", {
@@ -277,6 +281,11 @@
         turns: 0,
         socket: socket,
         davesRule: true,
+        Choice : {
+          Pick: 'PICK',
+          Strike: 'STRIKE',
+          None: ''
+        }
       }
     },
     mounted() {
@@ -322,7 +331,6 @@
             }
 
             this.stage_image_URLs = data;
-            console.log(data)
           }
         } catch (e) {
           console.log(e)
@@ -345,10 +353,8 @@
               const item = { stage_name: '', order: '', choice: '', playerName: ''};
               item.stage_name = results[i].stage_name;
               data.push(item);
-              console.log(results[i].stage_name)
             }
             this.stageList = data;
-            console.log(data)
           }
         } catch (e) {
           console.log(e)
@@ -360,18 +366,15 @@
           const stage = this.options[index];
 
           if (stage != null) {
-            const s = {}
-            s.stage_name = stage.stage_name;
-            s.order = stage.order;
-            s.choice = stage.choice;
-            s.playerName = stage.playerName;
+
+            const s = new Stage(stage.stage_name,stage.order,stage.choice,stage.playerName)
 
             if (pick) {
               if(this.davesRule) {
                 this.options.splice(index, 1)[0];;
               }
 
-              s.choice = "PICK"
+              s.choice = this.Choice.Pick;
               this.choices.push(s);
 
               const stages = this.choices;
@@ -379,14 +382,14 @@
               this.submitStageStrikes(stages);
 
               for (const option of this.options) {
-                option.choice = ''
+                option.choice = this.Choice.None;
               }
               this.choices = [];
               this.turns++;
 
             } else {
-              stage.choice = "STRIKE";
-              s.choice = "STRIKE";
+              stage.choice = this.Choice.Strike;
+              s.choice = this.Choice.Strike;
               this.choices.push(s);
             }
           }
@@ -403,7 +406,7 @@
 
             const itemInOptions = this.options.find(x => x.stage_name == stage_name)
             if(itemInOptions != undefined) {
-              itemInOptions.choice = ''
+              itemInOptions.choice = this.Choice.None;
             }
           }
         }
@@ -415,11 +418,7 @@
             const data = [];
 
             for (let i = 0; i < stages.length; i++) {
-              const strike = {};
-              strike.stage_name = stages[i].stage_name;
-              strike.order = stages[i].order;
-              strike.choice = stages[i].choice;
-              strike.playerName = stages[i].playerName;
+              const strike = new Stage(stages[i].stage_name,stages[i].order,stages[i].choice,stages[i].playerName)
               data.push(strike);
             }
 
@@ -454,34 +453,16 @@
 
         if (starterStages != null && counterPicks != null) {
           for (let i = 0; i < starterStages.length; i++) {
-            const item = {};
-            item.stage_name = starterStages[i].stage_name;
-            item.order = "STARTER";
-            item.choice = '';
-            item.playerName = '';
-
-            const prev_item = {};
-            prev_item.stage_name = starterStages[i].stage_name;
-            prev_item.order = "STARTER";
-            prev_item.choice = '';
-            prev_item.playerName = '';
+            const item = new Stage(starterStages[i].stage_name,"STARTER",this.Choice.None,'')
+            const prev_item = new Stage(starterStages[i].stage_name,"STARTER",this.Choice.None,'')
 
             stageSelections.push(item);
             prevSelections.push(prev_item);
           }
 
           for (let j = 0; j < counterPicks.length; j++) {
-            const item = {};
-            item.stage_name = counterPicks[j].stage_name;
-            item.order = "COUNTERPICK";
-            item.choice = '';
-            item.playerName = '';
-
-            const prev_item = {};
-            prev_item.stage_name = counterPicks[j].stage_name;
-            prev_item.order = "COUNTERPICK";
-            prev_item.choice = '';
-            prev_item.playerName = '';
+            const item = new Stage(counterPicks[j].stage_name,"COUNTERPICK",this.Choice.None,'')
+            const prev_item = new Stage(counterPicks[j].stage_name,"COUNTERPICK",this.Choice.None,'')
 
             stageSelections.push(item);
             prevSelections.push(prev_item);
@@ -506,11 +487,7 @@
             const data = [];
 
             for (let i = 0; i < this.previous_options.length; i++) {
-              const item = {};
-              item.stage_name = this.previous_options[i].stage_name;
-              item.order = this.previous_options[i].order;
-              item.choice = '';
-              item.playerName = '';
+              const item = new Stage(this.previous_options[i].stage_name,this.previous_options[i].order,this.Choice.None,'')
 
               data.push(item);
             }
@@ -534,17 +511,8 @@
 
             if (results != null) {
               for (let i = 0; i < results.length; i++) {
-                const item = {}
-                item.stage_name = results[i].stage_name;
-                item.order = results[i].order;
-                item.choice = '';
-                item.playerName = '';
-
-                const prev_item = {}
-                prev_item.stage_name = results[i].stage_name;
-                prev_item.order = results[i].order;
-                prev_item.choice = '';
-                prev_item.playerName = '';
+                const item = new Stage(results[i].stage_name,results[i].order,this.Choice.None,'')
+                const prev_item = new Stage(results[i].stage_name,results[i].order,this.Choice.None,'')
 
                 data.push(item)
                 prev_data.push(prev_item)
@@ -564,9 +532,9 @@
       },
       async importKeyOrGenerate() {
 
-        var room = await this.importRoomKey(<%= user.id %>,"stage strikes")
+        var room = await KeyManager.importRoomKey('http://'+this.host+this.port+'/keys/get_key',<%= user.id %>,"stage strikes")
         if(room.length == 0) {
-          room = await this.generateRoomKey(<%= user.id %>,"stage strikes")
+          room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/keys/create_key',<%= user.id %>,"stage strikes")
         }
 
         this.strikerRoom = room
@@ -575,56 +543,6 @@
         this.socket.auth = { room }
         this.socket.connect()
 
-      },
-      async importRoomKey(user_id,module_name) {
-        var key = ""
-        try {
-          const data = { "user_id": user_id, "module_name": module_name }
-          const path = 'http://' + this.host + this.port + '/keys/get_key'
-
-          const response = await fetch(path, {
-            method: "post",
-            headers: {
-              "Content-Type": "application/json; charset=UTF-8",
-            },
-            body: JSON.stringify(data)
-          })
-
-          if(response.ok) {
-            const results = await response.json()
-            if(results.length > 0) {
-              key = results[0].key_value
-            }
-          }
-
-        } catch(e) {
-          console.log(e)
-        }
-        return key
-      },
-      async generateRoomKey(user_id,module_name) {
-        var key = ""
-        try {
-          const data = { "user_id": user_id, "module_name": module_name }
-          const path = 'http://' + this.host + this.port + '/keys/create_key'
-
-          const response = await fetch(path, {
-            method: "post",
-            headers: {
-              "Content-Type": "application/json; charset=UTF-8",
-            },
-            body: JSON.stringify(data)
-          })
-
-          if(response.ok) {
-            const results = await response.json()
-            key = results.key_value
-          }
-
-        } catch(e) {
-          console.log(e)
-        }
-        return key
       },
       getModuleURL(module, room) {
         if(module != null && room != null) {
