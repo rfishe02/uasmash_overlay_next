@@ -473,6 +473,8 @@
           this.resetOptionsAndChoices();
 
           localStorage.setItem('options', JSON.stringify(stageSelections));
+
+          // TODO: Save to database
         }
         this.options = stageSelections;
         this.previous_options = prevSelections;

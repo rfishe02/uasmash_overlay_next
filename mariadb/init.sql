@@ -1,10 +1,32 @@
+ALTER DATABASE uasmash CHARACTER SET='utf8mb4' COLLATE='utf8mb4_unicode_ci';
 
 CREATE TABLE uasmash.stages (
 	stage_id INT NOT NULL AUTO_INCREMENT,
   stage_name VARCHAR(50),
   image_url VARCHAR(50),
 	PRIMARY KEY(stage_id)
-);
+)
+CHARACTER SET 'utf8mb4'
+COLLATE 'utf8mb4_unicode_ci';
+
+CREATE TABLE uasmash.users (
+  user_id INT NOT NULL AUTO_INCREMENT,
+  user_name VARCHAR(50) NOT NULL UNIQUE,
+  user_password VARCHAR(500) NOT NULL,
+  PRIMARY KEY (user_id)
+)
+CHARACTER SET 'utf8mb4'
+COLLATE 'utf8mb4_unicode_ci';
+
+CREATE TABLE uasmash.user_keys (
+	user_id INT NOT NULL,
+	module_name VARCHAR(50) NOT NULL,
+	key_value VARCHAR(500) UNIQUE,
+	PRIMARY KEY(user_id, module_name),
+	FOREIGN KEY (user_id) REFERENCES uasmash.users (user_id)
+)
+CHARACTER SET 'utf8mb4'
+COLLATE 'utf8mb4_unicode_ci';
 
 INSERT INTO uasmash.stages (stage_id,stage_name,image_url) VALUES (DEFAULT,"Battlefield","SSBU-Battlefield.png");
 INSERT INTO uasmash.stages (stage_id,stage_name,image_url) VALUES (DEFAULT,"Castle Siege","SSBU-Castle_Siege.png");
@@ -32,18 +54,3 @@ INSERT INTO uasmash.stages (stage_id,stage_name,image_url) VALUES (DEFAULT,"Wuhu
 INSERT INTO uasmash.stages (stage_id,stage_name,image_url) VALUES (DEFAULT,"Yggdrasil's Altar","SSBU-Yggdrasil'sAltar.jpeg");
 INSERT INTO uasmash.stages (stage_id,stage_name,image_url) VALUES (DEFAULT,"Yoshi's Island","SSBU-Yoshi's_Island_(SSBB).png");
 INSERT INTO uasmash.stages (stage_id,stage_name,image_url) VALUES (DEFAULT,"Yoshi's Story","SSBU-Yoshi's_Story.png");
-
-CREATE TABLE uasmash.users (
-  user_id INT NOT NULL AUTO_INCREMENT,
-  user_name VARCHAR(50) NOT NULL UNIQUE,
-  user_password VARCHAR(500) NOT NULL,
-  PRIMARY KEY (user_id)
-);
-
-CREATE TABLE uasmash.user_keys (
-	user_id INT NOT NULL,
-	module_name VARCHAR(50) NOT NULL,
-	key_value VARCHAR(500) UNIQUE,
-	PRIMARY KEY(user_id, module_name),
-	FOREIGN KEY (user_id) REFERENCES uasmash.users (user_id)
-);
