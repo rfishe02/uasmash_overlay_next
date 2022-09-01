@@ -28,6 +28,15 @@ CREATE TABLE uasmash.user_keys (
 CHARACTER SET 'utf8mb4'
 COLLATE 'utf8mb4_unicode_ci';
 
+CREATE TABLE uasmash.stage_lists (
+	user_id INT NOT NULL,
+	stage_list JSON,
+	PRIMARY KEY(user_id),
+	FOREIGN KEY (user_id) REFERENCES uasmash.users (user_id)
+)
+CHARACTER SET 'utf8mb4'
+COLLATE 'utf8mb4_unicode_ci';
+
 INSERT INTO uasmash.stages (stage_id,stage_name,image_url) VALUES (DEFAULT,"Battlefield","SSBU-Battlefield.png");
 INSERT INTO uasmash.stages (stage_id,stage_name,image_url) VALUES (DEFAULT,"Castle Siege","SSBU-Castle_Siege.png");
 INSERT INTO uasmash.stages (stage_id,stage_name,image_url) VALUES (DEFAULT,"Final Destination","SSBU-Final_Destination.jpeg");

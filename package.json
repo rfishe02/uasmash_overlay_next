@@ -19,9 +19,11 @@
     "morgan": "~1.9.1",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
+    "passport-passwordless": "^0.0.1",
     "path": "^0.12.7",
     "primeicons": "^5.0.0",
     "primevue": "^3.16.2",
-    "socket.io": "^4.5.1"
+    "socket.io": "^4.5.1",
+    "vue": "^3.2.38"
   }
 }

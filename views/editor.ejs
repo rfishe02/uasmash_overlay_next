@@ -34,6 +34,7 @@
   <script src="https://unpkg.com/primevue@^3/autocomplete/autocomplete.min.js"></script>
   <script src="https://unpkg.com/primevue@^3/selectbutton/selectbutton.min.js"></script>
   <script src="https://unpkg.com/primevue@^3/checkbox/checkbox.min.js"></script>
+  <script src="https://unpkg.com/primevue@^3/togglebutton/togglebutton.min.js"></script>
 
   <script src="/socket.io/socket.io.js"></script>
 
@@ -275,7 +276,7 @@
             </div>
 
             <div class="row justify-content-between mb-3">
-              <div class="col-6">
+              <div class="col-8 mb-2">
                 <p-button
                   label="Publish"
                   class="p-button-primary"
@@ -289,7 +290,16 @@
                   @click="clearOverlayForm"
                 ></p-button>
               </div>
-              <!-- TODO: Reconnect button -->
+
+              <!--
+              <div class="col-4">
+                <p-togglebutton v-model="socketConnected"
+                on-label="Connected" off-label="Disconnected"
+                on-icon="bi bi-share-fill" off-icon="bi bi-share"
+                class="w-full sm:w-10rem">
+                </p-togglebutton>
+              </div>-->
+
             </div>
 
             <div class="row mb-3">
@@ -355,9 +365,7 @@
   })
 
   socket.on("connect_error", (err) => {
-    //console.log(err instanceof Error)
-    //console.log(err.message)
-    //console.log(err.data)
+    console.log("connect error")
   })
 
   socket.on("connect", () => {
@@ -365,6 +373,22 @@
   })
 
   socket.on("disconnect", () => {
+    socket.connect();
+  })
+
+  socket.on("close", (reason) => {
+
+  })
+
+  addEventListener('pagehide', (event) => {
+    socket.disconnect()
+  })
+
+  addEventListener('pageshow', (event) => {
+
+    if(event.persisted) {
+      socket.connect()
+    }
 
   })
 
@@ -447,7 +471,17 @@
     },
     mounted() {
       this.setInitialState()
-      this.importKeyOrGenerate()
+
+      this.importKeyOrGenerate().then((room) => {
+        if(room.length > 0) {
+          this.overlayRoom = room
+          this.overlayModule = "module/overlay"
+
+          socket.auth = { room }
+          socket.connect()
+        }
+      })
+
     },
     methods: {
       async setInitialState() {
@@ -555,18 +589,14 @@
         }
       },
       async importKeyOrGenerate() {
-
         var room = await KeyManager.importRoomKey('http://'+this.host+this.port+'/keys/get_key',<%= user.id %>,"overlay")
         if(room.length == 0) {
           room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/keys/create_key',<%= user.id %>,"overlay")
         }
 
-        this.overlayRoom = room
-        this.overlayModule = "module/overlay"
+        console.log("import key or generate")
 
-        this.socket.auth = { room }
-        this.socket.connect()
-
+        return room;
       },
       getModuleURL(module, room) {
         if(module != null && room != null) {
@@ -652,6 +682,8 @@
             this.socket.emit("overlay-update", {
               content: form,
               to: this.overlayRoom,
+            }, (response) => {
+
             })
 
           } else {
@@ -699,6 +731,7 @@
       "p-selectbutton": primevue.selectbutton,
       "p-checkbox": primevue.checkbox,
       "p-inputtext": primevue.inputtext,
+      "p-togglebutton": primevue.togglebutton
     },
   }).use(primevue.config.default).mount('#app')
 

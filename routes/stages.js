@@ -8,12 +8,6 @@ router.get('/', async function(req, res, next) {
 
     const result = await db.pool.query("SELECT * FROM stages")
 
-    console.log(result.length)
-
-    for(var i = 0; i < result.length; i++) {
-      console.log(result[i])
-    }
-
     res.setHeader("Content-Type", "application/json; charset=UTF-8")
     res.json(result)
 

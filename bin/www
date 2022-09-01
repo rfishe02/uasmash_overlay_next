@@ -51,11 +51,13 @@ io.on("connection", (socket) => {
    console.log(socket.id+" connected");
    socket.join(socket.room);
 
-   socket.on("overlay-update", ({ content, to }) => {
+   socket.on("overlay-update", ({ content, to }, callback) => {
      socket.to(to).emit("overlay-push", {
        content,
        from: socket.id,
      });
+
+     callback("200");
    });
 
    socket.on("striker-update", ({ content, to }) => {
@@ -66,7 +68,7 @@ io.on("connection", (socket) => {
    });
 
    socket.on("disconnect", (reason) => {
-     console.log(socket.id+" disconnected");
+     console.log(socket.id+" disconnected: "+reason);
    });
 
 });

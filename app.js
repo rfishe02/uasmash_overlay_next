@@ -22,6 +22,7 @@ var overlayRouter = require('./routes/overlay');
 var strikerRouter = require('./routes/striker');
 var stageStrikesRouter = require('./routes/stage_strikes');
 
+var stageListRouter = require('./routes/stage_lists');
 var smashGGRouter = require('./routes/smashgg');
 
 var app = express();
@@ -67,7 +68,6 @@ passport.deserializeUser(function(user, cb) {
   });
 });
 
-//TODO: Configure sessions & authentication with cookies.
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -83,6 +83,7 @@ app.use('/module',stageStrikesRouter)
 app.use('/users', usersRouter);
 app.use('/keys', keysRouter);
 
+app.use('/stage_lists',stageListRouter)
 app.use('/smashgg',smashGGRouter)
 
 app.set('view engine', 'ejs');

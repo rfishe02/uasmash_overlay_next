@@ -250,9 +250,7 @@
   })
 
   socket.on("connect_error", (err) => {
-    //console.log(err instanceof Error)
-    //console.log(err.message)
-    //console.log(err.data)
+    console.log("connect error")
   })
 
   socket.on("connect", () => {
@@ -260,6 +258,22 @@
   })
 
   socket.on("disconnect", () => {
+    socket.connect();
+  })
+
+  socket.on("close", (reason) => {
+
+  })
+
+  addEventListener('pagehide', (event) => {
+    socket.disconnect()
+  })
+
+  addEventListener('pageshow', (event) => {
+
+    if(event.persisted) {
+      socket.connect()
+    }
 
   })
 
@@ -285,7 +299,7 @@
           Pick: 'PICK',
           Strike: 'STRIKE',
           None: ''
-        }
+        },
       }
     },
     mounted() {
@@ -293,9 +307,17 @@
       this.loadConfigStageList()
 
       this.resetOptionsAndChoices()
-      this.loadStageSelectionsFromStorage()
+      this.loadStageSelectionsFromDB()
 
-      this.importKeyOrGenerate()
+      this.importKeyOrGenerate().then((room) => {
+        if(room.length > 0) {
+          this.strikerRoom = room
+          this.strikerModule = "module/stage_strikes"
+
+          this.socket.auth = { room }
+          this.socket.connect()
+        }
+      })
     },
     methods: {
       getNumberOfChoices() {
@@ -472,7 +494,9 @@
           this.clearConfigStageSelections();
           this.resetOptionsAndChoices();
 
-          localStorage.setItem('options', JSON.stringify(stageSelections));
+          //localStorage.setItem('options', JSON.stringify(stageSelections));
+
+          this.saveStageSelectionsToDB(stageSelections)
 
           // TODO: Save to database
         }
@@ -496,13 +520,71 @@
 
             this.options = data;
           } else {
-            this.loadStageSelectionsFromStorage();
+            this.loadStageSelectionsFromDB();
           }
         } else {
-          this.loadStageSelectionsFromStorage();
+          this.loadStageSelectionsFromDB();
         }
       },
-      loadStageSelectionsFromStorage() {
+      async saveStageSelectionsToDB(stage_list) {
+        try {
+
+          const response = await fetch('http://'+this.host+this.port+'/stage_lists/save_list', {
+            method: "post",
+            headers: {
+              "Content-Type": "application/json; charset=UTF-8",
+            },
+            body: JSON.stringify({"user_id":<%= user.id %>,"stage_list":JSON.stringify(stage_list)})
+          });
+
+          if(response.ok) {
+            const results = await response.json()
+            console.log(results)
+          }
+
+        } catch (e) {
+          console.log(e)
+        }
+      },
+      async loadStageSelectionsFromDB() {
+        try {
+
+          const response = await fetch('http://'+this.host+this.port+'/stage_lists/load_list', {
+            method: "post",
+            headers: {
+              "Content-Type": "application/json; charset=UTF-8",
+            },
+            body: JSON.stringify({"user_id":<%= user.id %>})
+          });
+
+          if(response.ok) {
+            const results = await response.json()
+
+            this.options = []
+            this.previous_options = []
+
+            if(results.length > 0) {
+              if(results[0].stage_list != undefined) {
+
+                for(var i = 0; i < results[0].stage_list.length; i++){
+                  this.previous_options.push(results[0].stage_list[i])
+                  this.options.push(new Stage(
+                    results[0].stage_list[i].stage_name,
+                    results[0].stage_list[i].order,
+                    results[0].stage_list[i].choice,
+                    results[0].stage_list[i].playerName
+                  ))
+                }
+                
+              }
+            }
+          }
+
+        } catch (e) {
+          console.log(e)
+        }
+      },
+      loadStageSelectionFromStorage() {
         try {
           const o = localStorage.getItem('options');
 
@@ -527,24 +609,17 @@
             this.options = []
             this.previous_options = []
           }
-
         } catch (e) {
           console.log(e)
         }
       },
       async importKeyOrGenerate() {
-
         var room = await KeyManager.importRoomKey('http://'+this.host+this.port+'/keys/get_key',<%= user.id %>,"stage strikes")
         if(room.length == 0) {
           room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/keys/create_key',<%= user.id %>,"stage strikes")
         }
 
-        this.strikerRoom = room
-        this.strikerModule = "module/stage_strikes"
-
-        this.socket.auth = { room }
-        this.socket.connect()
-
+        return room;
       },
       getModuleURL(module, room) {
         if(module != null && room != null) {
