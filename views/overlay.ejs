@@ -14,7 +14,9 @@
   <link rel="stylesheet" href="/stylesheets/overlay.css">
 
   <style>
-
+    body {
+      background-color: gray;
+    }
   </style>
 
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -62,49 +64,40 @@
         </div>
       </transition>-->
 
-      <div class="container-fluid" style="height: 1080px;">
+      <div class="container-fluid" style="width: 1920px; height: 1080px;">
 
-        <div class="row justify-content-center" style="padding-top: 25px;">
-
-          <div class="col-3 shadow" style="color: white;">
-            <div class="row">
-              <div class="col-11" style="background-color: rgba(202, 34, 0, 0.9); border-top-left-radius: .5rem;">
-                <div class="player-name">{{p1Name}}</div>
-              </div>
-              <div class="col-1" style="background-color: rgba(202, 34, 0, 0.9); border-top-right-radius: .5rem;">
-                <div class="player-score">{{p1Score}}</div>
-              </div>
-              <div class="col rounded-bottom" style="background-color: rgba(0, 0, 0, 0.9);">
-                <div v-if="typedHeader.length < 1" class="event-title">{{eventRound}}</div>
-                <div v-if="typedHeader.length > 0" class="event-title">{{typedHeader}}</div>
-              </div>
-            </div>
+        <div class="row justify-content-center">
+          <div class="col-2">
+            <img src="/fsmsmashlogo.png" style="margin-left: -5px; height: 75px; top: 3%; position: absolute;"/>
           </div>
-
-          <div class="col-2"><img src="/fsmsmashlogo.png" style="height: 70px; padding-left: 5px;"/></div>
-
-          <div class="col-3 shadow" style="color: white;">
-            <div class="row">
-              <div class="col-1" style="background-color: rgba(35, 125, 210, 0.9); border-top-left-radius: .5rem;">
-                <div class="player-score">{{p2Score}}</div>
-              </div>
-              <div class="col-11" style="background-color: rgba(35, 125, 210, 0.9); border-top-right-radius: .5rem;">
-                <div class="player-name" style="text-align: right;">{{p2Name}}</div>
-              </div>
-              <div class="col rounded-bottom" style="background-color: rgba(0, 0, 0, 0.9);">
-                <div class="event-title" style="text-align: right;">{{bestOf}}</div>
-              </div>
-            </div>
-          </div>
-
         </div>
 
+        <transition>
+          <div v-if="p1Name.length > 0 || p2Name.length > 0" class="row justify-content-center" style="padding-top: 20px;">
+            <team-one :name='p1Name' :score="p1Score" :title="eventRound" :color="'team-one-color'"> </team-one>
+            <div class="col-2"></div>
+            <team-two :name='p2Name' :score="p2Score" :title="bestOf" :color="'team-two-color'"> </team-two>
+          </div>
+        </transition>
+
+        <transition>
+          <div v-if="p1Name.length > 0 || p2Name.length > 0" class="row justify-content-center">
+            <central-header :round="eventRound" :bestof="bestOf"> </central-header>
+          </div>
+        </transition>
+
+        <transition>
+          <div v-if="bracketType.length > 0" class="row" style="position: absolute; left: 13px; top: 10%; min-width: 175px;">
+            <left-header :title="bracketType"> </left-header>
+          </div>
+        </transition>
+
         <div class="row justify-content-between fixed-bottom" style="height: 225px;">
-          <div class="col-2 rounded" style="background-color: rgba(0, 0, 0, 0.9); margin-left: 25px; margin-bottom: 15px;">
+          <div class="col-2 shadow rounded" style="background-color: rgba(0, 0, 0, 0.9); margin-left: 25px; margin-bottom: 15px;">
             <div class="text-light p-2">test</div>
           </div>
 
-          <div class="col-2 rounded" style="background-color: rgba(0, 0, 0, 0.9); margin-right: 25px; margin-bottom: 15px;">
+          <div class="col-2 shadow rounded" style="background-color: rgba(0, 0, 0, 0.9); margin-right: 25px; margin-bottom: 15px;">
             <div class="text-light p-2">test</div>
           </div>
         </div>
@@ -116,7 +109,12 @@
   </div>
 </body>
 
-<script>
+<script type="module">
+  import TeamOne from '/javascripts/TeamOne.js'
+  import TeamTwo from '/javascripts/TeamTwo.js'
+  import LeftHeader from '/javascripts/LeftHeader.js'
+  import CentralHeader from '/javascripts/CentralHeader.js'
+
   const { createApp} = Vue
 
   const socket = io("http://" + window.location.hostname + ":3000", {
@@ -134,18 +132,18 @@
     overlayApp.p2Name = overlayApp.p2 == null ? "" : overlayApp.p2.name
     overlayApp.p2Score = overlayApp.p2 == null ? "" : overlayApp.p2.score
 
-    overlayApp.bracketType = content["bracketType"]
-    overlayApp.eventRound = content["eventRound"]
-    overlayApp.bestOf = content["bestOf"]
-    overlayApp.typedHeader = content["typedHeader"]
+    overlayApp.bracketType = content["bracketType"].toUpperCase()
+    overlayApp.eventRound = content["eventRound"].toUpperCase()
+    overlayApp.bestOf = content["bestOf"].toUpperCase()
+    overlayApp.typedHeader = content["typedHeader"].toUpperCase()
 
     sessionStorage.setItem("teamOne",JSON.stringify(content["teamOne"]))
     sessionStorage.setItem("teamTwo",JSON.stringify(content["teamTwo"]))
 
-    sessionStorage.setItem("bracketType",content["bracketType"])
-    sessionStorage.setItem("eventRound",content["eventRound"])
-    sessionStorage.setItem("bestOf",content["bestOf"])
-    sessionStorage.setItem("typedHeader",content["typedHeader"])
+    sessionStorage.setItem("bracketType",overlayApp.bracketType)
+    sessionStorage.setItem("eventRound",overlayApp.eventRound)
+    sessionStorage.setItem("bestOf",overlayApp.bestOf)
+    sessionStorage.setItem("typedHeader",overlayApp.typedHeader)
 
     console.log(overlayApp.p1)
     console.log(overlayApp.p2)
@@ -214,6 +212,12 @@
     },
     methods : {
 
+    },
+    components: {
+      TeamOne,
+      TeamTwo,
+      LeftHeader,
+      CentralHeader,
     }
   }).mount('#app')
 

@@ -5,7 +5,7 @@ async function queryTournamentsSmashGG(key) {
   try {
     const distanceFrom = "35.3815365, -94.3746986"
     const distance = "10mi"
-    const afterDate = Math.floor(Date.now() / 1000) - 604800//000
+    const afterDate = Math.floor(Date.now() / 1000) - 604800000
     const query = `
     query LocalTournaments($distanceFrom: String, $distance: String, $afterDate: Timestamp) {
       tournaments(

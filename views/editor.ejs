@@ -230,6 +230,7 @@
                   :options="bracketList"
                   option-label="name"
                   placeholder="Bracket Type"
+                  :editable="true"
                 ></p-dropdown>
               </div>
               <div class="col-6 col-md-4 mb-2">
@@ -239,6 +240,7 @@
                   :options="roundList"
                   option-label="name"
                   placeholder="Round"
+                  :editable="true"
                 ></p-dropdown>
               </div>
               <div class="col-6 col-md-4 mb-2">
@@ -248,9 +250,13 @@
                   :options="matchList"
                   option-label="name"
                   placeholder="Best of"
+                  :editable="true"
                 ></p-dropdown>
               </div>
 
+              <!-- TODO: Remove typedHeader. -->
+
+              <!--
               <div class="col-12 mb-3">
                 <div class="p-inputgroup">
                   <span class="p-inputgroup-addon">
@@ -266,7 +272,7 @@
                     placeholder="Manual Entry"
                   ></p-inputtext>
                 </div>
-              </div>
+              </div>-->
             </div>
 
             <div class="row justify-content-between mb-3">
@@ -317,13 +323,14 @@
 
       </div>
 
+      <!--
       <preview-header
       :team-one="getTeamOneName"
       :team-two="getTeamTwoName"
       :score-one="getPlayer1Score"
       :score-two="getPlayer2Score"
       :event-header="getEventHeader"
-      > </preview-header>
+      > </preview-header>-->
 
     </div>
 
@@ -386,9 +393,9 @@
         teamTwo: {name:'', value: ''},
         p1Score: {name: '', value: ''},
         p2Score: {name: '', value: ''},
-        bracketType: {name: '', value: ''},
-        eventRound: {name: '', value: ''},
-        bestOf: {name: '', value: ''},
+        bracketType: "",
+        eventRound: "",
+        bestOf: "",
         typedHeader: '',
         loading2: false,
         filters2: {
@@ -409,14 +416,13 @@
           { name: "4", value: "4" },
         ],
         bracketList: [
-          { name: "-", value: "" },
+          { name: "Friendlies", value: "Friendlies" },
           { name: "Pools", value: "Pools" },
           { name: "Bracket", value: "Bracket" },
           { name: "Top 32", value: "Top 32" },
           { name: "Top 8", value: "Top 8" },
         ],
         roundList: [
-          { name: "-", value: "" },
           { name: "Round 1", value: "Round 1" },
           { name: "Round 2", value: "Round 2" },
           { name: "Round 3", value: "Round 3" },
@@ -442,7 +448,6 @@
           { name: "Grand Final Reset", value: "Grand Final Reset" },
         ],
         matchList: [
-          { name: "-", value: "" },
           { name: "Best of 3", value: "Best of 3" },
           { name: "Best of 5", value: "Best of 5" },
         ],
@@ -589,15 +594,17 @@
         try {
           if (this.teamOne != null && this.p1Score != null && this.teamTwo != null && this.p2Score != null) {
 
+            // TODO: Remove typedHeader.
+
             const form = Editor.getOverlayForm(
               this.setSelection,
               Editor.getFormattedName(this.teamOne),
               Editor.getFormattedScore(this.p1Score),
               Editor.getFormattedName(this.teamTwo),
               Editor.getFormattedScore(this.p2Score),
-              this.bracketType,
-              this.eventRound,
-              this.bestOf,
+              Editor.getFormattedName(this.bracketType),
+              Editor.getFormattedName(this.eventRound),
+              Editor.getFormattedName(this.bestOf),
               this.typedHeader,
             );
 
@@ -621,9 +628,9 @@
         this.p1Score = { name: "", value: "" }
         this.p2Score = { name: "", value: "" }
 
-        this.bracketType = { name: "", value: "" }
-        this.eventRound = { name: "", value: "" }
-        this.bestOf = { name: "", value: "" }
+        this.bracketType = ""
+        this.eventRound = ""
+        this.bestOf = ""
         this.typedHeader = ""
       },
     },

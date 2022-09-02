@@ -19,6 +19,8 @@ export default {
     }
   },
 
+  // TODO: Remove support for typedHeader.
+
   getFormattedEventHeader(bracketType,eventRound,bestOf,typedHeader,typingHeader) {
     let generatedHeader = ""
 
@@ -71,9 +73,9 @@ export default {
     form["teamOne"] = one
     form["teamTwo"] = two
 
-    form["bracketType"] = bracketType == null ? '' : bracketType.value
-    form["eventRound"] = eventRound == null ? '' : eventRound.value
-    form["bestOf"] = bestOf == null ? '' : bestOf.value
+    form["bracketType"] = bracketType
+    form["eventRound"] = eventRound
+    form["bestOf"] = bestOf
     form["typedHeader"] = typedHeader == null ? '' : typedHeader
 
     return form

@@ -23,16 +23,17 @@
 
 
 
+.white-border {
+  border-style: solid;
+  border-color: rgba(255,255,255,1);
+  border-width: 7px 7px 7px 0;
+}
+
 .player-name {
   font-size: 18pt;
   font-weight: bold;
   padding: 5px;
-}
-
-.event-title {
-  font-size: 14pt;
-  font-weight: bold;
-  padding: 5px;
+  color: white;
 }
 
 .player-score {
@@ -40,9 +41,23 @@
   font-weight: bold;
   padding-top: 5px;
   padding-left: 0;
+  color: white;
 }
 
+.event-title {
+  font-size: 16pt;
+  font-weight: bold;
+  padding: 5px;
+  color: white;
+}
 
+.team-one-color {
+  background-color: rgba(202, 34, 0, 0.9);
+}
+
+.team-two-color {
+  background-color: rgba(35, 125, 210, 0.9);
+}
 
 
 
