@@ -57,24 +57,19 @@
 <body>
   <div id="app">
 
-    <div class="container-fluid" style="height: 1080px">
+    <div class="container-fluid">
       <transition>
-        <div
-          v-if="showstrike"
-          id="uastagelist"
-          class="row justify-content-center"
-          style="padding-top: 10px"
-        >
-          <!--style="padding-top: 35px"-->
+        <div v-if="showstrike" id="uastagelist" class="row justify-content-center">
 
           <template v-for="item in strikeList" v-bind:key="item">
             <div class="col p-1 mb-2" style="max-width: 225px">
 
-              <stage-card-large :item="item" :url="getImageURL(item.stage_name)">
+              <stage-card-large :item="item" :url="getImageURL(item.stageName)">
               </stage-card-large>
 
             </div>
           </template>
+
         </div>
       </transition>
     </div>
@@ -96,7 +91,7 @@
 
     for (let i = 0; i < content.length; i++) {
       const strike = {};
-      strike.stage_name = content[i]["stage_name"];
+      strike.stageName = content[i]["stageName"];
       strike.order = content[i]["order"];
       strike.choice = content[i]["choice"];
       strike.playerName = content[i]["playerName"];
@@ -129,7 +124,7 @@
         socket: socket,
         showstrike: false,
         strikeList: [],
-        stage_image_URLs: {},
+        stageImageURLs: {},
 
       }
     },
@@ -145,9 +140,9 @@
       }
     },
     methods: {
-      getImageURL(stage_name) {
-        if (this.stage_image_URLs != null) {
-          return this.stage_image_URLs[stage_name];
+      getImageURL(stageName) {
+        if (this.stageImageURLs != null) {
+          return this.stageImageURLs[stageName];
         } else {
           return "";
         }
@@ -170,7 +165,7 @@
               data[results[i].stage_name] = "/stages/" +results[i].image_url;
             }
 
-            this.stage_image_URLs = data;
+            this.stageImageURLs = data;
           }
         } catch (e) {
           console.log(e)

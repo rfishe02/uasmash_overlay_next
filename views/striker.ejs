@@ -114,10 +114,10 @@
 
             <div class="col-12 mb-3">
               <p-multiselect
-                v-model="starterselection"
+                v-model="starterSelection"
                 :options="stageList"
                 :filter="true"
-                option-label="stage_name"
+                option-label="stageName"
                 placeholder="Starter Stages"
                 style="width: 100%"
                 display="chip"
@@ -128,10 +128,10 @@
             </div>
             <div class="col-12 mb-3">
               <p-multiselect
-                v-model="counterpickselection"
+                v-model="counterpickSelection"
                 :options="stageList"
                 :filter="true"
-                option-label="stage_name"
+                option-label="stageName"
                 placeholder="Counterpick Stages"
                 style="width: 100%"
                 display="chip"
@@ -169,7 +169,7 @@
               <div class="card shadow text-center border-secondary " :class="{ 'bg-secondary text-light' : item.choice == Choice.Strike }"
               >
 
-                <card-header :item="item" :url="getImageURL(item.stage_name)"></card-header>
+                <card-header :item="item" :url="getImageURL(item.stageName)"></card-header>
                 <card-body :item="item"></card-body>
 
                 <div class="card-footer p-2" :class="{ 'border-light': item.choice == Choice.None, 'border-dark' : item.choice == Choice.Strike }">
@@ -188,7 +188,7 @@
 
                   <div class="row justify-content-center" v-if="item.choice == Choice.Strike">
                     <div class="col">
-                      <button class="btn btn-dark text-light" type="button" @click="undoChoice(item.stage_name)" style="font-size: 16pt">
+                      <button class="btn btn-dark text-light" type="button" @click="undoChoice(item.stageName)" style="font-size: 16pt">
                         <i class="bi bi-arrow-counterclockwise"></i>
                       </button>
                     </div>
@@ -203,13 +203,13 @@
         </transition-group>
       </div>
 
-      <template v-for="(record, index) in previous_choices" v-bind:key="record">
+      <template v-for="(record, index) in previousChoices" v-bind:key="record">
         <p style="color: white; margin-top: 15px">Set {{ index + 1 }}</p>
         <div class="row row-cols-2 row-cols-sm-4 row-cols-lg-5 rounded">
           <template v-for="item in record" v-bind:key="item">
             <div class="col p-1">
 
-              <stage-card-small :item="item" :url="getImageURL(item.stage_name)">
+              <stage-card-small :item="item" :url="getImageURL(item.stageName)">
               </stage-card-small>
 
             </div>
@@ -271,17 +271,17 @@
       return {
         host: window.location.hostname,
         port: ":3000",
-        stage_image_URLs: {},
+        stageImageURLs: {},
         stageList: [],
-        starterselection: [],
-        counterpickselection: [],
+        starterSelection: [],
+        counterpickSelection: [],
         strikerModule: "",
         strikerRoom: "",
         display: false,
-        previous_options: [],
+        previousOptions: [],
         options: [],
         choices: [],
-        previous_choices: [],
+        previousChoices: [],
         turns: 0,
         socket: socket,
         davesRule: true,
@@ -317,9 +317,9 @@
           return 0;
         }
       },
-      getImageURL(stage_name) {
-        if (this.stage_image_URLs != null && stage_name != null) {
-          return this.stage_image_URLs[stage_name];
+      getImageURL(stageName) {
+        if (this.stageImageURLs != null && stageName != null) {
+          return this.stageImageURLs[stageName];
         } else {
           // TODO: Return placeholder image.
           return "./pexels-gradienta-6985001.jpeg";
@@ -342,7 +342,7 @@
               data[results[i].stage_name] = "/stages/" + results[i].image_url;
             }
 
-            this.stage_image_URLs = data;
+            this.stageImageURLs = data;
           }
         } catch (e) {
           console.log(e)
@@ -362,7 +362,7 @@
             const data = [];
 
             for (let i = 0; i < results.length; i++) {
-              const item = { stage_name: results[i].stage_name, order: '', choice: '', playerName: ''};
+              const item = { stageName: results[i].stage_name, order: '', choice: '', playerName: ''};
               data.push(item);
             }
             this.stageList = data;
@@ -380,7 +380,7 @@
             Striker.pick(this.options,this.choices,index,this.davesRule)
 
             const stages = this.choices
-            this.previous_choices.push(stages)
+            this.previousChoices.push(stages)
             this.submitStageStrikes(stages)
 
             this.choices = []
@@ -391,10 +391,10 @@
           }
         }
       },
-      undoChoice(stage_name) {
+      undoChoice(stageName) {
         if (this.choices != null && this.options != null) {
           if (this.choices.length > 0) {
-            Striker.undo(this.options,this.choices,stage_name)
+            Striker.undo(this.options,this.choices,stageName)
           }
         }
       },
@@ -417,7 +417,7 @@
       resetOptionsAndChoices() {
         this.options = [];
         this.choices = [];
-        this.previous_choices = [];
+        this.previousChoices = [];
         this.turns = 0;
       },
       resetActivityAndReloadStages() {
@@ -432,9 +432,9 @@
         var prevSelections = [];
 
         try {
-          if (this.starterselection != null && this.counterpickselection != null) {
-            stageSelections = Striker.createOptionsList(this.starterselection,this.counterpickselection)
-            prevSelections = Striker.createOptionsList(this.starterselection,this.counterpickselection)
+          if (this.starterSelection != null && this.counterpickSelection != null) {
+            stageSelections = Striker.createOptionsList(this.starterSelection,this.counterpickSelection)
+            prevSelections = Striker.createOptionsList(this.starterSelection,this.counterpickSelection)
 
             this.toggleStrikerConfig();
             this.clearConfigStageSelections();
@@ -447,19 +447,19 @@
         }
 
         this.options = stageSelections;
-        this.previous_options = prevSelections;
+        this.previousOptions = prevSelections;
       },
       clearConfigStageSelections() {
-        this.starterselection = [];
-        this.counterpickselection = [];
+        this.starterSelection = [];
+        this.counterpickSelection = [];
       },
       loadStageSelections() {
-        if (this.previous_options != null) {
-          if (this.previous_options.length > 0) {
+        if (this.previousOptions != null) {
+          if (this.previousOptions.length > 0) {
             const data = [];
 
-            for (let i = 0; i < this.previous_options.length; i++) {
-              data.push(new Stage(this.previous_options[i].stage_name,this.previous_options[i].order,this.Choice.None,''));
+            for (let i = 0; i < this.previousOptions.length; i++) {
+              data.push(new Stage(this.previousOptions[i].stageName,this.previousOptions[i].order,this.Choice.None,''));
             }
 
             this.options = data;
@@ -505,53 +505,24 @@
             const results = await response.json()
 
             this.options = []
-            this.previous_options = []
+            this.previousOptions = []
 
             if(results.length > 0) {
               if(results[0].stage_list != undefined) {
 
                 for(var i = 0; i < results[0].stage_list.length; i++){
-                  this.previous_options.push(results[0].stage_list[i])
-                  this.options.push(new Stage(
-                    results[0].stage_list[i].stage_name,
-                    results[0].stage_list[i].order,
-                    results[0].stage_list[i].choice,
-                    results[0].stage_list[i].playerName
-                  ))
+                  this.previousOptions.push(results[0].stage_list[i])
+                  this.options.push({
+                    stageName: results[0].stage_list[i].stageName,
+                    order: results[0].stage_list[i].order,
+                    choice: results[0].stage_list[i].choice,
+                    playerName: results[0].stage_list[i].playerName
+                  })
                 }
               }
             }
           }
 
-        } catch (e) {
-          console.log(e)
-        }
-      },
-      loadStageSelectionFromStorage() {
-        try {
-          const o = localStorage.getItem('options');
-
-          if(o != undefined) {
-            const results = JSON.parse(o)
-            const data = []
-            const prev_data = []
-
-            if (results != null) {
-              for (let i = 0; i < results.length; i++) {
-                const item = new Stage(results[i].stage_name,results[i].order,this.Choice.None,'')
-                const prev_item = new Stage(results[i].stage_name,results[i].order,this.Choice.None,'')
-
-                data.push(item)
-                prev_data.push(prev_item)
-              }
-            }
-            this.options = data
-            this.previous_options = prev_data
-
-          } else {
-            this.options = []
-            this.previous_options = []
-          }
         } catch (e) {
           console.log(e)
         }

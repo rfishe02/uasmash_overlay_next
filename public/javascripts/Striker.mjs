@@ -6,7 +6,7 @@ export default {
 
     if(stage != null) {
       choices.push({
-        stage_name: stage.stage_name,
+        stageName: stage.stageName,
         order: stage.order,
         choice: 'PICK',
         playerName: stage.playerName
@@ -28,7 +28,7 @@ export default {
     if(stage != null) {
       stage.choice = 'STRIKE'
       choices.push({
-        stage_name: stage.stage_name,
+        stageName: stage.stageName,
         order: stage.order,
         choice: 'STRIKE',
         playerName: stage.playerName
@@ -36,13 +36,13 @@ export default {
     }
   },
 
-  undo(options, choices, stage_name) {
-    const indexOfChoice = choices.findIndex(x => x.stage_name == stage_name);
+  undo(options, choices, stageName) {
+    const indexOfChoice = choices.findIndex(x => x.stageName == stageName);
     if(indexOfChoice > -1) {
       choices.splice(indexOfChoice, 1);
     }
 
-    const itemInOptions = options.find(x => x.stage_name == stage_name)
+    const itemInOptions = options.find(x => x.stageName == stageName)
     if(itemInOptions != undefined) {
       itemInOptions.choice = '';
     }
@@ -53,7 +53,7 @@ export default {
 
     for (let i = 0; i < stages.length; i++) {
       const stage = {
-        stage_name: stages[i].stage_name,
+        stageName: stages[i].stageName,
         order: stages[i].order,
         choice: stages[i].choice,
         playerName: stages[i].playerName
@@ -69,7 +69,7 @@ export default {
 
     for (let i = 0; i < starterStages.length; i++) {
       const item = {
-        stage_name: starterStages[i].stage_name,
+        stageName: starterStages[i].stageName,
         order: "STARTER",
         choice: '',
         playerName: ''
@@ -79,7 +79,7 @@ export default {
 
     for (let j = 0; j < counterpickStages.length; j++) {
       const item = {
-        stage_name: counterpickStages[j].stage_name,
+        stageName: counterpickStages[j].stageName,
         order: "COUNTERPICK",
         choice: '',
         playerName: ''

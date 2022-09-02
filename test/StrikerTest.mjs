@@ -9,38 +9,38 @@ describe('Striker', function () {
     it('if pick, set stage to pick and add to choices, remove from options if DSR', function () {
 
       var options = [{
-        stage_name: "Battlefield",
+        stageName: "Battlefield",
         order: 'STARTER',
         choice: '',
         playerName: ''
       },{
-        stage_name: "Yoshi's Story",
+        stageName: "Yoshi's Story",
         order: 'COUNTERPICK',
         choice: 'STRIKE',
         playerName: ''
       }]
 
       var options_outcome = [{
-        stage_name: "Yoshi's Story",
+        stageName: "Yoshi's Story",
         order: 'COUNTERPICK',
         choice: '',
         playerName: ''
       }]
 
       var choices = [{
-        stage_name: "Yoshi's Island",
+        stageName: "Yoshi's Island",
         order: 'COUNTERPICK',
         choice: 'STRIKE',
         playerName: ''
       }]
 
       var choices_outcome = [{
-        stage_name: "Yoshi's Island",
+        stageName: "Yoshi's Island",
         order: 'COUNTERPICK',
         choice: 'STRIKE',
         playerName: ''
       },{
-        stage_name: "Battlefield",
+        stageName: "Battlefield",
         order: 'STARTER',
         choice: 'PICK',
         playerName: ''
@@ -57,43 +57,43 @@ describe('Striker', function () {
     it('if strike, set stage to strike and add to choices', function () {
 
       var options = [{
-        stage_name: "Battlefield",
+        stageName: "Battlefield",
         order: 'STARTER',
         choice: '',
         playerName: ''
       },{
-        stage_name: "Yoshi's Story",
+        stageName: "Yoshi's Story",
         order: 'COUNTERPICK',
         choice: 'STRIKE',
         playerName: ''
       }]
 
       var options_outcome = [{
-        stage_name: "Battlefield",
+        stageName: "Battlefield",
         order: 'STARTER',
         choice: 'STRIKE',
         playerName: ''
       },{
-        stage_name: "Yoshi's Story",
+        stageName: "Yoshi's Story",
         order: 'COUNTERPICK',
         choice: 'STRIKE',
         playerName: ''
       }]
 
       var choices = [{
-        stage_name: "Yoshi's Island",
+        stageName: "Yoshi's Island",
         order: 'COUNTERPICK',
         choice: 'STRIKE',
         playerName: ''
       }]
 
       var choices_outcome = [{
-        stage_name: "Yoshi's Island",
+        stageName: "Yoshi's Island",
         order: 'COUNTERPICK',
         choice: 'STRIKE',
         playerName: ''
       },{
-        stage_name: "Battlefield",
+        stageName: "Battlefield",
         order: 'STARTER',
         choice: 'STRIKE',
         playerName: ''
@@ -110,43 +110,43 @@ describe('Striker', function () {
     it('if undo, set stage to none and remove from choices', function () {
 
       var options = [{
-        stage_name: "Battlefield",
+        stageName: "Battlefield",
         order: 'STARTER',
         choice: 'STRIKE',
         playerName: ''
       },{
-        stage_name: "Yoshi's Story",
+        stageName: "Yoshi's Story",
         order: 'COUNTERPICK',
         choice: 'STRIKE',
         playerName: ''
       }]
 
       var options_outcome = [{
-        stage_name: "Battlefield",
+        stageName: "Battlefield",
         order: 'STARTER',
         choice: '',
         playerName: ''
       },{
-        stage_name: "Yoshi's Story",
+        stageName: "Yoshi's Story",
         order: 'COUNTERPICK',
         choice: 'STRIKE',
         playerName: ''
       }]
 
       var choices = [{
-        stage_name: "Yoshi's Island",
+        stageName: "Yoshi's Island",
         order: 'COUNTERPICK',
         choice: 'STRIKE',
         playerName: ''
       },{
-        stage_name: "Battlefield",
+        stageName: "Battlefield",
         order: 'STARTER',
         choice: 'STRIKE',
         playerName: ''
       }]
 
       var choices_outcome = [{
-        stage_name: "Yoshi's Island",
+        stageName: "Yoshi's Island",
         order: 'COUNTERPICK',
         choice: 'STRIKE',
         playerName: ''
@@ -163,12 +163,12 @@ describe('Striker', function () {
     it('return properly formatted object', function () {
 
       var choices = [{
-        stage_name: "Yoshi's Island",
+        stageName: "Yoshi's Island",
         order: 'COUNTERPICK',
         choice: 'STRIKE',
         playerName: ''
       },{
-        stage_name: "Battlefield",
+        stageName: "Battlefield",
         order: 'STARTER',
         choice: 'STRIKE',
         playerName: ''
@@ -184,46 +184,46 @@ describe('Striker', function () {
     it('return array of options give starter and counterpick selections', function () {
 
       var starter = [{
-        stage_name: "Yoshi's Island",
+        stageName: "Yoshi's Island",
         order: '',
         choice: '',
         playerName: ''
       },{
-        stage_name: "Battlefield",
+        stageName: "Battlefield",
         order: '',
         choice: '',
         playerName: ''
       }]
 
       var counterpick = [{
-        stage_name: "Small Battlefield",
+        stageName: "Small Battlefield",
         order: '',
         choice: '',
         playerName: ''
       },{
-        stage_name: "Yoshi's Story",
+        stageName: "Yoshi's Story",
         order: '',
         choice: '',
         playerName: ''
       }]
 
       var outcome = [{
-        stage_name: "Yoshi's Island",
+        stageName: "Yoshi's Island",
         order: 'STARTER',
         choice: '',
         playerName: ''
       },{
-        stage_name: "Battlefield",
+        stageName: "Battlefield",
         order: 'STARTER',
         choice: '',
         playerName: ''
       },{
-        stage_name: "Small Battlefield",
+        stageName: "Small Battlefield",
         order: 'COUNTERPICK',
         choice: '',
         playerName: ''
       },{
-        stage_name: "Yoshi's Story",
+        stageName: "Yoshi's Story",
         order: 'COUNTERPICK',
         choice: '',
         playerName: ''

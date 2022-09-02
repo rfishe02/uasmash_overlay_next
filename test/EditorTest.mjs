@@ -80,25 +80,31 @@ describe('Editor', function () {
     it('should return a properly formatted object', function () {
       var outputA = {
         teamOne: {
-          name: 'teamone',
-          score: 'p1score',
+          name: 'teamOne',
+          score: 'p1Score',
           members: []
         },
         teamTwo: {
-          name: 'teamtwo',
-          score: 'p2score',
+          name: 'teamTwo',
+          score: 'p2Score',
           members: []
         },
-        eventheader: 'eventheader'
+        bracketType: 'bracketType',
+        eventRound: 'eventRound',
+        bestOf: 'bestOf',
+        typedHeader: 'typedHeader'
       }
 
       var outputB = Editor.getOverlayForm(
         null,
-        'teamone',
-        'p1score',
-        'teamtwo',
-        'p2score',
-        'eventheader'
+        'teamOne',
+        'p1Score',
+        'teamTwo',
+        'p2Score',
+        {name:'bracketType',value:'bracketType'},
+        {name:'eventRound',value:'eventRound'},
+        {name:'bestOf',value:'bestOf'},
+        'typedHeader'
       )
 
       assert.deepEqual(outputA,outputB)

@@ -83,7 +83,7 @@
           <p-datatable
             show-gridlines
             :value="setList"
-            v-model:selection="setselection"
+            v-model:selection="setSelection"
             selection-mode="single"
             class="p-datatable-sm border"
             data-key="id"
@@ -99,15 +99,15 @@
             <template #header>
               <div class="p-inputgroup">
                 <p-dropdown
-                  v-model="tournamentselection"
+                  v-model="tournamentSelection"
                   :options="tournamentList"
                   option-label="name"
                   placeholder="Select a Tournament"
                   @change="importPlayerList()"
                 ></p-dropdown>
                 <p-dropdown
-                  v-model="eventselection"
-                  :options="getEventList(tournamentselection)"
+                  v-model="eventSelection"
+                  :options="getEventList(tournamentSelection)"
                   option-label="name"
                   placeholder="Select an Event"
                 ></p-dropdown>
@@ -180,7 +180,7 @@
             <div class="row" style="">
               <div class="col-6 col-md-4 mb-2">
                 <p-autocomplete
-                  v-model="teamone"
+                  v-model="teamOne"
                   :suggestions="filteredPlayers"
                   @complete="filterPlayers($event)"
                   option-label="name"
@@ -191,7 +191,7 @@
               </div>
               <div class="col mb-2">
                 <p-selectbutton
-                  v-model="p1score"
+                  v-model="p1Score"
                   :options="scoreOptions"
                   option-label="name"
                 ></p-selectbutton>
@@ -201,7 +201,7 @@
             <div class="row mb-3">
               <div class="col-6 col-md-4 mb-2">
                 <p-autocomplete
-                  v-model="teamtwo"
+                  v-model="teamTwo"
                   :suggestions="filteredPlayers"
                   @complete="filterPlayers($event)"
                   option-label="name"
@@ -211,7 +211,7 @@
               </div>
               <div class="col">
                 <p-selectbutton
-                  v-model="p2score"
+                  v-model="p2Score"
                   :options="scoreOptions"
                   option-label="name"
                 ></p-selectbutton>
@@ -226,7 +226,7 @@
               <div class="col-6 col-md-4 mb-2">
                 <p-dropdown
                   class="w-100"
-                  v-model="brackettype"
+                  v-model="bracketType"
                   :options="bracketList"
                   option-label="name"
                   placeholder="Bracket Type"
@@ -235,7 +235,7 @@
               <div class="col-6 col-md-4 mb-2">
                 <p-dropdown
                   class="w-100"
-                  v-model="eventround"
+                  v-model="eventRound"
                   :options="roundList"
                   option-label="name"
                   placeholder="Round"
@@ -244,7 +244,7 @@
               <div class="col-6 col-md-4 mb-2">
                 <p-dropdown
                   class="w-100"
-                  v-model="bestof"
+                  v-model="bestOf"
                   :options="matchList"
                   option-label="name"
                   placeholder="Best of"
@@ -255,14 +255,14 @@
                 <div class="p-inputgroup">
                   <span class="p-inputgroup-addon">
                     <p-checkbox
-                      v-model="typing_header"
+                      v-model="typingHeader"
                       :binary="true"
                     ></p-checkbox>
                   </span>
                   <p-inputtext
                     type="text"
-                    v-model="typed_header"
-                    :disabled="!typing_header"
+                    v-model="typedHeader"
+                    :disabled="!typingHeader"
                     placeholder="Manual Entry"
                   ></p-inputtext>
                 </div>
@@ -374,22 +374,22 @@
       return {
         host: window.location.hostname,
         port: ":3000",
-        typing_header: false,
+        typingHeader: false,
         tournamentList: [],
         setList: [],
         playerList: [],
         filteredPlayers: [],
-        tournamentselection: [],
-        eventselection: [],
-        setselection: [],
-        teamone: {name: '', value: ''},
-        teamtwo: {name:'', value: ''},
-        p1score: {name: '', value: ''},
-        p2score: {name: '', value: ''},
-        brackettype: {name: '', value: ''},
-        eventround: {name: '', value: ''},
-        bestof: {name: '', value: ''},
-        typed_header: '',
+        tournamentSelection: [],
+        eventSelection: [],
+        setSelection: [],
+        teamOne: {name: '', value: ''},
+        teamTwo: {name:'', value: ''},
+        p1Score: {name: '', value: ''},
+        p2Score: {name: '', value: ''},
+        bracketType: {name: '', value: ''},
+        eventRound: {name: '', value: ''},
+        bestOf: {name: '', value: ''},
+        typedHeader: '',
         loading2: false,
         filters2: {
           global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -416,6 +416,7 @@
           { name: "Top 8", value: "Top 8" },
         ],
         roundList: [
+          { name: "-", value: "" },
           { name: "Round 1", value: "Round 1" },
           { name: "Round 2", value: "Round 2" },
           { name: "Round 3", value: "Round 3" },
@@ -441,6 +442,7 @@
           { name: "Grand Final Reset", value: "Grand Final Reset" },
         ],
         matchList: [
+          { name: "-", value: "" },
           { name: "Best of 3", value: "Best of 3" },
           { name: "Best of 5", value: "Best of 5" },
         ],
@@ -490,25 +492,25 @@
         }
       },
       onSetSelection() {
-        const choice = this.setselection
+        const choice = this.setSelection
         if (choice != null) {
-          this.teamone = { name: choice.teamOne.name, value: choice.teamOne.name }
-          this.teamtwo = { name: choice.teamTwo.name, value: choice.teamTwo.name }
+          this.teamOne = { name: choice.teamOne.name, value: choice.teamOne.name }
+          this.teamTwo = { name: choice.teamTwo.name, value: choice.teamTwo.name }
 
-          this.p1score = { name: "-", value: "" }
-          this.p2score = { name: "-", value: "" }
+          this.p1Score = { name: "-", value: "" }
+          this.p2Score = { name: "-", value: "" }
 
-          this.brackettype = { name: choice.phaseName, value: choice.phaseName }
-          this.eventround = { name: choice.fullRoundText, value: choice.fullRoundText }
-          this.bestof = { name: "Best of 3", value: "Best of 3" }
+          this.bracketType = { name: choice.phaseName, value: choice.phaseName }
+          this.eventRound = { name: choice.fullRoundText, value: choice.fullRoundText }
+          this.bestOf = { name: "Best of 3", value: "Best of 3" }
         }
       },
       async importSetList() {
-        if (this.eventselection != null) {
+        if (this.eventSelection != null) {
           this.clearOverlayForm()
 
           try {
-            const response = await fetch('http://'+this.host+this.port +'/smashgg/query_sets?' + new URLSearchParams({"event_id":this.eventselection.id}), {
+            const response = await fetch('http://'+this.host+this.port +'/smashgg/query_sets?' + new URLSearchParams({"event_id":this.eventSelection.id}), {
               method: "get",
               headers: {
                 "Content-Type": "application/json; charset=UTF-8",
@@ -526,11 +528,11 @@
         }
       },
       async importPlayerList() {
-        if (this.tournamentselection != null) {
-          if (this.tournamentselection.id != null) {
+        if (this.tournamentSelection != null) {
+          if (this.tournamentSelection.id != null) {
 
             try {
-              const response = await fetch('http://'+this.host+this.port+'/smashgg/query_players?' + new URLSearchParams({"tourney_id":this.tournamentselection.id}), {
+              const response = await fetch('http://'+this.host+this.port+'/smashgg/query_players?' + new URLSearchParams({"tourney_id":this.tournamentSelection.id}), {
                 method: "get",
                 headers: {
                   "Content-Type": "application/json; charset=UTF-8",
@@ -585,15 +587,18 @@
       },
       async submitOverlayForm() {
         try {
-          if (this.teamone != null && this.p1score != null && this.teamtwo != null && this.p2score != null) {
+          if (this.teamOne != null && this.p1Score != null && this.teamTwo != null && this.p2Score != null) {
 
             const form = Editor.getOverlayForm(
-              this.setselection,
-              Editor.getFormattedName(this.teamone),
-              Editor.getFormattedScore(this.p1score),
-              Editor.getFormattedName(this.teamtwo),
-              Editor.getFormattedScore(this.p2score),
-              Editor.getFormattedEventHeader(this.brackettype,this.eventround,this.bestof,this.typed_header,this.typing_header)
+              this.setSelection,
+              Editor.getFormattedName(this.teamOne),
+              Editor.getFormattedScore(this.p1Score),
+              Editor.getFormattedName(this.teamTwo),
+              Editor.getFormattedScore(this.p2Score),
+              this.bracketType,
+              this.eventRound,
+              this.bestOf,
+              this.typedHeader,
             );
 
             this.socket.emit("overlay-update", {
@@ -611,32 +616,32 @@
         }
       },
       clearOverlayForm() {
-        this.teamone = { name: "", value: "" }
-        this.teamtwo = { name: "", value: "" }
-        this.p1score = { name: "", value: "" }
-        this.p2score = { name: "", value: "" }
+        this.teamOne = { name: "", value: "" }
+        this.teamTwo = { name: "", value: "" }
+        this.p1Score = { name: "", value: "" }
+        this.p2Score = { name: "", value: "" }
 
-        this.brackettype = { name: "", value: "" }
-        this.eventround = { name: "", value: "" }
-        this.bestof = { name: "", value: "" }
-        this.typed_header = ""
+        this.bracketType = { name: "", value: "" }
+        this.eventRound = { name: "", value: "" }
+        this.bestOf = { name: "", value: "" }
+        this.typedHeader = ""
       },
     },
     computed: {
       getTeamOneName() {
-        return Editor.getFormattedName(this.teamone)
+        return Editor.getFormattedName(this.teamOne)
       },
       getTeamTwoName() {
-        return Editor.getFormattedName(this.teamtwo)
+        return Editor.getFormattedName(this.teamTwo)
       },
       getPlayer1Score() {
-        return Editor.getFormattedScore(this.p1score)
+        return Editor.getFormattedScore(this.p1Score)
       },
       getPlayer2Score() {
-        return Editor.getFormattedScore(this.p2score)
+        return Editor.getFormattedScore(this.p2Score)
       },
       getEventHeader() {
-        return Editor.getFormattedEventHeader(this.brackettype,this.eventround,this.bestof,this.typed_header,this.typing_header)
+        return Editor.getFormattedEventHeader(this.bracketType,this.eventRound,this.bestOf,this.typedHeader,this.typingHeader)
       },
       getModuleURL() {
         if(this.overlayRoom != null && this.overlayModule != null) {

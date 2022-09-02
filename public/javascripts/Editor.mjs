@@ -19,16 +19,16 @@ export default {
     }
   },
 
-  getFormattedEventHeader(brackettype,eventround,bestof,typed_header,typing_header) {
+  getFormattedEventHeader(bracketType,eventRound,bestOf,typedHeader,typingHeader) {
     let generatedHeader = ""
 
-    if (brackettype != null && eventround != null && bestof != null && typed_header != null) {
-      const bracket = brackettype.value == null ? "" : brackettype.value;
-      const event = eventround.value == null ? "" : eventround.value;
-      const best = bestof.value == null ? "" : bestof.value;
+    if (bracketType != null && eventRound != null && bestOf != null && typedHeader != null) {
+      const bracket = bracketType.value == null ? "" : bracketType.value;
+      const event = eventRound.value == null ? "" : eventRound.value;
+      const best = bestOf.value == null ? "" : bestOf.value;
 
-      if (typing_header) {
-        generatedHeader = typed_header;
+      if (typingHeader) {
+        generatedHeader = typedHeader;
       } else {
         if (bracket.length > 0 && event.length > 0) {
           generatedHeader = bracket + " " + event
@@ -48,29 +48,33 @@ export default {
     return generatedHeader
   },
 
-  getOverlayForm(setselection,teamone,p1score,teamtwo,p2score,eventheader) {
+  getOverlayForm(setSelection,teamOne,p1Score,teamTwo,p2Score,bracketType,eventRound,bestOf,typedHeader) {
     const form = {};
-    const teamOne = { members: [] };
-    const teamTwo = { members: [] };
+    const one = { members: [] };
+    const two = { members: [] };
 
-    teamOne.name = teamone
-    teamOne.score = p1score
+    one.name = teamOne
+    one.score = p1Score
 
-    teamTwo.name = teamtwo
-    teamTwo.score = p2score
+    two.name = teamTwo
+    two.score = p2Score
 
-    if(setselection != null) {
-      if (setselection.teamOne != null) {
-        teamOne.members = setselection.teamOne.members
+    if(setSelection != null) {
+      if (setSelection.teamOne != null) {
+        one.members = setSelection.teamOne.members
       }
-      if (setselection.teamTwo != null) {
-        teamTwo.members = setselection.teamTwo.members
+      if (setSelection.teamTwo != null) {
+        two.members = setSelection.teamTwo.members
       }
     }
 
-    form["teamOne"] = teamOne
-    form["teamTwo"] = teamTwo
-    form["eventheader"] = eventheader
+    form["teamOne"] = one
+    form["teamTwo"] = two
+
+    form["bracketType"] = bracketType == null ? '' : bracketType.value
+    form["eventRound"] = eventRound == null ? '' : eventRound.value
+    form["bestOf"] = bestOf == null ? '' : bestOf.value
+    form["typedHeader"] = typedHeader == null ? '' : typedHeader
 
     return form
   }
