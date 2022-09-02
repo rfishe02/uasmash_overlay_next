@@ -69,7 +69,10 @@
 
           <template v-for="item in strikeList" v-bind:key="item">
             <div class="col p-1 mb-2" style="max-width: 225px">
-              <stage-card :item="item" :url="getImageURL(item.stage_name)"> </stage-card>
+
+              <stage-card-large :item="item" :url="getImageURL(item.stage_name)">
+              </stage-card-large>
+
             </div>
           </template>
         </div>
@@ -81,7 +84,7 @@
 
 <script  type="module">
   const { createApp} = Vue
-  import StageCard from '/javascripts/StageCard.js'
+  import StageCardLarge from '/javascripts/StageCardLarge.js'
 
   const socket = io("http://" + window.location.hostname + ":3000", {
     reconnectionDelayMax: 10000,
@@ -178,7 +181,7 @@
 
     },
     components: {
-      StageCard
+      StageCardLarge
     },
   }).mount('#app')
 

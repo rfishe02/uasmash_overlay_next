@@ -583,26 +583,17 @@
           this.socket.emit("subscribe",this.overlayRoom)
         }
       },
-      getFormattedName(data) {
-        return Editor.getFormattedName(data)
-      },
-      getFormattedScore(score) {
-        return Editor.getFormattedName(score)
-      },
-      getFormattedEventHeader() {
-        return Editor.getFormattedEventHeader(this.brackettype,this.eventround,this.bestof,this.typed_header,this.typing_header)
-      },
       async submitOverlayForm() {
         try {
           if (this.teamone != null && this.p1score != null && this.teamtwo != null && this.p2score != null) {
 
             const form = Editor.getOverlayForm(
               this.setselection,
-              this.getFormattedName(this.teamone),
-              this.getFormattedScore(this.p1score),
-              this.getFormattedName(this.teamtwo),
-              this.getFormattedScore(this.p2score),
-              this.getFormattedEventHeader()
+              Editor.getFormattedName(this.teamone),
+              Editor.getFormattedScore(this.p1score),
+              Editor.getFormattedName(this.teamtwo),
+              Editor.getFormattedScore(this.p2score),
+              Editor.getFormattedEventHeader(this.brackettype,this.eventround,this.bestof,this.typed_header,this.typing_header)
             );
 
             this.socket.emit("overlay-update", {
@@ -613,7 +604,7 @@
             })
 
           } else {
-            // TODO: throw error?
+            // TODO: Throw error?
           }
         } catch (e) {
           console.log(e)
@@ -633,19 +624,19 @@
     },
     computed: {
       getTeamOneName() {
-        return this.getFormattedName(this.teamone)
+        return Editor.getFormattedName(this.teamone)
       },
       getTeamTwoName() {
-        return this.getFormattedName(this.teamtwo)
+        return Editor.getFormattedName(this.teamtwo)
       },
       getPlayer1Score() {
-        return this.getFormattedScore(this.p1score)
+        return Editor.getFormattedScore(this.p1score)
       },
       getPlayer2Score() {
-        return this.getFormattedScore(this.p2score)
+        return Editor.getFormattedScore(this.p2score)
       },
       getEventHeader() {
-        return this.getFormattedEventHeader()
+        return Editor.getFormattedEventHeader(this.brackettype,this.eventround,this.bestof,this.typed_header,this.typing_header)
       },
       getModuleURL() {
         if(this.overlayRoom != null && this.overlayModule != null) {

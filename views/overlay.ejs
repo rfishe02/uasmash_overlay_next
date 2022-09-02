@@ -107,6 +107,10 @@
     overlayApp.p2score = overlayApp.p2 == null ? "" : overlayApp.p2.score
 
     overlayApp.eventheader = content["eventheader"]
+
+    sessionStorage.setItem("teamOne",JSON.stringify(content["teamOne"]))
+    sessionStorage.setItem("teamTwo",JSON.stringify(content["teamTwo"]))
+    sessionStorage.setItem("eventheader",content["eventheader"])
   })
 
   const overlayApp = createApp({
@@ -131,6 +135,25 @@
       if(room != null) {
         this.socket.connect()
         this.socket.emit("subscribe",room)
+
+        const teamOne = sessionStorage.getItem("teamOne")
+        const teamTwo = sessionStorage.getItem("teamTwo")
+        const eventheader = sessionStorage.getItem("eventheader")
+
+        if(teamOne != undefined) {
+          this.p1 = JSON.parse(teamOne)
+          this.p1Name = this.p1.name
+          this.p1score = this.p1.score
+        }
+        if(teamTwo != undefined) {
+          this.p2 = JSON.parse(teamTwo)
+          this.p2Name = this.p2.name
+          this.p2score = this.p2.score
+        }
+        if(eventheader != undefined) {
+          this.eventheader = eventheader
+        }
+
       }
     },
     methods : {

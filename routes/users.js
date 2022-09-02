@@ -59,6 +59,6 @@ router.post(
   }
 );
 
-//TODO: Logout feature
+//TODO: Logout feature.
 
 module.exports = router;

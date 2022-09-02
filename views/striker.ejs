@@ -208,7 +208,10 @@
         <div class="row row-cols-2 row-cols-sm-4 row-cols-lg-5 rounded">
           <template v-for="item in record" v-bind:key="item">
             <div class="col p-1">
-              <stage-card :item="item" :url="getImageURL(item.stage_name)"> </stage-card>
+
+              <stage-card-small :item="item" :url="getImageURL(item.stage_name)">
+              </stage-card-small>
+
             </div>
           </template>
         </div>
@@ -221,7 +224,7 @@
 <script type="module">
   import CardHeader from '/javascripts/CardHeader.js'
   import CardBody from '/javascripts/CardBody.js'
-  import StageCard from '/javascripts/StageCard.js'
+  import StageCardSmall from '/javascripts/StageCardSmall.js'
 
   import Striker from '/javascripts/Striker.mjs'
 
@@ -319,7 +322,7 @@
           return this.stage_image_URLs[stage_name];
         } else {
           // TODO: Return placeholder image.
-          return "";
+          return "./pexels-gradienta-6985001.jpeg";
         }
       },
       async getStageImageURLs() {
@@ -425,18 +428,22 @@
         this.display = !this.display;
       },
       saveStrikerConfig() {
-        const stageSelections = [];
-        const prevSelections = [];
+        var stageSelections = [];
+        var prevSelections = [];
 
-        if (this.starterselection != null && this.counterpickselection != null) {
-          stageSelections = Striker.createOptionsList(this.starterselection,this.counterpickselection)
-          prevSelections = Striker.createOptionsList(this.starterselection,this.counterpickselection)
+        try {
+          if (this.starterselection != null && this.counterpickselection != null) {
+            stageSelections = Striker.createOptionsList(this.starterselection,this.counterpickselection)
+            prevSelections = Striker.createOptionsList(this.starterselection,this.counterpickselection)
 
-          this.toggleStrikerConfig();
-          this.clearConfigStageSelections();
-          this.resetOptionsAndChoices();
+            this.toggleStrikerConfig();
+            this.clearConfigStageSelections();
+            this.resetOptionsAndChoices();
 
-          this.saveStageSelectionsToDB(stageSelections)
+            this.saveStageSelectionsToDB(stageSelections)
+          }
+        } catch(e) {
+          console.log(e)
         }
 
         this.options = stageSelections;
@@ -590,7 +597,7 @@
 
       CardHeader,
       CardBody,
-      StageCard
+      StageCardSmall
     },
   }).use(primevue.config.default).mount('#app')
 
