@@ -223,6 +223,8 @@
   import CardBody from '/javascripts/CardBody.js'
   import StageCard from '/javascripts/StageCard.js'
 
+  import Striker from '/javascripts/Striker.mjs'
+
   import Stage from '/javascripts/Stage.js'
   import KeyManager from '/javascripts/KeyManager.js'
 
@@ -316,12 +318,12 @@
         if (this.stage_image_URLs != null && stage_name != null) {
           return this.stage_image_URLs[stage_name];
         } else {
+          // TODO: Return placeholder image.
           return "";
         }
       },
       async getStageImageURLs() {
         try {
-
           const response = await fetch('http://' + this.host + this.port + '/stages', {
             method: "get",
             headers: {
@@ -357,8 +359,7 @@
             const data = [];
 
             for (let i = 0; i < results.length; i++) {
-              const item = { stage_name: '', order: '', choice: '', playerName: ''};
-              item.stage_name = results[i].stage_name;
+              const item = { stage_name: results[i].stage_name, order: '', choice: '', playerName: ''};
               data.push(item);
             }
             this.stageList = data;
@@ -368,53 +369,29 @@
         }
       },
       pickStage(index, pick) {
-
         if (this.options != null && this.options.length > 0) {
-          const stage = this.options[index];
+          if(this.choices == null) {
+            this.choices = []
+          }
+          if (pick) {
+            Striker.pick(this.options,this.choices,index,this.davesRule)
 
-          if (stage != null) {
+            const stages = this.choices
+            this.previous_choices.push(stages)
+            this.submitStageStrikes(stages)
 
-            const s = new Stage(stage.stage_name,stage.order,stage.choice,stage.playerName)
+            this.choices = []
+            this.turns++
 
-            if (pick) {
-              if(this.davesRule) {
-                this.options.splice(index, 1)[0];;
-              }
-
-              s.choice = this.Choice.Pick;
-              this.choices.push(s);
-
-              const stages = this.choices;
-              this.previous_choices.push(stages);
-              this.submitStageStrikes(stages);
-
-              for (const option of this.options) {
-                option.choice = this.Choice.None;
-              }
-              this.choices = [];
-              this.turns++;
-
-            } else {
-              stage.choice = this.Choice.Strike;
-              s.choice = this.Choice.Strike;
-              this.choices.push(s);
-            }
+          } else {
+            Striker.strike(this.options,this.choices,index)
           }
         }
-
       },
       undoChoice(stage_name) {
         if (this.choices != null && this.options != null) {
           if (this.choices.length > 0) {
-            const indexOfChoice = this.choices.findIndex(x => x.stage_name == stage_name);
-            if(indexOfChoice > -1) {
-              this.choices.splice(indexOfChoice, 1);
-            }
-
-            const itemInOptions = this.options.find(x => x.stage_name == stage_name)
-            if(itemInOptions != undefined) {
-              itemInOptions.choice = this.Choice.None;
-            }
+            Striker.undo(this.options,this.choices,stage_name)
           }
         }
       },
@@ -422,12 +399,7 @@
         try {
 
           if (this.strikerRoom != null) {
-            const data = [];
-
-            for (let i = 0; i < stages.length; i++) {
-              const strike = new Stage(stages[i].stage_name,stages[i].order,stages[i].choice,stages[i].playerName)
-              data.push(strike);
-            }
+            const data = Striker.createStageStrikesForm(stages)
 
             socket.emit("striker-update", {
               content: data,
@@ -453,36 +425,20 @@
         this.display = !this.display;
       },
       saveStrikerConfig() {
-        const starterStages = this.starterselection;
-        const counterPicks = this.counterpickselection;
         const stageSelections = [];
         const prevSelections = [];
 
-        if (starterStages != null && counterPicks != null) {
-          for (let i = 0; i < starterStages.length; i++) {
-            const item = new Stage(starterStages[i].stage_name,"STARTER",this.Choice.None,'')
-            const prev_item = new Stage(starterStages[i].stage_name,"STARTER",this.Choice.None,'')
-
-            stageSelections.push(item);
-            prevSelections.push(prev_item);
-          }
-
-          for (let j = 0; j < counterPicks.length; j++) {
-            const item = new Stage(counterPicks[j].stage_name,"COUNTERPICK",this.Choice.None,'')
-            const prev_item = new Stage(counterPicks[j].stage_name,"COUNTERPICK",this.Choice.None,'')
-
-            stageSelections.push(item);
-            prevSelections.push(prev_item);
-          }
+        if (this.starterselection != null && this.counterpickselection != null) {
+          stageSelections = Striker.createOptionsList(this.starterselection,this.counterpickselection)
+          prevSelections = Striker.createOptionsList(this.starterselection,this.counterpickselection)
 
           this.toggleStrikerConfig();
           this.clearConfigStageSelections();
           this.resetOptionsAndChoices();
 
-          //localStorage.setItem('options', JSON.stringify(stageSelections));
-
           this.saveStageSelectionsToDB(stageSelections)
         }
+
         this.options = stageSelections;
         this.previous_options = prevSelections;
       },
@@ -496,9 +452,7 @@
             const data = [];
 
             for (let i = 0; i < this.previous_options.length; i++) {
-              const item = new Stage(this.previous_options[i].stage_name,this.previous_options[i].order,this.Choice.None,'')
-
-              data.push(item);
+              data.push(new Stage(this.previous_options[i].stage_name,this.previous_options[i].order,this.Choice.None,''));
             }
 
             this.options = data;
@@ -558,7 +512,6 @@
                     results[0].stage_list[i].playerName
                   ))
                 }
-
               }
             }
           }

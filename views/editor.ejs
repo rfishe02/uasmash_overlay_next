@@ -333,6 +333,7 @@
 <script type="module">
   import KeyManager from '/javascripts/KeyManager.js'
   import PreviewHeader from '/javascripts/PreviewHeader.js'
+  import Editor from '/javascripts/Editor.mjs'
 
   const { createApp} = Vue
   const { FilterMatchMode, FilterOperator } = primevue.api;
@@ -494,8 +495,8 @@
           this.teamone = { name: choice.teamOne.name, value: choice.teamOne.name }
           this.teamtwo = { name: choice.teamTwo.name, value: choice.teamTwo.name }
 
-          this.p1score = { name: "0", value: "0" }
-          this.p2score = { name: "0", value: "0" }
+          this.p1score = { name: "-", value: "" }
+          this.p2score = { name: "-", value: "" }
 
           this.brackettype = { name: choice.phaseName, value: choice.phaseName }
           this.eventround = { name: choice.fullRoundText, value: choice.fullRoundText }
@@ -583,78 +584,26 @@
         }
       },
       getFormattedName(data) {
-        if (data == null) {
-          return ""
-        } else if (typeof data == "string") {
-          return data
-        } else {
-          return data.name
-        }
+        return Editor.getFormattedName(data)
       },
       getFormattedScore(score) {
-        if (score == null) {
-          return ""
-        } else {
-          return score.value
-        }
+        return Editor.getFormattedName(score)
       },
       getFormattedEventHeader() {
-        let generatedHeader = ""
-
-        if (
-          this.brackettype != null && this.eventround != null && this.bestof != null && this.typed_header != null
-        ) {
-          const bracket = this.brackettype.value == null ? "" : this.brackettype.value;
-          const event = this.eventround.value == null ? "" : this.eventround.value;
-          const best = this.bestof.value == null ? "" : this.bestof.value;
-
-          if (this.typing_header) {
-            generatedHeader = this.typed_header;
-          } else {
-            if (bracket.length > 0 && event.length > 0) {
-              generatedHeader = bracket + " " + event
-            } else if (bracket.length > 0) {
-              generatedHeader = bracket
-            } else if (event.length > 0) {
-              generatedHeader = event
-            }
-
-            if (generatedHeader.length > 0 && best.length > 0) {
-              generatedHeader = generatedHeader + " - " + best
-            } else if (best.length > 0) {
-              generatedHeader = best
-            }
-          }
-        }
-        return generatedHeader
+        return Editor.getFormattedEventHeader(this.brackettype,this.eventround,this.bestof,this.typed_header,this.typing_header)
       },
       async submitOverlayForm() {
         try {
-          if ( this.teamone != null && this.teamtwo != null &&
-            this.p1score != null && this.p2score != null
-          ) {
-            const form = {};
-            const teamOne = { members: [] };
-            const teamTwo = { members: [] };
+          if (this.teamone != null && this.p1score != null && this.teamtwo != null && this.p2score != null) {
 
-            teamOne.name = this.getFormattedName(this.teamone)
-            teamOne.score = this.getFormattedScore(this.p1score)
-
-            if (this.setselection.teamOne != null) {
-              teamOne.members = this.setselection.teamOne.members
-            }
-
-            teamTwo.name = this.getFormattedName(this.teamtwo)
-            teamTwo.score = this.getFormattedScore(this.p2score)
-
-            if (this.setselection.teamTwo != null) {
-              teamTwo.members = this.setselection.teamTwo.members
-            }
-
-            form["teamOne"] = teamOne
-            form["teamTwo"] = teamTwo
-
-            form["eventheader"] = this.getFormattedEventHeader()
+            const form = Editor.getOverlayForm(
+              this.setselection,
+              this.getFormattedName(this.teamone),
+              this.getFormattedScore(this.p1score),
+              this.getFormattedName(this.teamtwo),
+              this.getFormattedScore(this.p2score),
+              this.getFormattedEventHeader()
+            );
 
             this.socket.emit("overlay-update", {
               content: form,
