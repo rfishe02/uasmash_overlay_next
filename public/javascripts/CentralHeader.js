@@ -7,7 +7,7 @@ export default {
   <div class="col-3"
     style="border-style: solid;
     border-color: rgba(255,255,255,1);
-    border-radius: 0rem 0rem 1rem 1rem;
+    border-radius: 0rem 0rem 0.5rem 0.5rem;
     border-width: 0px 7px 7px 7px;
     background-color: rgba(0, 0, 0, 0.9);">
 
@@ -18,7 +18,7 @@ export default {
   <div class="col-3"
     style="border-style: solid;
     border-color: rgba(255,255,255,1);
-    border-radius: 0rem 0rem 1rem 1rem;
+    border-radius: 0rem 0rem 0.5rem 0.5rem;
     border-width: 0px 7px 7px 7px;
     background-color: rgba(0, 0, 0, 0.9);
     text-align: right;

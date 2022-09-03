@@ -615,6 +615,11 @@
 
             })
 
+            // TODO: Find a way to persist data without introducing bugs. A get recent button? This should happen with user knowledge.
+
+            this.clearOverlayForm()
+            //this.setSelection = {}
+
           } else {
             // TODO: Throw error?
           }
@@ -632,6 +637,8 @@
         this.eventRound = ""
         this.bestOf = ""
         this.typedHeader = ""
+
+        this.setSelection = {}
       },
     },
     computed: {

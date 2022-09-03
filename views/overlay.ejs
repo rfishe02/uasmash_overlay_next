@@ -15,7 +15,7 @@
 
   <style>
     body {
-      background-color: gray;
+
     }
   </style>
 
@@ -74,9 +74,9 @@
 
         <transition>
           <div v-if="p1Name.length > 0 || p2Name.length > 0" class="row justify-content-center" style="padding-top: 20px;">
-            <team-one :name='p1Name' :score="p1Score" :title="eventRound" :color="'team-one-color'"> </team-one>
+            <team-one :name='p1Name' :score="p1Score" :title="eventRound" :color="'team-one-gradient'"> </team-one>
             <div class="col-2"></div>
-            <team-two :name='p2Name' :score="p2Score" :title="bestOf" :color="'team-two-color'"> </team-two>
+            <team-two :name='p2Name' :score="p2Score" :title="bestOf" :color="'team-two-gradient'"> </team-two>
           </div>
         </transition>
 
@@ -87,20 +87,43 @@
         </transition>
 
         <transition>
-          <div v-if="bracketType.length > 0" class="row" style="position: absolute; left: 13px; top: 10%; min-width: 175px;">
+          <div v-if="bracketType.length > 0" class="row" style="position: absolute; left: 10px; top: 10%; min-width: 200px;">
             <left-header :title="bracketType"> </left-header>
           </div>
         </transition>
 
-        <div class="row justify-content-between fixed-bottom" style="height: 225px;">
-          <div class="col-2 shadow rounded" style="background-color: rgba(0, 0, 0, 0.9); margin-left: 25px; margin-bottom: 15px;">
-            <div class="text-light p-2">test</div>
+        <div class="row justify-content-between fixed-bottom" style="">
+          <div class="col" style="max-width: 350px; margin-left: 25px; margin-bottom: 15px;">
+            <social-media :members="p1.members"> </social-media>
           </div>
-
-          <div class="col-2 shadow rounded" style="background-color: rgba(0, 0, 0, 0.9); margin-right: 25px; margin-bottom: 15px;">
-            <div class="text-light p-2">test</div>
+          <div class="col" style=" max-width: 350px; margin-right: 25px; margin-bottom: 15px;">
+            <social-media :members="p2.members"> </social-media>
           </div>
         </div>
+
+        <div class="row justify-content-between fixed-bottom">
+          <div class="col shadow" style="height: 200px;
+          border :solid;
+          border-color: white;
+          border-radius: .5rem .5rem .5rem .5rem;
+          border-width: 7px;
+          max-width: 350px;
+          margin-left: 25px;
+          margin-bottom: 15px;">
+          </div>
+
+          <div class="col shadow" style="height: 200px;
+          border :solid;
+          border-color: white;
+          border-radius: .5rem .5rem .5rem .5rem;
+          border-width: 7px;
+          max-width: 350px;
+          margin-right: 25px;
+          margin-bottom: 15px;">
+          </div>
+        </div>
+
+
 
       </div>
 
@@ -114,6 +137,7 @@
   import TeamTwo from '/javascripts/TeamTwo.js'
   import LeftHeader from '/javascripts/LeftHeader.js'
   import CentralHeader from '/javascripts/CentralHeader.js'
+  import SocialMedia from '/javascripts/SocialMedia.js'
 
   const { createApp} = Vue
 
@@ -137,16 +161,31 @@
     overlayApp.bestOf = content["bestOf"].toUpperCase()
     overlayApp.typedHeader = content["typedHeader"].toUpperCase()
 
+
+    // TODO: Come up with a way to show multiple social accounts, until then truncate teams with multiple members.
+
+    if(overlayApp.p1.members != null) {
+      if(overlayApp.p1.members.length > 1) {
+        overlayApp.p1.members = []
+      }
+    }
+
+    if(overlayApp.p2.members != null) {
+      if(overlayApp.p2.members.length > 1) {
+        overlayApp.p2.members = []
+      }
+    }
+
+
     sessionStorage.setItem("teamOne",JSON.stringify(content["teamOne"]))
     sessionStorage.setItem("teamTwo",JSON.stringify(content["teamTwo"]))
+
+    // TODO: Remove typed header.
 
     sessionStorage.setItem("bracketType",overlayApp.bracketType)
     sessionStorage.setItem("eventRound",overlayApp.eventRound)
     sessionStorage.setItem("bestOf",overlayApp.bestOf)
     sessionStorage.setItem("typedHeader",overlayApp.typedHeader)
-
-    console.log(overlayApp.p1)
-    console.log(overlayApp.p2)
 
   })
 
@@ -209,6 +248,9 @@
         this.typedHeader = typedHeader
       }
 
+      console.log(this.p1)
+      console.log(this.p2)
+
     },
     methods : {
 
@@ -218,6 +260,7 @@
       TeamTwo,
       LeftHeader,
       CentralHeader,
+      SocialMedia,
     }
   }).mount('#app')
 
