@@ -4,7 +4,7 @@ export default {
     bestof: '',
   },
   template: `
-  <div class="col-3"
+  <div class="col-3 shadow"
     style="border-style: solid;
     border-color: rgba(255,255,255,1);
     border-radius: 0rem 0rem 0.5rem 0.5rem;
@@ -14,8 +14,10 @@ export default {
     <div class="event-title">{{round}}</div>
 
   </div>
+
   <div class="col-2"> </div>
-  <div class="col-3"
+
+  <div class="col-3 shadow"
     style="border-style: solid;
     border-color: rgba(255,255,255,1);
     border-radius: 0rem 0rem 0.5rem 0.5rem;
