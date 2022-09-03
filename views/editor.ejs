@@ -29,6 +29,7 @@
   <script src="https://unpkg.com/primevue@^3/column/column.min.js"></script>
   <script src="https://unpkg.com/primevue@^3/autocomplete/autocomplete.min.js"></script>
   <script src="https://unpkg.com/primevue@^3/selectbutton/selectbutton.min.js"></script>
+  <script src="https://unpkg.com/primevue@^3/radiobutton/radiobutton.min.js"></script>
   <script src="https://unpkg.com/primevue@^3/checkbox/checkbox.min.js"></script>
   <script src="https://unpkg.com/primevue@^3/togglebutton/togglebutton.min.js"></script>
 
@@ -177,6 +178,12 @@
               <h5>Player Information</h5>
             </div>
 
+            <div class="row mb-3">
+              <div class="col">
+                <p-selectbutton :unselectable="false" v-model="seatingChoice" :options="seatingOptions" aria-labelledby=""></p-selectbutton>
+              </div>
+            </div class="row">
+
             <div class="row" style="">
               <div class="col-6 col-md-4 mb-2">
                 <p-autocomplete
@@ -187,7 +194,6 @@
                   :dropdown="false"
                   placeholder="Team 1"
                 ></p-autocomplete>
-
               </div>
               <div class="col mb-2">
                 <p-selectbutton
@@ -391,6 +397,8 @@
         setSelection: [],
         teamOne: {name: '', value: ''},
         teamTwo: {name:'', value: ''},
+        seatingOptions: ['No Order','Team 1 Left','Team 1 Right'],
+        seatingChoice: 'No Order',
         p1Score: {name: '', value: ''},
         p2Score: {name: '', value: ''},
         bracketType: "",
@@ -606,6 +614,7 @@
               Editor.getFormattedName(this.eventRound),
               Editor.getFormattedName(this.bestOf),
               this.typedHeader,
+              this.seatingChoice
             );
 
             this.socket.emit("overlay-update", {
@@ -639,6 +648,7 @@
         this.typedHeader = ""
 
         this.setSelection = {}
+        this.seatingChoice = 'No Order'
       },
     },
     computed: {
@@ -673,6 +683,7 @@
       "p-button": primevue.button,
       "p-autocomplete": primevue.autocomplete,
       "p-selectbutton": primevue.selectbutton,
+      "p-radiobutton": primevue.radiobutton,
       "p-checkbox": primevue.checkbox,
       "p-inputtext": primevue.inputtext,
       "p-togglebutton": primevue.togglebutton,

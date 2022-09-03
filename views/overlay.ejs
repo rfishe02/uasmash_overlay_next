@@ -92,7 +92,6 @@
           </div>
         </transition>
 
-        <!--
         <div class="row justify-content-between fixed-bottom" style="">
           <div class="col" style="max-width: 350px; margin-left: 25px; margin-bottom: 15px;">
             <social-media :members="p1.members"> </social-media>
@@ -100,7 +99,7 @@
           <div class="col" style=" max-width: 350px; margin-right: 25px; margin-bottom: 15px;">
             <social-media :members="p2.members"> </social-media>
           </div>
-        </div>-->
+        </div>
 
         <div class="row justify-content-between fixed-bottom">
           <div class="col shadow" style="height: 200px;
@@ -178,15 +177,15 @@
     }
 
 
-    sessionStorage.setItem("teamOne",JSON.stringify(content["teamOne"]))
-    sessionStorage.setItem("teamTwo",JSON.stringify(content["teamTwo"]))
+    localStorage.setItem("teamOne",JSON.stringify(content["teamOne"]))
+    localStorage.setItem("teamTwo",JSON.stringify(content["teamTwo"]))
 
     // TODO: Remove typed header.
 
-    sessionStorage.setItem("bracketType",overlayApp.bracketType)
-    sessionStorage.setItem("eventRound",overlayApp.eventRound)
-    sessionStorage.setItem("bestOf",overlayApp.bestOf)
-    sessionStorage.setItem("typedHeader",overlayApp.typedHeader)
+    localStorage.setItem("bracketType",overlayApp.bracketType)
+    localStorage.setItem("eventRound",overlayApp.eventRound)
+    localStorage.setItem("bestOf",overlayApp.bestOf)
+    localStorage.setItem("typedHeader",overlayApp.typedHeader)
 
   })
 
@@ -217,13 +216,13 @@
         this.socket.emit("subscribe",room)
       }
 
-      const teamOne = sessionStorage.getItem("teamOne")
-      const teamTwo = sessionStorage.getItem("teamTwo")
+      const teamOne = localStorage.getItem("teamOne")
+      const teamTwo = localStorage.getItem("teamTwo")
 
-      const bracketType = sessionStorage.getItem("bracketType")
-      const eventRound = sessionStorage.getItem("eventRound")
-      const bestOf = sessionStorage.getItem("bestOf")
-      const typedHeader = sessionStorage.getItem("typedHeader")
+      const bracketType = localStorage.getItem("bracketType")
+      const eventRound = localStorage.getItem("eventRound")
+      const bestOf = localStorage.getItem("bestOf")
+      const typedHeader = localStorage.getItem("typedHeader")
 
       if(teamOne != undefined) {
         this.p1 = JSON.parse(teamOne)

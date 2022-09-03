@@ -50,28 +50,36 @@ export default {
     return generatedHeader
   },
 
-  getOverlayForm(setSelection,teamOne,p1Score,teamTwo,p2Score,bracketType,eventRound,bestOf,typedHeader) {
+  getOverlayForm(setSelection,teamOne,p1Score,teamTwo,p2Score,bracketType,eventRound,bestOf,typedHeader, seatingChoice) {
     const form = {};
-    const one = { members: [] };
-    const two = { members: [] };
+    const teamA = { members: [] };
+    const teamB = { members: [] };
 
-    one.name = teamOne
-    one.score = p1Score
+    teamA.name = teamOne
+    teamA.score = p1Score
 
-    two.name = teamTwo
-    two.score = p2Score
+    teamB.name = teamTwo
+    teamB.score = p2Score
 
-    if(setSelection != null) {
+    // TODO: Rethink this approach?
+    // Do not save additional information, such as social media information, if no order is specified.
+
+    if(setSelection != null && seatingChoice != 'No Order') {
       if (setSelection.teamOne != null) {
-        one.members = setSelection.teamOne.members
+        teamA.members = setSelection.teamOne.members
       }
       if (setSelection.teamTwo != null) {
-        two.members = setSelection.teamTwo.members
+        teamB.members = setSelection.teamTwo.members
       }
     }
 
-    form["teamOne"] = one
-    form["teamTwo"] = two
+    if(seatingChoice == 'Team 1 Left' || seatingChoice == 'No Order') {
+      form["teamOne"] = teamA
+      form["teamTwo"] = teamB
+    } else if(seatingChoice == 'Team 1 Right') {
+      form["teamTwo"] = teamA
+      form["teamOne"] = teamB
+    }
 
     form["bracketType"] = bracketType
     form["eventRound"] = eventRound
