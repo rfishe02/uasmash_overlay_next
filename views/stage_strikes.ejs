@@ -62,7 +62,7 @@
         <div v-if="showstrike" id="uastagelist" class="row justify-content-center">
 
           <template v-for="item in strikeList" v-bind:key="item">
-            <div class="col p-1 mb-2" style="max-width: 225px">
+            <div class="col p-2 mb-2" style="max-width: 225px">
 
               <stage-card-large :item="item" :url="getImageURL(item.stageName)">
               </stage-card-large>
