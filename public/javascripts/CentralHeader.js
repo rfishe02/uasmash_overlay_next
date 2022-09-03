@@ -8,7 +8,7 @@ export default {
     style="border-style: solid;
     border-color: rgba(255,255,255,1);
     border-radius: 0rem 0rem 0.5rem 0.5rem;
-    border-width: 0px 7px 7px 7px;
+    border-width: 0px 5px 5px 5px;
     background-color: rgba(0, 0, 0, 0.9);">
 
     <div class="event-title">{{round}}</div>
@@ -19,7 +19,7 @@ export default {
     style="border-style: solid;
     border-color: rgba(255,255,255,1);
     border-radius: 0rem 0rem 0.5rem 0.5rem;
-    border-width: 0px 7px 7px 7px;
+    border-width: 0px 5px 5px 5px;
     background-color: rgba(0, 0, 0, 0.9);
     text-align: right;
     ">

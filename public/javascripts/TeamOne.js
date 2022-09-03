@@ -11,7 +11,7 @@ export default {
     style=" border-style: solid;
     border-color: rgba(255,255,255,1);
     border-radius: 0.5rem 0.5rem 0rem 0rem;
-    border-width: 7px 7px 0px 7px;">
+    border-width: 5px 5px 0px 5px;">
     <div class="row h-100" :class="color">
       <div class="col-11">
         <div class="player-name">{{name}}</div>
