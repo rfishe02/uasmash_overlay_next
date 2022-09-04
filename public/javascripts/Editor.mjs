@@ -24,21 +24,27 @@ export default {
     const teamA = { members: [] };
     const teamB = { members: [] };
 
-    teamA.name = teamOne
+    teamA.name = this.getFormattedName(teamOne)
     teamA.score = p1Score
 
-    teamB.name = teamTwo
+    teamB.name = this.getFormattedName(teamTwo)
     teamB.score = p2Score
 
     // TODO: Rethink this approach?
     // Do not save additional information, such as social media information, if no order is specified.
 
-    if(setSelection != null && seatingChoice != 'No Order') {
-      if (setSelection.teamOne != null) {
-        teamA.members = setSelection.teamOne.members
-      }
-      if (setSelection.teamTwo != null) {
-        teamB.members = setSelection.teamTwo.members
+    if(seatingChoice != 'No Order') {
+      if(setSelection != null) {
+        if (setSelection.teamOne != null) {
+          teamA.members = setSelection.teamOne.members
+        } else if(teamOne.socials != null) {
+          teamA.members.push(teamOne)
+        }
+        if (setSelection.teamTwo != null) {
+          teamB.members = setSelection.teamTwo.members
+        } else if(teamTwo.socials != null) {
+          teamB.members.push(teamTwo)
+        }
       }
     }
 

@@ -115,12 +115,12 @@
                 <p-button icon="pi pi-refresh" @click="importSetList()" ></p-button>
               </div>
               <!--
-                  <div class="flex justify-content-end">
-                    <span class="p-input-icon-left ">
-                      <i class="pi pi-search" />
-                      <InputText v-model="filters2['global'].value" placeholder="Keyword Search" />
-                    </span>
-                  </div>-->
+              <div class="flex justify-content-end">
+                <span class="p-input-icon-left ">
+                  <i class="pi pi-search" />
+                  <InputText v-model="filters2['global'].value" placeholder="Keyword Search" />
+                </span>
+              </div>-->
             </template>
             <template #empty> No sets to show. </template>
             <template #loading> Loading set data. Please wait. </template>
@@ -319,7 +319,6 @@
 
 <script type="module">
   import KeyManager from '/javascripts/KeyManager.js'
-  import PreviewHeader from '/javascripts/PreviewHeader.js'
   import Editor from '/javascripts/Editor.mjs'
 
   const { createApp} = Vue
@@ -480,7 +479,12 @@
         const choice = this.setSelection
         if (choice != null) {
           this.teamOne = { name: choice.teamOne.name }
-          this.teamTwo = { name: choice.teamTwo.name }
+
+          if(choice.teamTwo != null) {
+            this.teamTwo = { name: choice.teamTwo.name }
+          } else {
+            this.teamTwo = { name: '' }
+          }
 
           this.p1Score = { name: "-", value: "" }
           this.p2Score = { name: "-", value: "" }
@@ -494,7 +498,7 @@
       },
       async importSetList() {
         if (this.eventSelection != null) {
-          this.clearOverlayForm()
+          //this.clearOverlayForm()
 
           try {
             const response = await fetch('http://'+this.host+this.port +'/smashgg/query_sets?' + new URLSearchParams({"event_id":this.eventSelection.id}), {
@@ -576,13 +580,11 @@
         try {
           if (this.teamOne != null && this.p1Score != null && this.teamTwo != null && this.p2Score != null) {
 
-            console.log(this.teamOne)
-
             const form = Editor.getOverlayForm(
               this.setSelection,
-              Editor.getFormattedName(this.teamOne),
+              this.teamOne,
               Editor.getFormattedScore(this.p1Score),
-              Editor.getFormattedName(this.teamTwo),
+              this.teamTwo,
               Editor.getFormattedScore(this.p2Score),
               Editor.getFormattedName(this.bracketType),
               Editor.getFormattedName(this.eventRound),
@@ -636,17 +638,12 @@
       getPlayer2Score() {
         return Editor.getFormattedScore(this.p2Score)
       },
-      getEventHeader() {
-        // TODO: Remove or rewrite.
-        return "Unsupported"
-      },
       getModuleURL() {
         if(this.overlayRoom != null && this.overlayModule != null) {
           return this.host +this.port+ "/" + this.overlayModule + "?id=" + this.overlayRoom
         } else {
           return ''
         }
-        console.log("here")
       }
     },
     components: {

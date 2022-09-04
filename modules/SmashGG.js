@@ -195,12 +195,13 @@ async function querySetsSmashGG(key,id){
         sets (sortType: CALL_ORDER,
           perPage: 24,
           filters: {
-            hideEmpty:false
+            hideEmpty: true
             state: [1,2]
           }
         ) {
           nodes {
             id
+            state
             startedAt
             completedAt
             round
