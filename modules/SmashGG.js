@@ -4,8 +4,8 @@ async function queryTournamentsSmashGG(key) {
 
   try {
     const distanceFrom = "35.3815365, -94.3746986"
-    const distance = "10mi"
-    const afterDate = Math.floor(Date.now() / 1000) - 604800000
+    const distance = "50mi"
+    const afterDate = Math.floor(Date.now() / 1000) - 604800//000
     const query = `
     query LocalTournaments($distanceFrom: String, $distance: String, $afterDate: Timestamp) {
       tournaments(
@@ -192,10 +192,11 @@ async function querySetsSmashGG(key,id){
       event(id: $eventID){
         id
         name
-        sets (sortType:MAGIC,
+        sets (sortType: CALL_ORDER,
           perPage: 24,
           filters: {
-            hideEmpty:true
+            hideEmpty:false
+            state: [1,2]
           }
         ) {
           nodes {
