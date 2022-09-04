@@ -19,38 +19,7 @@ export default {
     }
   },
 
-  // TODO: Remove support for typedHeader.
-
-  getFormattedEventHeader(bracketType,eventRound,bestOf,typedHeader,typingHeader) {
-    let generatedHeader = ""
-
-    if (bracketType != null && eventRound != null && bestOf != null && typedHeader != null) {
-      const bracket = bracketType.value == null ? "" : bracketType.value;
-      const event = eventRound.value == null ? "" : eventRound.value;
-      const best = bestOf.value == null ? "" : bestOf.value;
-
-      if (typingHeader) {
-        generatedHeader = typedHeader;
-      } else {
-        if (bracket.length > 0 && event.length > 0) {
-          generatedHeader = bracket + " " + event
-        } else if (bracket.length > 0) {
-          generatedHeader = bracket
-        } else if (event.length > 0) {
-          generatedHeader = event
-        }
-
-        if (generatedHeader.length > 0 && best.length > 0) {
-          generatedHeader = generatedHeader + " - " + best
-        } else if (best.length > 0) {
-          generatedHeader = best
-        }
-      }
-    }
-    return generatedHeader
-  },
-
-  getOverlayForm(setSelection,teamOne,p1Score,teamTwo,p2Score,bracketType,eventRound,bestOf,typedHeader, seatingChoice) {
+  getOverlayForm(setSelection,teamOne,p1Score,teamTwo,p2Score,bracketType,eventRound,bestOf,seatingChoice) {
     const form = {};
     const teamA = { members: [] };
     const teamB = { members: [] };
@@ -84,7 +53,6 @@ export default {
     form["bracketType"] = bracketType
     form["eventRound"] = eventRound
     form["bestOf"] = bestOf
-    form["typedHeader"] = typedHeader == null ? '' : typedHeader
 
     return form
   }

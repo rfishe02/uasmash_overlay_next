@@ -260,25 +260,6 @@
                 ></p-dropdown>
               </div>
 
-              <!-- TODO: Remove typedHeader. -->
-
-              <!--
-              <div class="col-12 mb-3">
-                <div class="p-inputgroup">
-                  <span class="p-inputgroup-addon">
-                    <p-checkbox
-                      v-model="typingHeader"
-                      :binary="true"
-                    ></p-checkbox>
-                  </span>
-                  <p-inputtext
-                    type="text"
-                    v-model="typedHeader"
-                    :disabled="!typingHeader"
-                    placeholder="Manual Entry"
-                  ></p-inputtext>
-                </div>
-              </div>-->
             </div>
 
             <div class="row justify-content-between mb-3">
@@ -329,14 +310,7 @@
 
       </div>
 
-      <!--
-      <preview-header
-      :team-one="getTeamOneName"
-      :team-two="getTeamTwoName"
-      :score-one="getPlayer1Score"
-      :score-two="getPlayer2Score"
-      :event-header="getEventHeader"
-      > </preview-header>-->
+      <!-- TODO: Rebuild preview header -->
 
     </div>
 
@@ -387,7 +361,6 @@
       return {
         host: window.location.hostname,
         port: ":3000",
-        typingHeader: false,
         tournamentList: [],
         setList: [],
         playerList: [],
@@ -395,8 +368,8 @@
         tournamentSelection: [],
         eventSelection: [],
         setSelection: [],
-        teamOne: {name: '', value: ''},
-        teamTwo: {name:'', value: ''},
+        teamOne: {name: ''},
+        teamTwo: {name: ''},
         seatingOptions: ['No Order','Team 1 Left','Team 1 Right'],
         seatingChoice: 'No Order',
         p1Score: {name: '', value: ''},
@@ -404,7 +377,6 @@
         bracketType: "",
         eventRound: "",
         bestOf: "",
-        typedHeader: '',
         loading2: false,
         filters2: {
           global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -507,8 +479,8 @@
       onSetSelection() {
         const choice = this.setSelection
         if (choice != null) {
-          this.teamOne = { name: choice.teamOne.name, value: choice.teamOne.name }
-          this.teamTwo = { name: choice.teamTwo.name, value: choice.teamTwo.name }
+          this.teamOne = { name: choice.teamOne.name }
+          this.teamTwo = { name: choice.teamTwo.name }
 
           this.p1Score = { name: "-", value: "" }
           this.p2Score = { name: "-", value: "" }
@@ -575,7 +547,7 @@
           for (let i = 0; i < items.length; i++) {
             const item = items[i]
             if (item.name.toLowerCase().indexOf(query.toLowerCase()) === 0) {
-              _filteredItems.push({ name: item.name, value: item.name })
+              _filteredItems.push(item)
             }
           }
 
@@ -604,7 +576,7 @@
         try {
           if (this.teamOne != null && this.p1Score != null && this.teamTwo != null && this.p2Score != null) {
 
-            // TODO: Remove typedHeader.
+            console.log(this.teamOne)
 
             const form = Editor.getOverlayForm(
               this.setSelection,
@@ -615,7 +587,6 @@
               Editor.getFormattedName(this.bracketType),
               Editor.getFormattedName(this.eventRound),
               Editor.getFormattedName(this.bestOf),
-              this.typedHeader,
               this.seatingChoice
             );
 
@@ -639,15 +610,14 @@
         }
       },
       clearOverlayForm() {
-        this.teamOne = { name: "", value: "" }
-        this.teamTwo = { name: "", value: "" }
+        this.teamOne = { name: "" }
+        this.teamTwo = { name: "" }
         this.p1Score = { name: "", value: "" }
         this.p2Score = { name: "", value: "" }
 
         this.bracketType = ""
         this.eventRound = ""
         this.bestOf = ""
-        this.typedHeader = ""
 
         this.setSelection = {}
         this.seatingChoice = 'No Order'
@@ -667,7 +637,8 @@
         return Editor.getFormattedScore(this.p2Score)
       },
       getEventHeader() {
-        return Editor.getFormattedEventHeader(this.bracketType,this.eventRound,this.bestOf,this.typedHeader,this.typingHeader)
+        // TODO: Remove or rewrite.
+        return "Unsupported"
       },
       getModuleURL() {
         if(this.overlayRoom != null && this.overlayModule != null) {
@@ -689,7 +660,6 @@
       "p-checkbox": primevue.checkbox,
       "p-inputtext": primevue.inputtext,
       "p-togglebutton": primevue.togglebutton,
-      PreviewHeader
     },
   }).use(primevue.config.default).mount('#app')
 

@@ -159,8 +159,6 @@
     overlayApp.bracketType = content["bracketType"].toUpperCase()
     overlayApp.eventRound = content["eventRound"].toUpperCase()
     overlayApp.bestOf = content["bestOf"].toUpperCase()
-    overlayApp.typedHeader = content["typedHeader"].toUpperCase()
-
 
     // TODO: Come up with a way to show multiple social accounts, until then truncate teams with multiple members.
 
@@ -185,7 +183,6 @@
     localStorage.setItem("bracketType",overlayApp.bracketType)
     localStorage.setItem("eventRound",overlayApp.eventRound)
     localStorage.setItem("bestOf",overlayApp.bestOf)
-    localStorage.setItem("typedHeader",overlayApp.typedHeader)
 
   })
 
@@ -203,7 +200,6 @@
         bracketType: "",
         eventRound:"",
         bestOf:"",
-        typedHeader:"",
         socket: socket
       }
     },
@@ -222,7 +218,6 @@
       const bracketType = localStorage.getItem("bracketType")
       const eventRound = localStorage.getItem("eventRound")
       const bestOf = localStorage.getItem("bestOf")
-      const typedHeader = localStorage.getItem("typedHeader")
 
       if(teamOne != undefined) {
         this.p1 = JSON.parse(teamOne)
@@ -243,9 +238,6 @@
       }
       if(bestOf != undefined) {
         this.bestOf = bestOf
-      }
-      if(typedHeader != undefined) {
-        this.typedHeader = typedHeader
       }
 
     },
