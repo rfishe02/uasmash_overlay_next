@@ -196,7 +196,7 @@ async function querySetsSmashGG(key,id){
           perPage: 24,
           filters: {
             hideEmpty: true
-            state: [1,2]
+            state: [1,2,3]
           }
         ) {
           nodes {
@@ -260,6 +260,7 @@ async function querySetsSmashGG(key,id){
                 s.fullRoundText = node.fullRoundText
                 s.totalGames = node.totalGames
                 s.id = node.id
+                s.state = node.state
 
                 if (node.phaseGroup != null) {
                   if (node.phaseGroup.phase != null) {

@@ -169,6 +169,7 @@
                 ></p-inputtext>
               </template>
             </p-column>
+
           </p-datatable>
         </div>
 
@@ -478,7 +479,12 @@
       onSetSelection() {
         const choice = this.setSelection
         if (choice != null) {
-          this.teamOne = { name: choice.teamOne.name }
+
+          if(choice.teamOne != null) {
+            this.teamOne = { name: choice.teamOne.name }
+          } else {
+            this.teamOne = { name: '' }
+          }
 
           if(choice.teamTwo != null) {
             this.teamTwo = { name: choice.teamTwo.name }
@@ -602,7 +608,6 @@
             // TODO: Find a way to persist data without introducing bugs. A get recent button? This should happen with user knowledge.
 
             //this.clearOverlayForm()
-            //this.setSelection = {}
 
           } else {
             // TODO: Throw error?
