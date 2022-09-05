@@ -78,7 +78,7 @@
     <div class="container-fluid" style="padding-bottom: 25px; padding-top: 15px">
 
       <div class="row">
-        <div class="col-12 col-lg-6 pb-3" style="height: 600px">
+        <div class="col-12 col-lg-6 pb-3" style="height: 500px">
           <p-datatable
             :value="setList"
             v-model:selection="setSelection"
@@ -700,12 +700,12 @@
               content: form,
               to: this.overlayRoom,
             }, (response) => {
-
+              console.log(response)
             })
 
             // TODO: Find a way to persist data without introducing bugs. A get recent button? This should happen with user knowledge.
 
-            this.clearOverlayForm()
+            //this.clearOverlayForm()
 
           } else {
             // TODO: Throw error?

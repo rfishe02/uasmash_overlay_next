@@ -14,8 +14,9 @@
   <link rel="stylesheet" href="/stylesheets/overlay.css">
 
   <style>
-    body {
-
+    body { background-color: rgba(0, 0, 0, 0);
+      margin: 0px auto;
+      overflow: hidden;
     }
   </style>
 
@@ -109,12 +110,12 @@
     overlayApp.eventRound = content["eventRound"].toUpperCase()
     overlayApp.bestOf = content["bestOf"].toUpperCase()
 
-    localStorage.setItem("teamOne",JSON.stringify(content["teamOne"]))
-    localStorage.setItem("teamTwo",JSON.stringify(content["teamTwo"]))
+    sessionStorage.setItem("teamOne",JSON.stringify(content["teamOne"]))
+    sessionStorage.setItem("teamTwo",JSON.stringify(content["teamTwo"]))
 
-    localStorage.setItem("bracketType",overlayApp.bracketType)
-    localStorage.setItem("eventRound",overlayApp.eventRound)
-    localStorage.setItem("bestOf",overlayApp.bestOf)
+    sessionStorage.setItem("bracketType",overlayApp.bracketType)
+    sessionStorage.setItem("eventRound",overlayApp.eventRound)
+    sessionStorage.setItem("bestOf",overlayApp.bestOf)
   })
 
   socket.on("score-push", ({ content, from }) => {
@@ -124,11 +125,11 @@
 
     if(overlayApp.p1 != null) {
       overlayApp.p1.score = content["p1Score"]
-      localStorage.setItem("teamOne",JSON.stringify(content["teamOne"]))
+      sessionStorage.setItem("teamOne",JSON.stringify(overlayApp.p1))
     }
     if(overlayApp.p2 != null) {
       overlayApp.p2.score = content["p2Score"]
-      localStorage.setItem("teamTwo",JSON.stringify(content["teamTwo"]))
+      sessionStorage.setItem("teamTwo",JSON.stringify(overlayApp.p2))
     }
 
   })
@@ -159,31 +160,31 @@
         this.socket.emit("subscribe",room)
       }
 
-      const teamOne = localStorage.getItem("teamOne")
-      const teamTwo = localStorage.getItem("teamTwo")
+      const teamOne = sessionStorage.getItem("teamOne")
+      const teamTwo = sessionStorage.getItem("teamTwo")
 
-      const bracketType = localStorage.getItem("bracketType")
-      const eventRound = localStorage.getItem("eventRound")
-      const bestOf = localStorage.getItem("bestOf")
+      const bracketType = sessionStorage.getItem("bracketType")
+      const eventRound = sessionStorage.getItem("eventRound")
+      const bestOf = sessionStorage.getItem("bestOf")
 
-      if(teamOne != undefined) {
+      if(teamOne != null) {
         this.p1 = JSON.parse(teamOne)
         this.p1Name = this.p1.name
         this.p1Score = this.p1.score
       }
-      if(teamTwo != undefined) {
+      if(teamTwo != null) {
         this.p2 = JSON.parse(teamTwo)
         this.p2Name = this.p2.name
         this.p2Score = this.p2.score
       }
 
-      if(bracketType != undefined) {
+      if(bracketType != null) {
         this.bracketType = bracketType
       }
-      if(eventRound != undefined) {
+      if(eventRound != null) {
         this.eventRound = eventRound
       }
-      if(bestOf != undefined) {
+      if(bestOf != null) {
         this.bestOf = bestOf
       }
 
