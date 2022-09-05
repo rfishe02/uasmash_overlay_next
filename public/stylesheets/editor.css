@@ -1,3 +1,8 @@
+
+.div-highlight, input  {
+  background-color: red;
+}
+
 .p-dropdown {
   height: 40px;
   width: 100%;

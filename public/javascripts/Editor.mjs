@@ -19,7 +19,7 @@ export default {
     }
   },
 
-  getOverlayForm(playerList,teamOne,p1Score,teamTwo,p2Score,bracketType,eventRound,bestOf,seatingChoice) {
+  getOverlayForm(playerList,teamOne,p1Score,teamTwo,p2Score,bracketType,eventRound,bestOf) {
     const form = {};
     const teamA = { members: [] };
     const teamB = { members: [] };
@@ -33,24 +33,17 @@ export default {
     // TODO: Rethink this approach?
     // Do not save additional information, such as social media information, if no order is specified.
 
-    if(seatingChoice != 'No Order') {
-      if(playerList != null) {
-        if (playerList[teamA.name] != null) {
-          teamA.members.push(playerList[teamA.name])
-        }
-        if (playerList[teamB.name] != null) {
-          teamB.members.push(playerList[teamB.name])
-        }
+    if(playerList != null) {
+      if (playerList[teamA.name] != null) {
+        teamA.members.push(playerList[teamA.name])
+      }
+      if (playerList[teamB.name] != null) {
+        teamB.members.push(playerList[teamB.name])
       }
     }
 
-    if(seatingChoice == 'Team 1 Left' || seatingChoice == 'No Order') {
-      form["teamOne"] = teamA
-      form["teamTwo"] = teamB
-    } else if(seatingChoice == 'Team 1 Right') {
-      form["teamTwo"] = teamA
-      form["teamOne"] = teamB
-    }
+    form["teamOne"] = teamA
+    form["teamTwo"] = teamB
 
     form["bracketType"] = bracketType
     form["eventRound"] = eventRound

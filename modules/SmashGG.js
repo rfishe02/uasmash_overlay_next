@@ -5,7 +5,7 @@ async function queryTournamentsSmashGG(key) {
   try {
     const distanceFrom = "35.3815365, -94.3746986"
     const distance = "25mi"
-    const afterDate = Math.floor(Date.now() / 1000) - 604800//000
+    const afterDate = Math.floor(Date.now() / 1000) - 604800000
     const query = `
     query LocalTournaments($distanceFrom: String, $distance: String, $afterDate: Timestamp) {
       tournaments(
@@ -246,26 +246,31 @@ async function querySetsSmashGG(key,id){
               data.data.event.sets.nodes.forEach((node) => {
                 const s = {}
                 s.fullRoundText = node.fullRoundText
-                s.totalGames = node.totalGames
                 s.id = node.id
                 s.state = node.state
+                s.totalGames = node.totalGames
+
+                s.bracketAndRound = s.fullRoundText
 
                 if (node.phaseGroup != null) {
                   if (node.phaseGroup.phase != null) {
                     s.phaseName = node.phaseGroup.phase.name
+
+                    s.bracketAndRound =  s.phaseName + " " + s.bracketAndRound
                   }
                 }
+
+                s.teamOne = { name: '' };
+                s.teamTwo = { name: '' };
 
                 if (node.slots != null) {
                   if (node.slots[0] != null) {
                     if (node.slots[0].entrant != null) {
-                      s.teamOne = {};
                       s.teamOne.name = node.slots[0].entrant.name
                         .slice(
                           node.slots[0].entrant.name.indexOf("| ") + 1,
                           node.slots[0].entrant.name.length
-                        )
-                        .trim()
+                        ).trim()
 
                       s.versusBanner = s.teamOne.name
                       s.teamOne.members = []
@@ -274,13 +279,12 @@ async function querySetsSmashGG(key,id){
 
                   if (node.slots[1] != null) {
                     if (node.slots[1].entrant != null) {
-                      s.teamTwo = {};
                       s.teamTwo.name = node.slots[1].entrant.name
                         .slice(
                           node.slots[1].entrant.name.indexOf("| ") + 1,
                           node.slots[1].entrant.name.length
-                        )
-                        .trim();
+                        ).trim();
+
                       s.versusBanner += " vs " + s.teamTwo.name
                       s.teamTwo.members = []
                     }
