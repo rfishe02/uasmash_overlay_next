@@ -33,37 +33,6 @@
 <body>
   <div id="app">
 
-    <!--
-    <div class="container-fluid" style="height: 1080px">
-      <div class="row justify-content-center" style="margin-top: 50px">
-        <div class="uaheader uaname col text-truncate shadow rounded-pill-left" style="background-color: rgba(202, 34, 0, 0.9)">
-          {{ p1Name }}
-        </div>
-        <div class="uaheader uascore col shadow">
-          {{ p1Score }}
-        </div>
-        <div class="ualogo col shadow">
-          <img src="/fsmsmashlogo.png" style="height: 55px"/>
-        </div>
-        <div class="uaheader uascore col shadow">
-          {{ p2Score }}
-        </div>
-        <div class="uaheader uaname col text-truncate shadow rounded-pill-right"
-          style="text-align: right; background-color: rgba(35, 125, 210, 0.9)">
-          {{ p2Name }}
-        </div>
-      </div>
-
-      <transition>
-        <div v-if="eventheader.length > 2" id="header-row"
-          class="row justify-content-center">
-          <div id="event-header"
-            class="col text-truncate uaheader uasubheader shadow">
-            {{ eventheader }}
-          </div>
-        </div>
-      </transition>-->
-
       <div class="container-fluid" style="width: 1920px; height: 1080px;">
 
         <div class="row justify-content-center">
@@ -82,7 +51,9 @@
 
         <transition>
           <div v-if="p1Name.length > 0 || p2Name.length > 0" class="row justify-content-center">
-            <central-header :round="eventRound" :bestof="bestOf"> </central-header>
+            <central-header :round="eventRound" :bestof="bestOf"
+            :leftcolor="{'dark-background': eventRound.length > 0 || bestOf.length > 0, 'collapse-score': eventRound.length == 0 && bestOf.length == 0}"
+            :rightcolor="{'dark-background': eventRound.length > 0 || bestOf.length > 0, 'collapse-score': eventRound.length == 0 && bestOf.length == 0}"> </central-header>
           </div>
         </transition>
 
@@ -92,38 +63,16 @@
           </div>
         </transition>
 
-        <div class="row mb-1 justify-content-between fixed-bottom" style="">
-          <div class="col" style="max-width: 350px; margin-left: 25px; margin-bottom: 15px;">
+        <div class="row justify-content-between fixed-bottom">
+          <div class="col shadow camera-boxes" style="margin-left: 25px;">
             <social-media :members="p1.members"> </social-media>
           </div>
-          <div class="col" style=" max-width: 350px; margin-right: 25px; margin-bottom: 15px;">
+
+          <div class="col shadow camera-boxes" style="margin-right: 25px;">
             <social-media :members="p2.members"> </social-media>
           </div>
+
         </div>
-
-        <div class="row justify-content-between fixed-bottom">
-          <div class="col shadow" style="height: 225px;
-            border :solid;
-            border-color: white;
-            border-radius: .5rem .5rem .5rem .5rem;
-            border-width: 5px;
-            max-width: 350px;
-            margin-left: 25px;
-            margin-bottom: 15px;">
-          </div>
-
-          <div class="col shadow" style="height: 225px;
-            border :solid;
-            border-color: white;
-            border-radius: .5rem .5rem .5rem .5rem;
-            border-width: 5px;
-            max-width: 350px;
-            margin-right: 25px;
-            margin-bottom: 15px;">
-          </div>
-        </div>
-
-
 
       </div>
 

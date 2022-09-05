@@ -4,7 +4,7 @@ async function queryTournamentsSmashGG(key) {
 
   try {
     const distanceFrom = "35.3815365, -94.3746986"
-    const distance = "50mi"
+    const distance = "25mi"
     const afterDate = Math.floor(Date.now() / 1000) - 604800//000
     const query = `
     query LocalTournaments($distanceFrom: String, $distance: String, $afterDate: Timestamp) {
@@ -216,18 +216,6 @@ async function querySetsSmashGG(key,id){
             slots {
               entrant {
                 name
-                participants {
-                  id
-                  gamerTag
-                  user {
-                    id
-                    genderPronoun
-                    authorizations {
-                      externalUsername
-                      type
-                    }
-                  }
-                }
               }
             }
           }
@@ -278,35 +266,9 @@ async function querySetsSmashGG(key,id){
                           node.slots[0].entrant.name.length
                         )
                         .trim()
+
                       s.versusBanner = s.teamOne.name
-
                       s.teamOne.members = []
-
-                      if (node.slots[0].entrant.participants != null) {
-                        node.slots[0].entrant.participants.forEach(
-                          (party) => {
-                            const p = {}
-                            p.id = party.id
-                            p.name = party.gamerTag
-
-                            if (party.user != null) {
-                              p.genderPronoun = party.user.genderPronoun;
-                              p.socials = [];
-                              if (party.user.authorizations != null) {
-                                party.user.authorizations.forEach(
-                                  (auth) => {
-                                    const s = {}
-                                    s.username = auth.externalUsername
-                                    s.type = auth.type
-                                    p.socials.push(s)
-                                  }
-                                );
-                              }
-                            }
-                            s.teamOne.members.push(p)
-                          }
-                        );
-                      }
                     }
                   }
 
@@ -320,34 +282,7 @@ async function querySetsSmashGG(key,id){
                         )
                         .trim();
                       s.versusBanner += " vs " + s.teamTwo.name
-
                       s.teamTwo.members = []
-
-                      if (node.slots[1].entrant.participants != null) {
-                        node.slots[1].entrant.participants.forEach(
-                          (party) => {
-                            const p = {}
-                            p.id = party.id
-                            p.name = party.gamerTag
-
-                            if (party.user != null) {
-                              p.genderPronoun = party.user.genderPronoun;
-                              p.socials = []
-                              if (party.user.authorizations != null) {
-                                party.user.authorizations.forEach(
-                                  (auth) => {
-                                    const s = {}
-                                    s.username = auth.externalUsername
-                                    s.type = auth.type
-                                    p.socials.push(s)
-                                  }
-                                );
-                              }
-                            }
-                            s.teamTwo.members.push(p)
-                          }
-                        );
-                      }
                     }
                   }
                 }

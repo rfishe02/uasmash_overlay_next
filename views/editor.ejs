@@ -80,98 +80,6 @@
       style="padding-bottom: 25px; padding-top: 15px"
     >
       <div class="row">
-        <div class="col-12 col-lg-6 pb-3" style="height: 515px">
-          <p-datatable
-            show-gridlines
-            :value="setList"
-            v-model:selection="setSelection"
-            selection-mode="single"
-            class="p-datatable-sm border"
-            data-key="id"
-            :scrollable="true"
-            scroll-height="flex"
-            @row-select="onSetSelection()"
-            filter-display="row"
-            v-model:filters="filters2"
-            :loading="loading2"
-            responsive-layout="scroll"
-            :global-filter-fields="['phaseName', 'fullRoundText', 'versusBanner']"
-          >
-            <template #header>
-              <div class="p-inputgroup">
-                <p-dropdown
-                  v-model="tournamentSelection"
-                  :options="tournamentList"
-                  option-label="name"
-                  placeholder="Select a Tournament"
-                  @change="importPlayerList()"
-                ></p-dropdown>
-                <p-dropdown
-                  v-model="eventSelection"
-                  :options="getEventList(tournamentSelection)"
-                  option-label="name"
-                  placeholder="Select an Event"
-                ></p-dropdown>
-                <p-button icon="pi pi-refresh" @click="importSetList()" ></p-button>
-              </div>
-              <!--
-              <div class="flex justify-content-end">
-                <span class="p-input-icon-left ">
-                  <i class="pi pi-search" />
-                  <InputText v-model="filters2['global'].value" placeholder="Keyword Search" />
-                </span>
-              </div>-->
-            </template>
-            <template #empty> No sets to show. </template>
-            <template #loading> Loading set data. Please wait. </template>
-
-            <p-column header="Bracket" filter-field="phaseName">
-              <template #body="{ data }">
-                {{ data.phaseName }}
-              </template>
-              <template #filter="{ filterModel, filterCallback }">
-                <p-inputtext
-                  type="text"
-                  v-model="filterModel.value"
-                  @input="filterCallback()"
-                  class="p-column-filter"
-                  placeholder="Search Bracket"
-                ></p-inputtext>
-              </template>
-            </p-column>
-
-            <p-column header="Round" filter-field="fullRoundText">
-              <template #body="{ data }">
-                {{ data.fullRoundText }}
-              </template>
-              <template #filter="{ filterModel, filterCallback }">
-                <p-inputtext
-                  type="text"
-                  v-model="filterModel.value"
-                  @input="filterCallback()"
-                  class="p-column-filter"
-                  placeholder="Search Round"
-                ></p-inputtext>
-              </template>
-            </p-column>
-
-            <p-column header="Match" filter-field="versusBanner">
-              <template #body="{ data }">
-                {{ data.versusBanner }}
-              </template>
-              <template #filter="{ filterModel, filterCallback }">
-                <p-inputtext
-                  type="text"
-                  v-model="filterModel.value"
-                  @input="filterCallback()"
-                  class="p-column-filter"
-                  placeholder="Search Match"
-                ></p-inputtext>
-              </template>
-            </p-column>
-
-          </p-datatable>
-        </div>
 
         <div class="col-12 col-lg-6">
           <form class="border" id="overlay-edit" style="margin-bottom: 25px">
@@ -201,6 +109,7 @@
                   v-model="p1Score"
                   :options="scoreOptions"
                   option-label="name"
+                  :unselectable="false"
                 ></p-selectbutton>
               </div>
             </div>
@@ -221,6 +130,7 @@
                   v-model="p2Score"
                   :options="scoreOptions"
                   option-label="name"
+                  :unselectable="false"
                 ></p-selectbutton>
               </div>
             </div>
@@ -231,34 +141,37 @@
 
             <div class="row mb-2">
               <div class="col-6 col-md-4 mb-2">
-                <p-dropdown
-                  class="w-100"
+                <p-autocomplete
                   v-model="bracketType"
-                  :options="bracketList"
-                  option-label="name"
+                  :suggestions="filteredBrackets"
+                  @complete="filterBrackets($event)"
+                  :dropdown="true"
                   placeholder="Bracket Type"
-                  :editable="true"
-                ></p-dropdown>
+                ></p-autocomplete>
               </div>
               <div class="col-6 col-md-4 mb-2">
-                <p-dropdown
-                  class="w-100"
+                <p-autocomplete
                   v-model="eventRound"
-                  :options="roundList"
-                  option-label="name"
+                  :suggestions="filteredRounds"
+                  @complete="filterRounds($event)"
+                  :dropdown="true"
                   placeholder="Round"
-                  :editable="true"
-                ></p-dropdown>
+                ></p-autocomplete>
               </div>
               <div class="col-6 col-md-4 mb-2">
+
+                <p-selectbutton :unselectable="false" v-model="bestOf" :options="matchList" aria-labelledby="">
+                </p-selectbutton>
+
+                <!--
                 <p-dropdown
                   class="w-100"
                   v-model="bestOf"
                   :options="matchList"
-                  option-label="name"
                   placeholder="Best of"
                   :editable="true"
-                ></p-dropdown>
+                ></p-dropdown>-->
+
               </div>
 
             </div>
@@ -307,6 +220,110 @@
             </div>
 
           </form>
+        </div>
+
+        <div class="col-12 col-lg-6 pb-3" style="height: 515px">
+
+          <p-datatable
+            show-gridlines
+            :value="setList"
+            v-model:selection="setSelection"
+            selection-mode="single"
+            class="p-datatable-sm border"
+            data-key="id"
+            :scrollable="true"
+            scroll-height="flex"
+            @row-select="onSetSelection()"
+            filter-display="menu"
+            v-model:filters="filters2"
+            :loading="loading2"
+            responsive-layout="scroll"
+            :global-filter-fields="['phaseName', 'fullRoundText', 'versusBanner']">
+            <template #header>
+
+              <div class="row mb-2">
+                <div class="col">
+                  <div class="p-inputgroup">
+                    <p-dropdown
+                      v-model="tournamentSelection"
+                      :options="tournamentList"
+                      option-label="name"
+                      placeholder="Select a Tournament"
+                      @change="importPlayerList()"
+                    ></p-dropdown>
+                    <p-dropdown
+                      v-model="eventSelection"
+                      :options="getEventList(tournamentSelection)"
+                      option-label="name"
+                      placeholder="Select an Event"
+                    ></p-dropdown>
+                    <p-button icon="pi pi-refresh" @click="importSetList()" ></p-button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row justify-content-end">
+                <div class="col-3 me-3">
+                  <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <p-inputtext v-model="filters2['global'].value" placeholder="Keyword Search"></p-inputtext>
+                  </span>
+                </div>
+              </div>
+
+            </template>
+
+            <template #empty> No sets to show. </template>
+            <template #loading> Loading set data. Please wait. </template>
+
+            <p-column header="Bracket" filter-field="phaseName">
+              <template #body="{ data }">
+                <div v-if="data.state == 3" style="color: #D3D3D3"> {{ data.phaseName }} </div>
+                <div v-if="data.state == 1 || data.state == 2"> {{ data.phaseName }} </div>
+              </template>
+              <template #filter="{ filterModel, filterCallback }">
+                <p-inputtext
+                  type="text"
+                  v-model="filterModel.value"
+                  @input="filterCallback()"
+                  class="p-column-filter"
+                  placeholder="Search Bracket"
+                ></p-inputtext>
+              </template>
+            </p-column>
+
+            <p-column header="Round" filter-field="fullRoundText">
+              <template #body="{ data }">
+                <div v-if="data.state == 3" style="color: #D3D3D3"> {{ data.fullRoundText }} </div>
+                <div v-if="data.state == 1 || data.state == 2"> {{ data.fullRoundText }} </div>
+              </template>
+              <template #filter="{ filterModel, filterCallback }">
+                <p-inputtext
+                  type="text"
+                  v-model="filterModel.value"
+                  @input="filterCallback()"
+                  class="p-column-filter"
+                  placeholder="Search Round"
+                ></p-inputtext>
+              </template>
+            </p-column>
+
+            <p-column header="Match" filter-field="versusBanner">
+              <template #body="{ data }">
+                <div v-if="data.state == 3" style="color: #D3D3D3"> {{ data.versusBanner }} </div>
+                <div v-if="data.state == 1 || data.state == 2"> {{ data.versusBanner }} </div>
+              </template>
+              <template #filter="{ filterModel, filterCallback }">
+                <p-inputtext
+                  type="text"
+                  v-model="filterModel.value"
+                  @input="filterCallback()"
+                  class="p-column-filter"
+                  placeholder="Search Match"
+                ></p-inputtext>
+              </template>
+            </p-column>
+          </p-datatable>
         </div>
 
       </div>
@@ -365,6 +382,8 @@
         setList: [],
         playerList: [],
         filteredPlayers: [],
+        filteredBrackets: [],
+        filteredRounds: [],
         tournamentSelection: [],
         eventSelection: [],
         setSelection: [],
@@ -372,11 +391,11 @@
         teamTwo: {name: ''},
         seatingOptions: ['No Order','Team 1 Left','Team 1 Right'],
         seatingChoice: 'No Order',
-        p1Score: {name: '', value: ''},
-        p2Score: {name: '', value: ''},
+        p1Score: {name: '-', value: ''},
+        p2Score: {name: '-', value: ''},
         bracketType: "",
         eventRound: "",
-        bestOf: "",
+        bestOf: "Best of 3",
         loading2: false,
         filters2: {
           global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -396,40 +415,40 @@
           { name: "4", value: "4" },
         ],
         bracketList: [
-          { name: "Friendlies", value: "Friendlies" },
-          { name: "Pools", value: "Pools" },
-          { name: "Bracket", value: "Bracket" },
-          { name: "Top 32", value: "Top 32" },
-          { name: "Top 8", value: "Top 8" },
+          "Friendlies",
+          "Pools",
+          "Bracket",
+          "Top 32",
+          "Top 8",
         ],
         roundList: [
-          { name: "Round 1", value: "Round 1" },
-          { name: "Round 2", value: "Round 2" },
-          { name: "Round 3", value: "Round 3" },
-          { name: "Round 4", value: "Round 4" },
-          { name: "Round 5", value: "Round 5" },
-          { name: "Winners Round 1", value: "Winners Round 1" },
-          { name: "Winners Round 2", value: "Winners Round 2" },
-          { name: "Winners Round 3", value: "Winners Round 3" },
-          { name: "Winners Round 4", value: "Winners Round 4" },
-          { name: "Winners Round 5", value: "Winners Round 5" },
-          { name: "Winners Quarter-Final", value: "Winners Quarter-Final" },
-          { name: "Winners Semi-Final", value: "Winners Semi-Final" },
-          { name: "Winners Final", value: "Winners Final" },
-          { name: "Losers Round 1", value: "Losers Round 1" },
-          { name: "Losers Round 2", value: "Losers Round 2" },
-          { name: "Losers Round 3", value: "Losers Round 3" },
-          { name: "Losers Round 4", value: "Losers Round 4" },
-          { name: "Losers Round 5", value: "Losers Round 5" },
-          { name: "Losers Quarter-Final", value: "Losers Quarter-Final" },
-          { name: "Losers Semi-Final", value: "Losers Semi-Final" },
-          { name: "Losers Final", value: "Losers Final" },
-          { name: "Grand Final", value: "Grand Final" },
-          { name: "Grand Final Reset", value: "Grand Final Reset" },
+          "Round 1",
+          "Round 2",
+          "Round 3",
+          "Round 4",
+          "Round 5",
+          "Winners Round 1",
+          "Winners Round 2",
+          "Winners Round 3",
+          "Winners Round 4",
+          "Winners Round 5",
+          "Winners Quarter-Final",
+          "Winners Semi-Final",
+          "Winners Final",
+          "Losers Round 1",
+          "Losers Round 2",
+          "Losers Round 3",
+          "Losers Round 4",
+          "Losers Round 5",
+          "Losers Quarter-Final",
+          "Losers Semi-Final",
+          "Losers Final",
+          "Grand Final",
+          "Grand Final Reset",
         ],
         matchList: [
-          { name: "Best of 3", value: "Best of 3" },
-          { name: "Best of 5", value: "Best of 5" },
+          "Best of 3",
+          "Best of 5",
         ],
       }
     },
@@ -495,9 +514,9 @@
           this.p1Score = { name: "-", value: "" }
           this.p2Score = { name: "-", value: "" }
 
-          this.bracketType = { name: choice.phaseName, value: choice.phaseName }
-          this.eventRound = { name: choice.fullRoundText, value: choice.fullRoundText }
-          this.bestOf = { name: "Best of 3", value: "Best of 3" }
+          this.bracketType = choice.phaseName
+          this.eventRound = choice.fullRoundText
+          this.bestOf = choice.fullRoundText.indexOf("Final") > 0 ? 'Best of 5' : 'Best of 3'
 
           this.seatingChoice = 'No Order'
         }
@@ -528,6 +547,8 @@
         if (this.tournamentSelection != null) {
           if (this.tournamentSelection.id != null) {
 
+            const playerDictionary = {}
+
             try {
               const response = await fetch('http://'+this.host+this.port+'/smashgg/query_players?' + new URLSearchParams({"tourney_id":this.tournamentSelection.id}), {
                 method: "get",
@@ -538,7 +559,12 @@
 
               if(response.ok) {
                 const results = await response.json()
-                this.playerList = results
+
+                for(var i = 0; i < results.length; i++) {
+                  playerDictionary[results[i].name] = results[i]
+                }
+
+                this.playerList = playerDictionary
               }
             } catch (e) {
               console.log(e)
@@ -554,14 +580,47 @@
           const query = event.query
           const _filteredItems = []
 
-          for (let i = 0; i < items.length; i++) {
-            const item = items[i]
-            if (item.name.toLowerCase().indexOf(query.toLowerCase()) === 0) {
-              _filteredItems.push(item)
+          for (const item in items) {
+            if (item.toLowerCase().indexOf(query.toLowerCase()) === 0) {
+              _filteredItems.push(items[item])
             }
           }
 
           this.filteredPlayers = _filteredItems
+        }
+      },
+      filterBrackets(event) {
+        const items = this.bracketList
+
+        if (items != null) {
+          const query = event.query
+          const _filteredItems = []
+
+          for (let i = 0; i < items.length; i++) {
+            const item = items[i]
+            if (item.toLowerCase().indexOf(query.toLowerCase()) === 0) {
+              _filteredItems.push(item)
+            }
+          }
+
+          this.filteredBrackets = _filteredItems
+        }
+      },
+      filterRounds(event) {
+        const items = this.roundList
+
+        if (items != null) {
+          const query = event.query
+          const _filteredItems = []
+
+          for (let i = 0; i < items.length; i++) {
+            const item = items[i]
+            if (item.toLowerCase().indexOf(query.toLowerCase()) >= 0) {
+              _filteredItems.push(item)
+            }
+          }
+
+          this.filteredRounds = _filteredItems
         }
       },
       async importKeyOrGenerate() {
@@ -587,14 +646,14 @@
           if (this.teamOne != null && this.p1Score != null && this.teamTwo != null && this.p2Score != null) {
 
             const form = Editor.getOverlayForm(
-              this.setSelection,
+              this.playerList,
               this.teamOne,
               Editor.getFormattedScore(this.p1Score),
               this.teamTwo,
               Editor.getFormattedScore(this.p2Score),
-              Editor.getFormattedName(this.bracketType),
-              Editor.getFormattedName(this.eventRound),
-              Editor.getFormattedName(this.bestOf),
+              this.bracketType,
+              this.eventRound,
+              this.bestOf,
               this.seatingChoice
             );
 
@@ -619,12 +678,12 @@
       clearOverlayForm() {
         this.teamOne = { name: "" }
         this.teamTwo = { name: "" }
-        this.p1Score = { name: "", value: "" }
-        this.p2Score = { name: "", value: "" }
+        this.p1Score = { name: "-", value: "" }
+        this.p2Score = { name: "-", value: "" }
 
         this.bracketType = ""
         this.eventRound = ""
-        this.bestOf = ""
+        this.bestOf = "Best of 3"
 
         this.setSelection = {}
         this.seatingChoice = 'No Order'

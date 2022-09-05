@@ -55,12 +55,42 @@
   background-color: rgba(35, 125, 210, 0.9);
 }
 
+.dark-background {
+  background-color: rgba(0, 0, 0, 0.9);
+}
 
+.collapse-score {
+  height: 0px;
+}
 
 .white-border {
   border-style: solid;
   border-color: rgba(255,255,255,1);
   border-width: 5px 5px 5px 0;
+}
+
+.upper-border{
+  border-style: solid;
+  border-color: rgba(255,255,255,1);
+  border-radius: 0.5rem 0.5rem 0rem 0rem;
+  border-width: 5px 5px 0px 5px;
+}
+
+.lower-border {
+  border-style: solid;
+  border-color: rgba(255,255,255,1);
+  border-radius: 0rem 0rem 0.5rem 0.5rem;
+  border-width: 0px 5px 5px 5px;
+}
+
+.camera-boxes {
+  height: 225px;
+  border :solid;
+  border-color: white;
+  border-radius: .5rem .5rem .5rem .5rem;
+  border-width: 5px;
+  max-width: 350px;
+  margin-bottom: 15px;
 }
 
 .player-name {
@@ -83,56 +113,4 @@
   font-weight: bold;
   padding: 5px;
   color: white;
-}
-
-
-
-.uaheader {
-  height: 40px;
-  color:white;
-  font-weight:bold;
-}
-
-.uasubheader {
-  font-size: 16pt;
-  background-color: rgba(0,0,0,0.7);
-  text-align: center;
-  padding-top: 7px;
-  margin-top: -8px;
-  border-bottom-right-radius: 2rem;
-  border-bottom-left-radius: 2rem;
-  max-width: 700px;
-}
-
-.uaname {
-  font-size: 18pt;
-  max-width: 375px;
-}
-
-.uascore {
-  text-align: center;
-  font-size: 18pt;
-  background-color: rgba(0,0,0,0.90);
-  max-width: 75px;
-}
-
-.ualogo {
-  margin-top: -7px;
-  padding-left: 3px;
-  background-color: rgba(0,0,0,1);
-  border-bottom-right-radius: 0.5rem;
-  border-bottom-left-radius: 0.5rem;
-  border-top-left-radius: 0.5rem;
-  border-top-right-radius: 0.5rem;
-  max-width: 230px;
-}
-
-.rounded-pill-left {
-  border-top-left-radius: 1.5rem;
-  border-bottom-left-radius: 1.5rem;
-}
-
-.rounded-pill-right {
-  border-top-right-radius: 1.5rem;
-  border-bottom-right-radius: 1.5rem;
 }

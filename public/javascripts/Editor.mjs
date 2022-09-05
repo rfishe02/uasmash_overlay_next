@@ -19,7 +19,7 @@ export default {
     }
   },
 
-  getOverlayForm(setSelection,teamOne,p1Score,teamTwo,p2Score,bracketType,eventRound,bestOf,seatingChoice) {
+  getOverlayForm(playerList,teamOne,p1Score,teamTwo,p2Score,bracketType,eventRound,bestOf,seatingChoice) {
     const form = {};
     const teamA = { members: [] };
     const teamB = { members: [] };
@@ -34,16 +34,12 @@ export default {
     // Do not save additional information, such as social media information, if no order is specified.
 
     if(seatingChoice != 'No Order') {
-      if(setSelection != null) {
-        if (setSelection.teamOne != null) {
-          teamA.members = setSelection.teamOne.members
-        } else if(teamOne.socials != null) {
-          teamA.members.push(teamOne)
+      if(playerList != null) {
+        if (playerList[teamA.name] != null) {
+          teamA.members.push(playerList[teamA.name])
         }
-        if (setSelection.teamTwo != null) {
-          teamB.members = setSelection.teamTwo.members
-        } else if(teamTwo.socials != null) {
-          teamB.members.push(teamTwo)
+        if (playerList[teamB.name] != null) {
+          teamB.members.push(playerList[teamB.name])
         }
       }
     }
