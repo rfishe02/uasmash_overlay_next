@@ -84,7 +84,6 @@
         <div class="col-12 col-lg-6 pb-3" style="height: 515px">
 
           <p-datatable
-            show-gridlines
             :value="setList"
             v-model:selection="setSelection"
             selection-mode="single"
@@ -136,8 +135,8 @@
 
             <p-column header="Bracket & Round" filter-field="bracketAndRound">
               <template #body="{ data }">
-                <div v-if="data.state == 3" style="color: #D3D3D3;"> {{ data.bracketAndRound }} </div>
-                <div v-if="data.state == 1 || data.state == 2"> {{ data.bracketAndRound }} </div>
+                <p v-if="data.state == 3" style="margin: 0; color: #D3D3D3;"> {{ data.bracketAndRound }} </p>
+                <p v-if="data.state == 1 || data.state == 2" style="margin: 0; color: black;"> {{ data.bracketAndRound }} </p>
               </template>
               <template #filter="{ filterModel, filterCallback }">
                 <p-inputtext
@@ -152,14 +151,8 @@
 
             <p-column header="Team One" filter-field="teamOne.name">
               <template #body="{ data }">
-
-                <div v-if="data.state == 3">
-                  <p-button @click="onSetSelection(data, false)" class="p-button-text" style="font-size: 10pt; text-align: left; color: #D3D3D3" :label="data.teamOne.name"></p-button>
-                </div>
-                <div v-if="data.state == 1 || data.state == 2">
-                  <p-button @click="onSetSelection(data, false)" icon="bi bi-arrow-left" class="p-button-secondary p-button-text" style="font-size: 10pt; text-align: left; color: black;" :label="data.teamOne.name"></p-button>
-                </div>
-
+                <p v-if="data.state == 3" style="margin: 0; color: #D3D3D3">{{data.teamOne.name}}</p>
+                <p v-if="data.state == 1 || data.state == 2" style="margin: 0; color: black;">{{data.teamOne.name}}</p>
               </template>
               <template #filter="{ filterModel, filterCallback }">
                 <p-inputtext
@@ -172,16 +165,23 @@
               </template>
             </p-column>
 
+            <p-column style="max-width: 5rem">
+              <template #body="{ data }">
+                  <template v-if="data.state == 3">
+                    <p-button @click="onSetSelection(data, false)" icon="bi bi-arrow-left-circle" class="p-button-secondary p-button-text" style="font-size: 14pt;"></p-button>
+                    <p-button @click="onSetSelection(data, true)" icon="bi bi-arrow-right-circle" class="p-button-secondary p-button-text" style="font-size: 14pt;"></p-button>
+                  </template>
+                  <template v-if="data.state == 1 || data.state == 2">
+                    <p-button @click="onSetSelection(data, false)" icon="bi bi-arrow-left-circle-fill" class="p-button-secondary p-button-text" style="font-size: 14pt;"></p-button>
+                    <p-button @click="onSetSelection(data, true)" icon="bi bi-arrow-right-circle-fill" class="p-button-secondary p-button-text" style="font-size: 14pt;"></p-button>
+                  </template>
+              </template>
+            </p-column>
+
             <p-column header="Team Two" filter-field="teamTwo.name">
               <template #body="{ data }">
-
-                <div v-if="data.state == 3">
-                  <p-button @click="onSetSelection(data, true)" class="p-button-text" style="font-size: 10pt; text-align: left; color: #D3D3D3" :label="data.teamTwo.name"></p-button>
-                </div>
-                <div v-if="data.state == 1 || data.state == 2">
-                  <p-button @click="onSetSelection(data, true)" icon="bi bi-arrow-left-right" class="p-button-secondary p-button-text" style="font-size: 10pt; text-align: left; color: black;" :label="data.teamTwo.name"></p-button>
-                </div>
-
+                <p v-if="data.state == 3" style="margin: 0; color: #D3D3D3">{{data.teamTwo.name}}</p>
+                <p v-if="data.state == 1 || data.state == 2" style="margin: 0; color: black;">{{data.teamTwo.name}}</p>
               </template>
               <template #filter="{ filterModel, filterCallback }">
                 <p-inputtext
@@ -191,6 +191,19 @@
                   class="p-column-filter"
                   placeholder="Search Match"
                 ></p-inputtext>
+              </template>
+            </p-column>
+
+            <p-column style="max-width: 5rem">
+              <template #body="{ data }">
+                  <template v-if="data.state == 3">
+                    <p-button @click="onSetSelection(data, true)" icon="bi bi-arrow-left-circle" class="p-button-secondary p-button-text" style="font-size: 14pt;"></p-button>
+                    <p-button @click="onSetSelection(data, false)" icon="bi bi-arrow-right-circle" class="p-button-secondary p-button-text" style="font-size: 14pt;"></p-button>
+                  </template>
+                  <template v-if="data.state == 1 || data.state == 2">
+                    <p-button @click="onSetSelection(data, true)" icon="bi bi-arrow-left-circle-fill" class="p-button-secondary p-button-text" style="font-size: 14pt;"></p-button>
+                    <p-button @click="onSetSelection(data, false)" icon="bi bi-arrow-right-circle-fill" class="p-button-secondary p-button-text" style="font-size: 14pt;"></p-button>
+                  </template>
               </template>
             </p-column>
 
@@ -213,7 +226,6 @@
                     @complete="filterPlayers($event)"
                     field="name"
                     :dropdown="false"
-                    :class="{ 'div-highlight': highlightDiv }"
                   ></p-autocomplete>
                   <label for="autocomplete">Left Team</label>
                 </span>
@@ -402,7 +414,6 @@
         tournamentSelection: [],
         eventSelection: [],
         setSelection: [],
-        highlightDiv: false,
         teamOne: {name: ''},
         teamTwo: {name: ''},
         p1Score: {name: '-', value: ''},
@@ -535,14 +546,7 @@
           this.eventRound = this.setSelection.fullRoundText
           this.bestOf = this.setSelection.fullRoundText.indexOf("Final") > 0 ? 'Best of 5' : 'Best of 3'
 
-          this.activateHighlight()
         }
-      },
-      activateHighlight() {
-        this.highlightDiv = true
-        setTimeout(() => {
-          this.highlightDiv = false
-        }, 1500)
       },
       async importSetList() {
         if (this.eventSelection != null) {

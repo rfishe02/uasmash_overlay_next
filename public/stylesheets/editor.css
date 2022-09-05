@@ -1,8 +1,4 @@
 
-.div-highlight, input  {
-  background-color: red;
-}
-
 .p-dropdown {
   height: 40px;
   width: 100%;
@@ -42,10 +38,6 @@
 
 th {
   background-color: rgb(245, 245, 245) !important;
-}
-
-tr {
-  height: 40px !important;
 }
 
 td {
