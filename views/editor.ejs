@@ -75,14 +75,10 @@
       </div>
     </nav>
 
-    <div
-      class="container-fluid"
-      style="padding-bottom: 25px; padding-top: 15px"
-    >
+    <div class="container-fluid" style="padding-bottom: 25px; padding-top: 15px">
+
       <div class="row">
-
-        <div class="col-12 col-lg-6 pb-3" style="height: 515px">
-
+        <div class="col-12 col-lg-6 pb-3" style="height: 600px">
           <p-datatable
             :value="setList"
             v-model:selection="setSelection"
@@ -212,13 +208,14 @@
 
 
         <div class="col-12 col-lg-6">
-          <form class="border" id="overlay-edit" style="margin-bottom: 25px">
+
+          <form class="border" id="overlay-edit" style="margin-bottom: 15px">
             <div class="row" style="margin-bottom: 25px;">
-              <h5>Player Information</h5>
+              <h5>Player & Banner Update</h5>
             </div>
 
             <div class="row mb-2">
-              <div class="field col mb-2" >
+              <div class="field col" >
                 <span class="p-float-label">
                   <p-autocomplete
                     v-model="teamOne"
@@ -288,11 +285,10 @@
                   placeholder="Round"
                 ></p-autocomplete>
               </div>
-              <div class="col-6 col-md-4 mb-2">
 
+              <div class="col-6 col-md-4 mb-2">
                 <p-selectbutton :unselectable="false" v-model="bestOf" :options="matchList" aria-labelledby="">
                 </p-selectbutton>
-
                 <!--
                 <p-dropdown
                   class="w-100"
@@ -301,12 +297,11 @@
                   placeholder="Best of"
                   :editable="true"
                 ></p-dropdown>-->
-
               </div>
 
             </div>
 
-            <div class="row justify-content-between mb-3">
+            <div class="row justify-content-between pt-3">
               <div class="col-8 mb-2">
                 <p-button
                   label="Publish"
@@ -321,37 +316,49 @@
                   @click="clearOverlayForm"
                 ></p-button>
               </div>
-
-              <!--
-              <div class="col-4">
-                <p-togglebutton v-model="socketConnected"
-                on-label="Connected" off-label="Disconnected"
-                on-icon="bi bi-share-fill" off-icon="bi bi-share"
-                class="w-full sm:w-10rem">
-                </p-togglebutton>
-              </div>-->
-
             </div>
+          </form>
 
+          <form class="border" >
             <div class="row mb-3">
-              <h5>Module URL</h5>
+              <h5>Score Update</h5>
             </div>
 
-            <div class = "row">
-              <div class="col-9">
-                <div class="p-inputgroup">
-                  <p-inputtext
-                  type="text"
-                  :value="getModuleURL"
-                  > </p-inputtext>
-                  <p-button icon="pi pi-refresh" class="p-button-text" @click="regenerateKey()" ></p-button>
-                </div>
+            <div class = "row mb-3">
+              <div class="col">
+                <p-selectbutton v-model="p1ScoreIncrement" :unselectable="false" option-label="name" :options="scoreOptions" aria-labelledby=""></p-selectbutton>
+              </div>
+              <div class="col">
+                <p-selectbutton v-model="p2ScoreIncrement" :unselectable="false" option-label="name" :options="scoreOptions" aria-labelledby=""></p-selectbutton>
               </div>
             </div>
 
+            <div class="row">
+              <div class="col-8 mb-2">
+                <p-button
+                  label="Update"
+                  class="p-button-primary"
+                  style="width: 125px; margin-right: 10px"
+                  @click="submitScoreForm"
+                ></p-button>
+              </div>
+            </div>
           </form>
-        </div>
 
+          <div class="row mb-2" style="padding-left: 20px;">
+            <h6>Module URL</h6>
+          </div>
+
+          <div class="row" style="padding-left: 20px;">
+            <div class="col-9">
+              <div class="p-inputgroup">
+                <p-inputtext type="text" :value="getModuleURL"> </p-inputtext>
+                <p-button icon="pi pi-refresh" class="p-button-text" @click="regenerateKey()" ></p-button>
+              </div>
+            </div>
+          </div>
+
+        </div>
 
       </div>
 
@@ -383,7 +390,7 @@
   })
 
   socket.on("disconnect", () => {
-    socket.connect();
+    //socket.connect();
   })
 
   socket.on("close", (reason) => {
@@ -418,6 +425,8 @@
         teamTwo: {name: ''},
         p1Score: {name: '-', value: ''},
         p2Score: {name: '-', value: ''},
+        p1ScoreIncrement: '',
+        p2ScoreIncrement: '',
         bracketType: "",
         eventRound: "",
         bestOf: "Best of 3",
@@ -434,6 +443,10 @@
         scoreOptions: [
           { name: "-", value: "" },
           { name: "0", value: "0" },
+          { name: "1", value: "1" },
+          { name: "2", value: "2" },
+          { name: "3", value: "3" },
+          { name: "4", value: "4" },
         ],
         bracketList: [
           "Friendlies",
@@ -692,7 +705,7 @@
 
             // TODO: Find a way to persist data without introducing bugs. A get recent button? This should happen with user knowledge.
 
-            //this.clearOverlayForm()
+            this.clearOverlayForm()
 
           } else {
             // TODO: Throw error?
@@ -712,6 +725,23 @@
         this.bestOf = "Best of 3"
 
         this.setSelection = {}
+      },
+      submitScoreForm() {
+
+        try {
+          const form = { p1Score: '', p2Score: '' }
+          form.p1Score = this.p1ScoreIncrement.value
+          form.p2Score = this.p2ScoreIncrement.value
+
+          this.socket.emit("score-update", {
+            content: form,
+            to: this.overlayRoom,
+          })
+
+        } catch(e) {
+          console.log(e)
+        }
+
       },
       reverseTeams() {
         const tempTeam = this.teamOne

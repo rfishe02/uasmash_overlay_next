@@ -109,29 +109,27 @@
     overlayApp.eventRound = content["eventRound"].toUpperCase()
     overlayApp.bestOf = content["bestOf"].toUpperCase()
 
-    // TODO: Come up with a way to show multiple social accounts, until then truncate teams with multiple members.
-
-    if(overlayApp.p1.members != null) {
-      if(overlayApp.p1.members.length > 1) {
-        overlayApp.p1.members = []
-      }
-    }
-
-    if(overlayApp.p2.members != null) {
-      if(overlayApp.p2.members.length > 1) {
-        overlayApp.p2.members = []
-      }
-    }
-
-
     localStorage.setItem("teamOne",JSON.stringify(content["teamOne"]))
     localStorage.setItem("teamTwo",JSON.stringify(content["teamTwo"]))
-
-    // TODO: Remove typed header.
 
     localStorage.setItem("bracketType",overlayApp.bracketType)
     localStorage.setItem("eventRound",overlayApp.eventRound)
     localStorage.setItem("bestOf",overlayApp.bestOf)
+  })
+
+  socket.on("score-push", ({ content, from }) => {
+
+    overlayApp.p1Score = content["p1Score"]
+    overlayApp.p2Score = content["p2Score"]
+
+    if(overlayApp.p1 != null) {
+      overlayApp.p1.score = content["p1Score"]
+      localStorage.setItem("teamOne",JSON.stringify(content["teamOne"]))
+    }
+    if(overlayApp.p2 != null) {
+      overlayApp.p2.score = content["p2Score"]
+      localStorage.setItem("teamTwo",JSON.stringify(content["teamTwo"]))
+    }
 
   })
 

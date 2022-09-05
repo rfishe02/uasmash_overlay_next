@@ -65,23 +65,30 @@ io.on("connection", (socket) => {
   });
 
   socket.on("overlay-update", ({ content, to }, callback) => {
-   socket.to(to).emit("overlay-push", {
-     content,
-     from: socket.id,
-   });
+    socket.to(to).emit("overlay-push", {
+      content,
+      from: socket.id,
+    });
 
-   callback("200");
+    callback("200");
+  });
+
+  socket.on("score-update", ({ content, to }) => {
+    socket.to(to).emit("score-push", {
+      content,
+      from: socket.id,
+    });
   });
 
   socket.on("striker-update", ({ content, to }) => {
-  socket.to(to).emit("striker-push", {
-    content,
-    from: socket.id,
-  });
+    socket.to(to).emit("striker-push", {
+      content,
+      from: socket.id,
+    });
   });
 
   socket.on("disconnect", (reason) => {
-   console.log(socket.id+" disconnected: "+reason);
+    console.log(socket.id+" disconnected: "+reason);
   });
 
 });
