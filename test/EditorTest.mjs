@@ -28,9 +28,17 @@ describe('Editor', function () {
   })
 
   describe('#getOverlayForm', function () {
-    it('should return an object with no added data if there are no entries in player list', function () {
+    it('should return an object with proper formatting', function () {
 
-      const playerList = {}
+      var teamOne = {
+        name: 'teamOne',
+        members: []
+      }
+
+      var teamTwo = {
+        name: 'teamTwo',
+        members: []
+      }
 
       var outputA = {
         teamOne: {
@@ -49,46 +57,9 @@ describe('Editor', function () {
       }
 
       var outputB = Editor.getOverlayForm(
-        playerList,
-        'teamOne',
+        teamOne,
         'p1Score',
-        'teamTwo',
-        'p2Score',
-        'bracketType',
-        'eventRound',
-        'bestOf',
-      )
-
-      assert.deepEqual(outputA,outputB)
-    })
-    it('should return an object with member data if there are entries in player list', function () {
-
-      const playerList = {
-        teamOne: {},
-        teamTwo: {}
-      }
-
-      var outputA = {
-        teamOne: {
-          name: 'teamOne',
-          score: 'p1Score',
-          members: [{}]
-        },
-        teamTwo: {
-          name: 'teamTwo',
-          score: 'p2Score',
-          members: [{}]
-        },
-        bracketType: 'bracketType',
-        eventRound: 'eventRound',
-        bestOf: 'bestOf',
-      }
-
-      var outputB = Editor.getOverlayForm(
-        playerList,
-        'teamOne',
-        'p1Score',
-        'teamTwo',
+        teamTwo,
         'p2Score',
         'bracketType',
         'eventRound',

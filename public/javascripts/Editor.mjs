@@ -19,27 +19,55 @@ export default {
     }
   },
 
-  getOverlayForm(playerList,teamOne,p1Score,teamTwo,p2Score,bracketType,eventRound,bestOf) {
+  getTeamOneObject(setSelection, playerList, seatingChoice) {
+    const team = { name: '', members: [] }
+
+    if(seatingChoice == 'Player 1 Right') {
+      team.name = setSelection.teamTwo == null ? "" : setSelection.teamTwo.name
+    } else {
+      team.name = setSelection.teamOne == null ? "" : setSelection.teamOne.name
+    }
+
+    if (seatingChoice != 'No Order' && playerList[team.name] != null) {
+      team.members.push(playerList[team.name])
+    }
+
+    return team
+  },
+
+  getTeamTwoObject(setSelection, playerList, seatingChoice) {
+    const team = { name: '', members: [] }
+
+    if(seatingChoice == 'Player 1 Right') {
+      team.name = setSelection.teamOne == null ? "" : setSelection.teamOne.name
+    } else {
+      team.name = setSelection.teamTwo == null ? "" : setSelection.teamTwo.name
+    }
+
+    if (seatingChoice != 'No Order' && playerList[team.name] != null) {
+      team.members.push(playerList[team.name])
+    }
+
+    return team
+  },
+
+  getOverlayForm(teamOne,p1Score,teamTwo,p2Score,bracketType,eventRound,bestOf) {
     const form = {};
-    const teamA = { members: [] };
-    const teamB = { members: [] };
+    const teamA = { name: '', score: '', members: [] };
+    const teamB = { name: '', score: '', members: [] };
 
     teamA.name = this.getFormattedName(teamOne)
     teamA.score = p1Score
 
+    if(teamOne.members != null) {
+      teamA.members = teamOne.members
+    }
+
     teamB.name = this.getFormattedName(teamTwo)
     teamB.score = p2Score
 
-    // TODO: Rethink this approach?
-    // Do not save additional information, such as social media information, if no order is specified.
-
-    if(playerList != null) {
-      if (playerList[teamA.name] != null) {
-        teamA.members.push(playerList[teamA.name])
-      }
-      if (playerList[teamB.name] != null) {
-        teamB.members.push(playerList[teamB.name])
-      }
+    if(teamTwo.members != null) {
+      teamB.members = teamTwo.members
     }
 
     form["teamOne"] = teamA
