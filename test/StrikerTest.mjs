@@ -181,31 +181,43 @@ describe('Striker', function () {
   })
 
   describe('#createOptionsList', function () {
-    it('return array of options give starter and counterpick selections', function () {
+    it('return array of options given starter selections', function () {
 
-      var starter = [{
+      var starter = ["Yoshi's Island","Battlefield"]
+
+      var outcome = [{
         stageName: "Yoshi's Island",
-        order: '',
+        order: 'STARTER',
         choice: '',
         playerName: ''
       },{
         stageName: "Battlefield",
-        order: '',
+        order: 'STARTER',
         choice: '',
         playerName: ''
       }]
 
-      var counterpick = [{
-        stageName: "Small Battlefield",
-        order: '',
+      assert.deepEqual(Striker.createOptionsList(starter,'STARTER'),outcome)
+
+    })
+  })
+
+  describe('#addToOptionsList', function () {
+    it('return array of options with added stage selections', function () {
+
+      var options = [{
+        stageName: "Yoshi's Island",
+        order: 'STARTER',
         choice: '',
         playerName: ''
       },{
-        stageName: "Yoshi's Story",
-        order: '',
+        stageName: "Battlefield",
+        order: 'STARTER',
         choice: '',
         playerName: ''
       }]
+
+      var counterpick = ["Small Battlefield","Yoshi's Story"]
 
       var outcome = [{
         stageName: "Yoshi's Island",
@@ -229,7 +241,40 @@ describe('Striker', function () {
         playerName: ''
       }]
 
-      assert.deepEqual(Striker.createOptionsList(starter,counterpick),outcome)
+      assert.deepEqual(Striker.addToOptionsList(options,counterpick,'COUNTERPICK'),outcome)
+
+    })
+  })
+
+  describe('#createCombinedOptionsList', function () {
+    it('return array of options give starter and counterpick selections', function () {
+
+      var starter = ["Yoshi's Island","Battlefield"]
+      var counterpick = ["Small Battlefield","Yoshi's Story"]
+
+      var outcome = [{
+        stageName: "Yoshi's Island",
+        order: 'STARTER',
+        choice: '',
+        playerName: ''
+      },{
+        stageName: "Battlefield",
+        order: 'STARTER',
+        choice: '',
+        playerName: ''
+      },{
+        stageName: "Small Battlefield",
+        order: 'COUNTERPICK',
+        choice: '',
+        playerName: ''
+      },{
+        stageName: "Yoshi's Story",
+        order: 'COUNTERPICK',
+        choice: '',
+        playerName: ''
+      }]
+
+      assert.deepEqual(Striker.createCombinedOptionsList(starter,counterpick),outcome)
 
     })
   })

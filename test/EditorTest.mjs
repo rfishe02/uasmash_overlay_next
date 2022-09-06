@@ -27,57 +27,11 @@ describe('Editor', function () {
     })
   })
 
-  describe('#getFormattedEventHeader', function () {
-    it('should return an empty string if all inputs are null', function () {
-      assert.equal(Editor.getFormattedEventHeader(
-        null,
-        null,
-        null,
-        null,
-        false
-      ),'')
-    })
-    it('should return string without bracket if bracket is empty', function () {
-      assert.equal(Editor.getFormattedEventHeader(
-        {name:'-', value:''},
-        {name:'round 1', value:'round 1'},
-        {name:'best of 3', value:'best of 3'},
-        '',
-        false
-      ),'round 1 - best of 3')
-    })
-    it('should return string without round if round is empty', function () {
-      assert.equal(Editor.getFormattedEventHeader(
-        {name:'pools', value:'pools'},
-        {name:'-', value:''},
-        {name:'best of 3', value:'best of 3'},
-        '',
-        false
-      ),'pools - best of 3')
-    })
-
-    it('should return string without "best of" if it is empty', function () {
-      assert.equal(Editor.getFormattedEventHeader(
-        {name:'pools', value:'pools'},
-        {name:'round 1', value:'round 1'},
-        {name:'-', value:''},
-        '',
-        false
-      ),'pools round 1')
-    })
-    it('should return the typed header if input is active', function () {
-      assert.equal(Editor.getFormattedEventHeader(
-        {name:'pools', value:'pools'},
-        {name:'round 1', value:'round 1'},
-        {name:'beat of 3', value:'best of 3'},
-        'this is a test',
-        true
-      ),'this is a test')
-    })
-  })
-
   describe('#getOverlayForm', function () {
-    it('should return a properly formatted object', function () {
+    it('should return an object with no added data if there are no entries in player list', function () {
+
+      const playerList = {}
+
       var outputA = {
         teamOne: {
           name: 'teamOne',
@@ -92,19 +46,53 @@ describe('Editor', function () {
         bracketType: 'bracketType',
         eventRound: 'eventRound',
         bestOf: 'bestOf',
-        typedHeader: 'typedHeader'
       }
 
       var outputB = Editor.getOverlayForm(
-        null,
+        playerList,
         'teamOne',
         'p1Score',
         'teamTwo',
         'p2Score',
-        {name:'bracketType',value:'bracketType'},
-        {name:'eventRound',value:'eventRound'},
-        {name:'bestOf',value:'bestOf'},
-        'typedHeader'
+        'bracketType',
+        'eventRound',
+        'bestOf',
+      )
+
+      assert.deepEqual(outputA,outputB)
+    })
+    it('should return an object with member data if there are entries in player list', function () {
+
+      const playerList = {
+        teamOne: {},
+        teamTwo: {}
+      }
+
+      var outputA = {
+        teamOne: {
+          name: 'teamOne',
+          score: 'p1Score',
+          members: [{}]
+        },
+        teamTwo: {
+          name: 'teamTwo',
+          score: 'p2Score',
+          members: [{}]
+        },
+        bracketType: 'bracketType',
+        eventRound: 'eventRound',
+        bestOf: 'bestOf',
+      }
+
+      var outputB = Editor.getOverlayForm(
+        playerList,
+        'teamOne',
+        'p1Score',
+        'teamTwo',
+        'p2Score',
+        'bracketType',
+        'eventRound',
+        'bestOf',
       )
 
       assert.deepEqual(outputA,outputB)
