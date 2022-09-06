@@ -1,6 +1,5 @@
 
 export default {
-
   pick(options, choices, index, davesRule) {
     const stage = options[index]
 
@@ -64,23 +63,13 @@ export default {
     return data
   },
 
-  createOptionsList(starterStages, counterpickStages) {
+  createOptionsList(stages, stageOrder) {
     const options = []
 
-    for (let i = 0; i < starterStages.length; i++) {
+    for (let i = 0; i < stages.length; i++) {
       const item = {
-        stageName: starterStages[i].stageName,
-        order: "STARTER",
-        choice: '',
-        playerName: ''
-      }
-      options.push(item);
-    }
-
-    for (let j = 0; j < counterpickStages.length; j++) {
-      const item = {
-        stageName: counterpickStages[j].stageName,
-        order: "COUNTERPICK",
+        stageName: stages[i],
+        order: stageOrder,
         choice: '',
         playerName: ''
       }
@@ -90,4 +79,45 @@ export default {
     return options
   },
 
+  addToOptionsList(listOfOptions, stages, stageOrder) {
+    const options = listOfOptions
+
+    for (let i = 0; i < stages.length; i++) {
+      const item = {
+        stageName: stages[i],
+        order: stageOrder,
+        choice: '',
+        playerName: ''
+      }
+      options.push(item);
+    }
+
+    return options
+  },
+
+  createCombinedOptionsList(starterStages, counterpickStages) {
+    const options = []
+
+    for (let i = 0; i < starterStages.length; i++) {
+      const item = {
+        stageName: starterStages[i],
+        order: "STARTER",
+        choice: '',
+        playerName: ''
+      }
+      options.push(item);
+    }
+
+    for (let j = 0; j < counterpickStages.length; j++) {
+      const item = {
+        stageName: counterpickStages[j],
+        order: "COUNTERPICK",
+        choice: '',
+        playerName: ''
+      }
+      options.push(item);
+    }
+
+    return options
+  },
 }

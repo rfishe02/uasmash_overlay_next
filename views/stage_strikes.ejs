@@ -89,21 +89,24 @@
   })
 
   socket.on("striker-push", ({ content, from }) => {
-    const data = [];
+    const data = []
 
     for (let i = 0; i < content.length; i++) {
-      const strike = {};
-      strike.stageName = content[i]["stageName"];
-      strike.order = content[i]["order"];
-      strike.choice = content[i]["choice"];
-      strike.playerName = content[i]["playerName"];
-
+      const strike = {}
+      strike.stageName = content[i]["stageName"]
+      strike.order = content[i]["order"]
+      strike.choice = content[i]["choice"]
+      strike.playerName = content[i]["playerName"]
       data.push(strike);
     }
 
-    stageStrikesApp.strikeList = data;
-    stageStrikesApp.showstrike = true;
-    setTimeout(() => (stageStrikesApp.showstrike = false), 5000);
+    clearTimeout(stageStrikesApp.timeOutID)
+
+    stageStrikesApp.showstrike = true
+    stageStrikesApp.strikeList = data
+
+    stageStrikesApp.timeOutID = setTimeout(() => (stageStrikesApp.showstrike = false), 10000)
+
   });
 
   socket.on("connect_error", (err) => {
@@ -127,7 +130,7 @@
         showstrike: false,
         strikeList: [],
         stageImageURLs: {},
-
+        timeOutID: -1,
       }
     },
     mounted() {

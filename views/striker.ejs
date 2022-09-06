@@ -115,9 +115,8 @@
             <div class="col-12 mb-3">
               <p-multiselect
                 v-model="starterSelection"
-                :options="stageList"
+                :options="stageNameList"
                 :filter="true"
-                option-label="stageName"
                 placeholder="Starter Stages"
                 style="width: 100%"
                 display="chip"
@@ -129,9 +128,8 @@
             <div class="col-12 mb-3">
               <p-multiselect
                 v-model="counterpickSelection"
-                :options="stageList"
+                :options="stageNameList"
                 :filter="true"
-                option-label="stageName"
                 placeholder="Counterpick Stages"
                 style="width: 100%"
                 display="chip"
@@ -162,45 +160,51 @@
     <div class="container-md mt-2 mb-2">
       <div class="row row-cols-2 row-cols-sm-4 row-cols-lg-5 rounded" style="overflow-y: auto; overflow-x: hidden">
 
-        <transition-group name="list">
+        <transition-group name="fade">
           <template v-for="(item, index) in options" v-bind:key="item">
 
-            <div class="col p-1" v-if="turns != 0 || item.order != 'COUNTERPICK'">
-              <div class="card shadow text-center border-secondary " :class="{ 'bg-secondary text-light' : item.choice == Choice.Strike }"
-              >
-
+            <div class="col p-1" >
+              <div class="card shadow text-center border-secondary" :class="{ 'bg-secondary text-light' : item.choice == Choice.Strike }">
                 <card-header :item="item" :url="getImageURL(item.stageName)"></card-header>
                 <card-body :item="item"></card-body>
 
                 <div class="card-footer p-2" :class="{ 'border-light': item.choice == Choice.None, 'border-dark' : item.choice == Choice.Strike }">
                   <div class="row justify-content-center" v-if="item.choice == Choice.None">
-                    <div class="col">
-                      <button class="btn btn-light text-primary" type="button" @click="pickStage(index, true)" style="font-size: 16pt">
+                    <div class="col-6 p-0">
+                      <!-- <button class="btn btn-light text-primary" type="button" @click="pickStage(index, true)" style="font-size: 16pt">
                         <i class="bi bi-check-circle"></i>
+                      </button>-->
+                      <button class="btn btn-primary" type="button" @click="pickStage(index, true)" style="font-size: 10pt; width: 75px;">
+                        PICK
                       </button>
                     </div>
-                    <div class="col">
-                      <button class="btn btn-light text-danger" type="button" @click="pickStage(index, false)" style="font-size: 16pt">
+                    <div class="col-6 p-0">
+                      <!-- <button class="btn btn-light text-danger" type="button" @click="pickStage(index, false)" style="font-size: 16pt">
                         <i class="bi bi-x-circle-fill"></i>
+                      </button>-->
+                      <button class="btn btn-danger" type="button" @click="pickStage(index, false)" style="font-size: 10pt; width: 75px;">
+                        STRIKE
                       </button>
                     </div>
                   </div>
 
                   <div class="row justify-content-center" v-if="item.choice == Choice.Strike">
                     <div class="col">
-                      <button class="btn btn-dark text-light" type="button" @click="undoChoice(item.stageName)" style="font-size: 16pt">
+                      <!-- <button class="btn btn-dark text-light" type="button" @click="undoChoice(item.stageName)" style="font-size: 16pt">
                         <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>-->
+                      <button class="btn btn-dark text-light" type="button" @click="undoChoice(item.stageName)" style="font-size: 10pt">
+                        UNDO
                       </button>
                     </div>
                   </div>
-
                 </div>
-
               </div>
             </div>
 
           </template>
         </transition-group>
+
       </div>
 
       <template v-for="(record, index) in previousChoices" v-bind:key="record">
@@ -209,8 +213,7 @@
           <template v-for="item in record" v-bind:key="item">
             <div class="col p-1">
 
-              <stage-card-small :item="item" :url="getImageURL(item.stageName)">
-              </stage-card-small>
+              <stage-card-small :item="item" :url="getImageURL(item.stageName)"></stage-card-small>
 
             </div>
           </template>
@@ -231,7 +234,7 @@
   import Stage from '/javascripts/Stage.js'
   import KeyManager from '/javascripts/KeyManager.js'
 
-  const { createApp} = Vue
+  const { createApp } = Vue
 
   const socket = io("http://" + window.location.hostname + ":3000", {
     reconnectionDelayMax: 10000,
@@ -272,13 +275,12 @@
         host: window.location.hostname,
         port: ":3000",
         stageImageURLs: {},
-        stageList: [],
+        stageNameList: [],
         starterSelection: [],
         counterpickSelection: [],
         strikerModule: "",
         strikerRoom: "",
         display: false,
-        previousOptions: [],
         options: [],
         choices: [],
         previousChoices: [],
@@ -312,17 +314,17 @@
     methods: {
       getNumberOfChoices() {
         if (this.choices != null) {
-          return this.choices.length;
+          return this.choices.length
         } else {
-          return 0;
+          return 0
         }
       },
       getImageURL(stageName) {
         if (this.stageImageURLs != null && stageName != null) {
-          return this.stageImageURLs[stageName];
+          return this.stageImageURLs[stageName]
         } else {
           // TODO: Return placeholder image.
-          return "./pexels-gradienta-6985001.jpeg";
+          return "./pexels-gradienta-6985001.jpeg"
         }
       },
       async getStageImageURLs() {
@@ -332,17 +334,17 @@
             headers: {
               "Content-Type": "application/json; charset=UTF-8",
             },
-          });
+          })
 
           if(response.ok) {
             const results = await response.json()
-            const data = {};
+            const data = {}
 
             for (let i = 0; i < results.length; i++) {
-              data[results[i].stage_name] = "/stages/" + results[i].image_url;
+              data[results[i].stage_name] = "/stages/" + results[i].image_url
             }
 
-            this.stageImageURLs = data;
+            this.stageImageURLs = data
           }
         } catch (e) {
           console.log(e)
@@ -355,17 +357,16 @@
             headers: {
               "Content-Type": "application/json; charset=UTF-8",
             },
-          });
+          })
 
           if(response.ok) {
             const results = await response.json()
-            const data = [];
+            const data = []
 
             for (let i = 0; i < results.length; i++) {
-              const item = { stageName: results[i].stage_name, order: '', choice: '', playerName: ''};
-              data.push(item);
+              data.push(results[i].stage_name)
             }
-            this.stageList = data;
+            this.stageNameList = data
           }
         } catch (e) {
           console.log(e)
@@ -384,8 +385,11 @@
             this.submitStageStrikes(stages)
 
             this.choices = []
-            this.turns++
 
+            if(this.turns == 0) {
+              this.options = Striker.addToOptionsList(this.options,this.counterpickSelection,'COUNTERPICK')
+            }
+            this.turns++
           } else {
             Striker.strike(this.options,this.choices,index)
           }
@@ -400,7 +404,6 @@
       },
       async submitStageStrikes(stages) {
         try {
-
           if (this.strikerRoom != null) {
             const data = Striker.createStageStrikesForm(stages)
 
@@ -409,65 +412,56 @@
               to: this.strikerRoom,
             });
           }
-
         } catch (e) {
-          console.log(e);
+          console.log(e)
         }
       },
       resetOptionsAndChoices() {
-        this.options = [];
-        this.choices = [];
-        this.previousChoices = [];
-        this.turns = 0;
+        this.options = []
+        this.choices = []
+        this.turns = 0
       },
       resetActivityAndReloadStages() {
-        this.resetOptionsAndChoices();
-        this.loadStageSelections();
+        this.resetOptionsAndChoices()
+        this.loadStageSelections()
       },
       toggleStrikerConfig() {
         this.display = !this.display;
       },
       saveStrikerConfig() {
-        var stageSelections = [];
-        var prevSelections = [];
+        var stageSelections = []
 
         try {
           if (this.starterSelection != null && this.counterpickSelection != null) {
-            stageSelections = Striker.createOptionsList(this.starterSelection,this.counterpickSelection)
-            prevSelections = Striker.createOptionsList(this.starterSelection,this.counterpickSelection)
+            stageSelections = Striker.createOptionsList(this.starterSelection,'STARTER')
 
-            this.toggleStrikerConfig();
-            this.clearConfigStageSelections();
-            this.resetOptionsAndChoices();
+            this.toggleStrikerConfig()
+            this.resetOptionsAndChoices()
 
-            this.saveStageSelectionsToDB(stageSelections)
+            this.saveStageSelectionsToDB(Striker.createCombinedOptionsList(this.starterSelection,this.counterpickSelection))
           }
         } catch(e) {
           console.log(e)
         }
 
         this.options = stageSelections;
-        this.previousOptions = prevSelections;
       },
       clearConfigStageSelections() {
-        this.starterSelection = [];
-        this.counterpickSelection = [];
+        this.starterSelection = []
+        this.counterpickSelection = []
       },
       loadStageSelections() {
-        if (this.previousOptions != null) {
-          if (this.previousOptions.length > 0) {
-            const data = [];
+        if (this.starterSelection != null) {
+          if (this.starterSelection.length > 0) {
 
-            for (let i = 0; i < this.previousOptions.length; i++) {
-              data.push(new Stage(this.previousOptions[i].stageName,this.previousOptions[i].order,this.Choice.None,''));
-            }
+            const data = Striker.createOptionsList(this.starterSelection,'STARTER')
+            this.options = data
 
-            this.options = data;
           } else {
-            this.loadStageSelectionsFromDB();
+            this.loadStageSelectionsFromDB()
           }
         } else {
-          this.loadStageSelectionsFromDB();
+          this.loadStageSelectionsFromDB()
         }
       },
       async saveStageSelectionsToDB(stage_list) {
@@ -503,23 +497,24 @@
           if(response.ok) {
             const results = await response.json()
 
-            this.options = []
-            this.previousOptions = []
-
             if(results.length > 0) {
               if(results[0].stage_list != undefined) {
+                this.starterSelection = []
+                this.counterpickSelection = []
 
                 for(var i = 0; i < results[0].stage_list.length; i++){
-                  this.previousOptions.push(results[0].stage_list[i])
-                  this.options.push({
-                    stageName: results[0].stage_list[i].stageName,
-                    order: results[0].stage_list[i].order,
-                    choice: results[0].stage_list[i].choice,
-                    playerName: results[0].stage_list[i].playerName
-                  })
+                  const stageName = results[0].stage_list[i].stageName
+                  if(results[0].stage_list[i].order == 'STARTER') {
+                    this.starterSelection.push(stageName)
+                  } else {
+                    this.counterpickSelection.push(stageName)
+                  }
                 }
+
+                this.options = Striker.createOptionsList(this.starterSelection,'STARTER')
               }
             }
+
           }
 
         } catch (e) {

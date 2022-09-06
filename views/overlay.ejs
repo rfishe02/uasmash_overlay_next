@@ -97,38 +97,44 @@
   })
 
   socket.on("overlay-push", ({ content, from }) => {
-    overlayApp.p1 = content["teamOne"]
-    overlayApp.p2 = content["teamTwo"]
+    try {
 
-    overlayApp.p1Name = overlayApp.p1 == null ? "" : overlayApp.p1.name
-    overlayApp.p1Score = overlayApp.p1 == null ? "" : overlayApp.p1.score
+      overlayApp.p1 = content["teamOne"]
+      overlayApp.p2 = content["teamTwo"]
 
-    overlayApp.p2Name = overlayApp.p2 == null ? "" : overlayApp.p2.name
-    overlayApp.p2Score = overlayApp.p2 == null ? "" : overlayApp.p2.score
+      overlayApp.p1Name = overlayApp.p1 == null ? "" : overlayApp.p1.name
+      overlayApp.p1Score = overlayApp.p1 == null ? "" : overlayApp.p1.score
 
-    overlayApp.bracketType = content["bracketType"].toUpperCase()
-    overlayApp.eventRound = content["eventRound"].toUpperCase()
-    overlayApp.bestOf = content["bestOf"].toUpperCase()
+      overlayApp.p2Name = overlayApp.p2 == null ? "" : overlayApp.p2.name
+      overlayApp.p2Score = overlayApp.p2 == null ? "" : overlayApp.p2.score
 
-    sessionStorage.setItem("teamOne",JSON.stringify(content["teamOne"]))
-    sessionStorage.setItem("teamTwo",JSON.stringify(content["teamTwo"]))
+      overlayApp.bracketType = content["bracketType"] == null ? "" : content["bracketType"].toUpperCase()
+      overlayApp.eventRound = content["eventRound"] == null ? "" : content["eventRound"].toUpperCase()
+      overlayApp.bestOf = content["bestOf"] == null ? "" : content["bestOf"].toUpperCase()
 
-    sessionStorage.setItem("bracketType",overlayApp.bracketType)
-    sessionStorage.setItem("eventRound",overlayApp.eventRound)
-    sessionStorage.setItem("bestOf",overlayApp.bestOf)
+      sessionStorage.setItem("teamOne",JSON.stringify(content["teamOne"]))
+      sessionStorage.setItem("teamTwo",JSON.stringify(content["teamTwo"]))
+
+      sessionStorage.setItem("bracketType",overlayApp.bracketType)
+      sessionStorage.setItem("eventRound",overlayApp.eventRound)
+      sessionStorage.setItem("bestOf",overlayApp.bestOf)
+
+    } catch(e) {
+      console.log(e)
+    }
   })
 
   socket.on("score-push", ({ content, from }) => {
 
-    overlayApp.p1Score = content["p1Score"]
-    overlayApp.p2Score = content["p2Score"]
+    overlayApp.p1Score = content["p1Score"] == null ? "" : content["p1Score"]
+    overlayApp.p2Score = content["p2Score"] == null ? "" : content["p1Score"]
 
     if(overlayApp.p1 != null) {
-      overlayApp.p1.score = content["p1Score"]
+      overlayApp.p1.score = overlayApp.p1Score
       sessionStorage.setItem("teamOne",JSON.stringify(overlayApp.p1))
     }
     if(overlayApp.p2 != null) {
-      overlayApp.p2.score = content["p2Score"]
+      overlayApp.p2.score = overlayApp.p2Score
       sessionStorage.setItem("teamTwo",JSON.stringify(overlayApp.p2))
     }
 
