@@ -309,7 +309,7 @@
               <div class="col-8 mb-2">
                 <p-button
                   label="Publish"
-                  class="p-button-primary"
+                  class="p-button-outlined"
                   style="width: 125px; margin-right: 10px"
                   @click="submitOverlayForm"
                 ></p-button>
@@ -337,13 +337,19 @@
               </div>
             </div>
 
-            <div class="row">
-              <div class="col-8 mb-2">
+            <div class="row pt-3">
+              <div class="col">
                 <p-button
                   label="Update"
-                  class="p-button-primary"
+                  class="p-button-outlined"
                   style="width: 125px; margin-right: 10px"
                   @click="submitScoreForm"
+                ></p-button>
+                <p-button
+                  label="Reset"
+                  class="p-button-text"
+                  style="width: 125px"
+                  @click="clearScoreForm"
                 ></p-button>
               </div>
             </div>
@@ -685,10 +691,7 @@
               this.bestOf,
             );
 
-            this.socket.emit("overlay-update", {
-              content: form,
-              to: this.overlayRoom,
-            }, (response) => {
+            this.socket.emit("overlay-update", {content: form, to: this.overlayRoom}, (response) => {
               console.log(response)
             })
 
@@ -714,6 +717,10 @@
         this.bestOf = "Best of 3"
 
         this.setSelection = {}
+      },
+      clearScoreForm() {
+        this.p1ScoreIncrement = { name: "-", value: "" }
+        this.p2ScoreIncrement = { name: "-", value: "" }
       },
       submitScoreForm() {
 
