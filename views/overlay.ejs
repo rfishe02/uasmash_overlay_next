@@ -127,7 +127,7 @@
   socket.on("score-push", ({ content, from }) => {
 
     overlayApp.p1Score = content["p1Score"] == null ? "" : content["p1Score"]
-    overlayApp.p2Score = content["p2Score"] == null ? "" : content["p1Score"]
+    overlayApp.p2Score = content["p2Score"] == null ? "" : content["p2Score"]
 
     if(overlayApp.p1 != null) {
       overlayApp.p1.score = overlayApp.p1Score
