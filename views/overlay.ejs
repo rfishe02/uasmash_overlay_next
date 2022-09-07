@@ -36,44 +36,17 @@
 
       <div class="container-fluid" style="width: 1920px; height: 1080px;">
 
-        <div class="row justify-content-center">
-          <div class="col-2">
-            <img src="/fsmsmashlogo.png" style="margin-left: -5px; height: 75px; top: 3%; position: absolute;"/>
-          </div>
-        </div>
-
-        <transition>
-          <div v-if="p1Name.length > 0 || p2Name.length > 0" class="row justify-content-center" style="padding-top: 20px;">
-            <team-one :name='p1Name' :score="p1Score" :title="eventRound" :color="'team-one-gradient'"> </team-one>
-            <div class="col-2"></div>
-            <team-two :name='p2Name' :score="p2Score" :title="bestOf" :color="'team-two-gradient'"> </team-two>
-          </div>
-        </transition>
-
-        <transition>
-          <div v-if="p1Name.length > 0 || p2Name.length > 0" class="row justify-content-center">
-            <central-header :round="eventRound" :bestof="bestOf"
-            :leftcolor="{'dark-background': eventRound.length > 0 || bestOf.length > 0, 'collapse-score': eventRound.length == 0 && bestOf.length == 0}"
-            :rightcolor="{'dark-background': eventRound.length > 0 || bestOf.length > 0, 'collapse-score': eventRound.length == 0 && bestOf.length == 0}"> </central-header>
-          </div>
-        </transition>
-
-        <transition>
-          <div v-if="bracketType.length > 0" class="row" style="position: absolute; left: 10px; top: 10%; min-width: 200px;">
-            <left-header :title="bracketType"> </left-header>
-          </div>
-        </transition>
-
-        <div class="row justify-content-between fixed-bottom">
-          <div class="col shadow camera-boxes" style="margin-left: 25px;">
-            <social-media :members="p1.members"> </social-media>
-          </div>
-
-          <div class="col shadow camera-boxes" style="margin-right: 25px;">
-            <social-media :members="p2.members"> </social-media>
-          </div>
-
-        </div>
+        <gameplay-overlay v-if="type == 0"
+        :p1name="p1Name"
+        :p2name="p2Name"
+        :p1score="p1Score"
+        :p2score="p2Score"
+        :eventround="eventRound"
+        :bestof="bestOf"
+        :bracketType="bracketType"
+        :p1members="p1.members"
+        :p2members="p2.members"
+        > </gameplay-overlay>
 
       </div>
 
@@ -83,11 +56,9 @@
 </body>
 
 <script type="module">
-  import TeamOne from '/javascripts/TeamOne.js'
-  import TeamTwo from '/javascripts/TeamTwo.js'
-  import LeftHeader from '/javascripts/LeftHeader.js'
-  import CentralHeader from '/javascripts/CentralHeader.js'
-  import SocialMedia from '/javascripts/SocialMedia.js'
+
+
+  import GameplayOverlay from '/javascripts/GameplayOverlay.js'
 
   const { createApp} = Vue
 
@@ -154,16 +125,21 @@
         bracketType: "",
         eventRound:"",
         bestOf:"",
-        socket: socket
+        socket: socket,
+        type: 0
       }
     },
     mounted() {
       const urlParams = new URLSearchParams(window.location.search)
       const room = urlParams.get('id')
+      const type = urlParams.get('type')
 
       if(room != null) {
         this.socket.connect()
         this.socket.emit("subscribe",room)
+      }
+      if(type != null) {
+        this.type = type
       }
 
       const teamOne = sessionStorage.getItem("teamOne")
@@ -199,11 +175,7 @@
 
     },
     components: {
-      TeamOne,
-      TeamTwo,
-      LeftHeader,
-      CentralHeader,
-      SocialMedia,
+      GameplayOverlay,
     }
   }).mount('#app')
 

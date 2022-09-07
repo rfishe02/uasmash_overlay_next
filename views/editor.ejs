@@ -360,9 +360,15 @@
           </div>
 
           <div class="row" style="padding-left: 20px;">
-            <div class="col-9">
+            <div class="col-12 mb-2">
               <div class="p-inputgroup">
-                <p-inputtext type="text" :value="getModuleURL"> </p-inputtext>
+                <p-inputtext type="text" :value="getModuleURL(0)"> </p-inputtext>
+                <p-button icon="pi pi-refresh" class="p-button-text" @click="regenerateKey()" ></p-button>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="p-inputgroup">
+                <p-inputtext type="text" :value="getModuleURL(1)"> </p-inputtext>
                 <p-button icon="pi pi-refresh" class="p-button-text" @click="regenerateKey()" ></p-button>
               </div>
             </div>
@@ -742,6 +748,13 @@
 
         this.teamOne = this.teamTwo
         this.teamTwo = tempTeam
+      },
+      getModuleURL(type) {
+        if(this.overlayRoom != null && this.overlayModule != null) {
+          return this.host +this.port+ "/" + this.overlayModule + "?id=" + this.overlayRoom + "&type=" + type
+        } else {
+          return ''
+        }
       }
     },
     computed: {
@@ -756,13 +769,6 @@
       },
       getPlayer2Score() {
         return Editor.getFormattedScore(this.p2Score)
-      },
-      getModuleURL() {
-        if(this.overlayRoom != null && this.overlayModule != null) {
-          return this.host +this.port+ "/" + this.overlayModule + "?id=" + this.overlayRoom
-        } else {
-          return ''
-        }
       }
     },
     components: {

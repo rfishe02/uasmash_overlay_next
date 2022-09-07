@@ -1,8 +1,6 @@
 
 export default {
-  props: {
-    members: '',
-  },
+  props: ['members'],
   template: `
   <template v-for="(item, index) in members">
     <div class="row h-100 align-content-end">
