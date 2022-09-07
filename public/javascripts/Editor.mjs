@@ -59,21 +59,21 @@ export default {
     teamA.name = this.getFormattedName(teamOne)
     teamA.score = p1Score
 
-    if(teamOne.members != null) {
-      teamA.members = teamOne.members
-    }
     if(teamOne.socials != null) {
       teamA.members.push(teamOne)
+    }
+    if(teamOne.members != null) {
+      teamA.members = teamOne.members
     }
 
     teamB.name = this.getFormattedName(teamTwo)
     teamB.score = p2Score
 
-    if(teamTwo.members != null) {
-      teamB.members = teamTwo.members
-    }
     if(teamTwo.socials != null) {
       teamB.members.push(teamTwo)
+    }
+    if(teamTwo.members != null) {
+      teamB.members = teamTwo.members
     }
 
     form["teamOne"] = teamA

@@ -123,7 +123,7 @@
   })
 
   socket.on("disconnect", () => {
-
+    socket.connect()
   })
 
   const stageStrikesApp = createApp({

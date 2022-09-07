@@ -366,12 +366,13 @@
                 <p-button icon="pi pi-refresh" class="p-button-text" @click="regenerateKey()" ></p-button>
               </div>
             </div>
+            <!--
             <div class="col-12">
               <div class="p-inputgroup">
                 <p-inputtext type="text" :value="getModuleURL(1)"> </p-inputtext>
                 <p-button icon="pi pi-refresh" class="p-button-text" @click="regenerateKey()" ></p-button>
               </div>
-            </div>
+            </div>-->
           </div>
 
         </div>
@@ -406,7 +407,7 @@
   })
 
   socket.on("disconnect", () => {
-    //socket.connect();
+    socket.connect();
   })
 
   socket.on("close", (reason) => {
@@ -515,7 +516,6 @@
           this.socket.emit("subscribe",room)
         }
       })
-
     },
     methods: {
       async setInitialState() {
@@ -755,7 +755,7 @@
         } else {
           return ''
         }
-      }
+      },
     },
     computed: {
       getTeamOneName() {
