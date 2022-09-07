@@ -11,17 +11,17 @@ export default {
   template: `
   <div class="row justify-content-center">
     <div class="col-2">
-      <img src="/fsmsmashlogo.png" style="margin-left: -5px; height: 75px; top: 3%; position: absolute;"/>
+      <img src="/fsmsmashlogo.png" style="margin-left: -5px; height: 75px; top: 2%; position: absolute;"/>
     </div>
   </div>
 
   <transition>
-    <div v-if="p1name.length > 0 || p2name.length > 0" class="row justify-content-center" style="padding-top: 20px;">
+    <div v-if="p1name.length > 0 || p2name.length > 0" class="row justify-content-center" style="padding-top: 15px;">
 
       <div class="col-3 shadow upper-border">
         <div class="row h-100 team-one-gradient" >
           <div class="col-11">
-            <div class="player-name">{{p1name}}</div>
+            <div class="player-name" >{{p1name}}</div>
           </div>
           <div class="col-1">
             <div class="player-score">{{p1score}}</div>
@@ -37,7 +37,7 @@ export default {
             <div class="player-score">{{p2score}}</div>
           </div>
           <div class="col-11" style="text-align: right;">
-            <div class="player-name">{{p2name}}</div>
+            <div class="player-name" >{{p2name}}</div>
           </div>
         </div>
       </div>
@@ -47,23 +47,24 @@ export default {
 
   <transition>
     <div v-if="p1name.length > 0 || p2name.length > 0" class="row justify-content-center">
-      <div class="col-3 shadow dark-background lower-border" :class="{'dark-background': eventround.length > 0 || bestof.length > 0, 'collapse-score': eventround.length == 0 && bestof.length == 0}" style="">
-        <div class="event-title">{{eventround}}</div>
+      <div class="col-3 shadow dark-background lower-border"
+      :class="{'dark-background': eventround.length > 0 || bestof.length > 0, 'collapse-score': eventround.length == 0 && bestof.length == 0}" >
+        <div class="event-title" >{{eventround}}</div>
       </div>
 
       <div class="col-2"> </div>
 
-      <div class="col-3 shadow dark-background lower-border" :class="{'dark-background': eventround.length > 0 || bestof.length > 0, 'collapse-score': eventround.length == 0 && bestof.length == 0}" style="text-align: right;">
-        <div class="event-title">{{bestof}}</div>
+      <div class="col-3 shadow dark-background lower-border"
+      :class="{'dark-background': eventround.length > 0 || bestof.length > 0, 'collapse-score': eventround.length == 0 && bestof.length == 0}" style="text-align: right;">
+        <div class="event-title" >{{bestof}}</div>
       </div>
     </div>
   </transition>
 
   <transition>
-    <div v-if="brackettype.length > 0" class="row" style="position: absolute; left: 10px; top: 2%; min-width: 200px;">
-      <div class="col shadow white-border dark-background"
-        style="border-radius: 0rem 0.5rem 0.5rem 0rem; padding-left: 15px;">
-        <div class="event-title">{{brackettype}}</div>
+    <div v-if="brackettype.length > 0" class="row" style="position: absolute; left: 0px; top: 6%; min-width: 175px; max-width: 275px; text-align: right;">
+      <div class="col shadow white-border dark-background" style="border-radius: 0.5rem 0.5rem 0.5rem 0.5rem;">
+        <div class="event-title" style="overflow-wrap: break-word;">{{brackettype}}</div>
       </div>
     </div>
   </transition>

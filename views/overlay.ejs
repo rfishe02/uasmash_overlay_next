@@ -48,6 +48,16 @@
         :p2members="p2.members"
         > </gameplay-overlay>
 
+        <div class="row justify-content-center fixed-bottom" v-if="type == 1">
+          <div class="col-4 white-border mb-3">
+            {{p1Name}}
+          </div>
+          <div class="col-1"></div>
+          <div class="col-4 white-border mb-3">
+            {{p2Name}}
+          </div>
+        </div>
+
       </div>
 
     </div>
