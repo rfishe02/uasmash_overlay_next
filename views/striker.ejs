@@ -164,26 +164,26 @@
           <template v-for="(item, index) in options" v-bind:key="item">
 
             <div class="col p-1" >
-              <div class="card shadow text-center border-secondary" :class="{ 'bg-secondary text-light' : item.choice == Choice.Strike }">
+              <div class="card h-100 shadow text-center border-secondary" :class="{ 'bg-secondary text-light' : item.choice == Choice.Strike }">
                 <card-header :item="item" :url="getImageURL(item.stageName)"></card-header>
                 <card-body :item="item"></card-body>
 
                 <div class="card-footer p-2" :class="{ 'border-light': item.choice == Choice.None, 'border-dark' : item.choice == Choice.Strike }">
                   <div class="row justify-content-center" v-if="item.choice == Choice.None">
                     <div class="col-6 p-0">
-                      <!-- <button class="btn btn-light text-primary" type="button" @click="pickStage(index, true)" style="font-size: 16pt">
-                        <i class="bi bi-check-circle"></i>
-                      </button>-->
-                      <button class="btn btn-primary" type="button" @click="pickStage(index, true)" style="font-size: 10pt; width: 75px;">
-                        PICK
-                      </button>
-                    </div>
-                    <div class="col-6 p-0">
                       <!-- <button class="btn btn-light text-danger" type="button" @click="pickStage(index, false)" style="font-size: 16pt">
                         <i class="bi bi-x-circle-fill"></i>
                       </button>-->
-                      <button class="btn btn-danger" type="button" @click="pickStage(index, false)" style="font-size: 10pt; width: 75px;">
+                      <button class="btn btn-outline-danger" type="button" @click="pickStage(index, false)" style="font-size: 10pt; height: 40px; width: 75px;">
                         STRIKE
+                      </button>
+                    </div>
+                    <div class="col-6 p-0">
+                      <!-- <button class="btn btn-light text-primary" type="button" @click="pickStage(index, true)" style="font-size: 16pt">
+                        <i class="bi bi-check-circle"></i>
+                      </button>-->
+                      <button class="btn btn-outline-primary" type="button" @click="pickStage(index, true)" style="font-size: 10pt; height: 40px; width: 75px;">
+                        PICK
                       </button>
                     </div>
                   </div>
@@ -193,7 +193,7 @@
                       <!-- <button class="btn btn-dark text-light" type="button" @click="undoChoice(item.stageName)" style="font-size: 16pt">
                         <i class="bi bi-arrow-counterclockwise"></i>
                       </button>-->
-                      <button class="btn btn-dark text-light" type="button" @click="undoChoice(item.stageName)" style="font-size: 10pt">
+                      <button class="btn btn-outline-light" type="button" @click="undoChoice(item.stageName)" style="font-size: 10pt; height: 40px; width: 75px;">
                         UNDO
                       </button>
                     </div>
