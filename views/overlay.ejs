@@ -208,17 +208,30 @@
           if(data.length == 0) {
             this.p1Name = ''
             this.p2Name = ''
+            this.p1Score = ''
+            this.p2Score = ''
             this.bracketType = ''
             this.eventRound = ''
+            this.bestOf = ''
           } else {
             data.forEach((set) => {
               if(set.state == 2) {
                 this.p1Name = set.teamOne.name
                 this.p2Name = set.teamTwo.name
+                this.p1Score = set.teamOne.score
+                this.p2Score = set.teamTwo.score
                 this.bracketType = set.phaseName
-                this.eventRound = set.fullRoundText
+                this.eventRound = set.fullRoundText == null ? '' : set.fullRoundText
+
+                if(this.eventRound.indexOf('Final') > 0) {
+                  this.bestOf = 'Best of 5'
+                } else {
+                  this.bestOf = 'Best of 3'
+                }
               }
             })
+
+            // TODO: Save to local storage
           }
 
         } catch(e) {
@@ -302,6 +315,8 @@
           if(response.ok) {
             const data = await response.json()
 
+            console.log(data)
+
             if (data.data != null) {
               if (data.data.tournament != null) {
                 if(data.data.tournament.streamQueue != null) {
@@ -329,78 +344,8 @@
                         }
                       }
 
-                      //TODO: Get data from games to aggregate scores, to show on screen.
-
-                      s.teamOne = { entrantID: '', name: '', members: [] }
-                      s.teamTwo = { entrantID: '', name: '', members: [] }
-
-                      if (set.slots != null) {
-                        if (set.slots[0] != null) {
-                          if (set.slots[0].entrant != null) {
-                            s.teamOne.entrantID = set.slots[0].entrant.id
-                            s.teamOne.name = set.slots[0].entrant.name.slice(set.slots[0].entrant.name.indexOf("| ") + 1,set.slots[0].entrant.name.length).trim()
-
-                              if (set.slots[0].entrant.participants != null) {
-                                set.slots[0].entrant.participants.forEach((player) => {
-
-                                  const item = {}
-                                  item.name = player.gamerTag.slice(player.gamerTag.indexOf("| ") + 1,player.gamerTag.length).trim()
-
-                                  if (player.user != null) {
-                                    item.id = player.user.id
-                                    item.socials = []
-
-                                    if (player.user.authorizations != null) {
-                                      player.user.authorizations.forEach((social) => {
-                                        const account = {}
-                                        account.username = social.externalUsername
-                                        account.type = social.type
-                                        item.socials.push(account)
-                                      });
-                                    }
-                                    item.genderPronoun = player.user.genderPronoun == null ? '' : player.user.genderPronoun
-                                  }
-
-                                  s.teamOne.members.push(item)
-                                })
-                              }
-
-                          }
-                        }
-
-                        if (set.slots[1] != null) {
-                          if (set.slots[1].entrant != null) {
-                            s.teamTwo.entrantID = set.slots[1].entrant.id
-                            s.teamTwo.name = set.slots[1].entrant.name.slice(set.slots[1].entrant.name.indexOf("| ") + 1,set.slots[1].entrant.name.length).trim();
-
-                            if (set.slots[1].entrant.participants != null) {
-                              set.slots[1].entrant.participants.forEach((player) => {
-
-                                const item = {}
-                                item.name = player.gamerTag.slice(player.gamerTag.indexOf("| ") + 1,player.gamerTag.length).trim()
-
-                                if (player.user != null) {
-                                  item.id = player.user.id
-                                  item.socials = []
-
-                                  if (player.user.authorizations != null) {
-                                    player.user.authorizations.forEach((social) => {
-                                      const account = {}
-                                      account.username = social.externalUsername
-                                      account.type = social.type
-                                      item.socials.push(account)
-                                    });
-                                  }
-                                  item.genderPronoun = player.user.genderPronoun == null ? '' : player.user.genderPronoun
-                                }
-
-                                s.teamTwo.members.push(item)
-                              })
-                            }
-
-                          }
-                        }
-                      }
+                      s.teamOne = this.getTeamData(set,0)
+                      s.teamTwo = this.getTeamData(set,1)
 
                       streamQueryData.push(s)
                     })
@@ -417,6 +362,56 @@
         }
 
         return streamQueryData
+      },
+      getTeamData(set, slotIndex) {
+        const team = { entrantID: '', name: '', score: 0, members: [] }
+
+        if(set.slots != null) {
+          const slots = set.slots[slotIndex]
+
+          if (slots != null) {
+            if (slots.entrant != null) {
+              team.entrantID = slots.entrant.id
+              team.name = slots.entrant.name.slice(slots.entrant.name.indexOf("| ") + 1,slots.entrant.name.length).trim()
+
+              if (slots.entrant.participants != null) {
+                slots.entrant.participants.forEach((player) => {
+
+                  const item = {}
+                  item.name = player.gamerTag.slice(player.gamerTag.indexOf("| ") + 1,player.gamerTag.length).trim()
+
+                  if (player.user != null) {
+                    item.id = player.user.id
+                    item.socials = []
+
+                    if (player.user.authorizations != null) {
+                      player.user.authorizations.forEach((social) => {
+                        const account = {}
+                        account.username = social.externalUsername
+                        account.type = social.type
+                        item.socials.push(account)
+                      });
+                    }
+                    item.genderPronoun = player.user.genderPronoun == null ? '' : player.user.genderPronoun
+                  }
+
+                  team.members.push(item)
+                })
+              }
+
+              if(set.games != null) {
+                set.games.forEach((game) => {
+                  if(game.winnerId === team.entrantID){
+                    team.score++
+                  }
+                })
+              }
+
+            }
+          }
+        }
+
+        return team
       }
     },
     components: {
