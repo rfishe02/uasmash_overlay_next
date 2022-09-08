@@ -246,6 +246,11 @@
                   name
                 }
                 fullRoundText
+                games {
+                  state
+                  orderNum
+                  winnerId
+                }
                 phaseGroup {
                   phase {
                     name
@@ -254,6 +259,7 @@
                 setGamesType
                 slots {
                   entrant {
+                    id
                     name
                     participants {
                       prefix
@@ -323,12 +329,15 @@
                         }
                       }
 
-                      s.teamOne = { name: '', members: [] }
-                      s.teamTwo = { name: '', members: [] }
+                      //TODO: Get data from games to aggregate scores, to show on screen.
+
+                      s.teamOne = { entrantID: '', name: '', members: [] }
+                      s.teamTwo = { entrantID: '', name: '', members: [] }
 
                       if (set.slots != null) {
                         if (set.slots[0] != null) {
                           if (set.slots[0].entrant != null) {
+                            s.teamOne.entrantID = set.slots[0].entrant.id
                             s.teamOne.name = set.slots[0].entrant.name.slice(set.slots[0].entrant.name.indexOf("| ") + 1,set.slots[0].entrant.name.length).trim()
 
                               if (set.slots[0].entrant.participants != null) {
@@ -361,6 +370,7 @@
 
                         if (set.slots[1] != null) {
                           if (set.slots[1].entrant != null) {
+                            s.teamTwo.entrantID = set.slots[1].entrant.id
                             s.teamTwo.name = set.slots[1].entrant.name.slice(set.slots[1].entrant.name.indexOf("| ") + 1,set.slots[1].entrant.name.length).trim();
 
                             if (set.slots[1].entrant.participants != null) {
