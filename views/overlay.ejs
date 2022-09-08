@@ -200,9 +200,7 @@
     },
     methods : {
       async pollSmashGGAPI(key,slug) {
-
         try {
-
           const data = await this.queryStreamQueueSmashGG(key,slug)
 
           if(data.length == 0) {

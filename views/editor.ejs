@@ -360,9 +360,19 @@
           </div>
 
           <div class="row" style="padding-left: 20px;">
+
             <div class="col-12 mb-2">
-              <div class="p-inputgroup">
-                <p-inputtext type="text" :value="getModuleURL(0)"> </p-inputtext>
+              <label for="module0nonpoll">Non-polling (Manual Entry)</label>
+              <div id="module0nonpoll" class="p-inputgroup">
+                <p-inputtext type="text" :value="getModuleURL(0,'false')"> </p-inputtext>
+                <p-button icon="pi pi-refresh" class="p-button-text" @click="regenerateKey()" ></p-button>
+              </div>
+            </div>
+
+            <div class="col-12 mb-2">
+              <label for="module1nonpoll">Polling (Automatic)</label>
+              <div id="module1nonpoll" class="p-inputgroup">
+                <p-inputtext type="text" :value="getModuleURL(0,'true')"> </p-inputtext>
                 <p-button icon="pi pi-refresh" class="p-button-text" @click="regenerateKey()" ></p-button>
               </div>
             </div>
@@ -749,9 +759,12 @@
         this.teamOne = this.teamTwo
         this.teamTwo = tempTeam
       },
-      getModuleURL(type) {
+      getModuleURL(type,polling) {
+        const slug = this.tournamentSelection.slug == null ? '' : this.tournamentSelection.slug
+
         if(this.overlayRoom != null && this.overlayModule != null) {
-          return this.host +this.port+ "/" + this.overlayModule + "?id=" + this.overlayRoom + "&type=" + type
+          return this.host +this.port+ "/" + this.overlayModule + "?id=" + this.overlayRoom + "&type=" + type + "&poll=" + polling + "&key=<%= apiKey %>" + "&slug=" + slug
+
         } else {
           return ''
         }
