@@ -48,7 +48,7 @@ app.use(session({
   name: 'uaoverlay_webapp',
   resave: false,
   saveUninitialized: false,
-  store: new SQLiteStore({ db: 'sessions.db', dir: './var/db' }),
+  store: new SQLiteStore({ db: 'sessions.db', dir: './' }),
   cookie: {
     secure: false,
     httpOnly: true,
