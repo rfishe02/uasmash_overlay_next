@@ -128,12 +128,9 @@
         winnerBestOfStart: 0,
         loserBestOfStart: 0,
         finalsOrder : {
-          'Winners Quarter-Final':0,
-          'Winners Semi-Final':1,
-          'Winners Final':2,
-          'Losers Quarter-Final':0,
-          'Losers Semi-Final':1,
-          'Losers Final':2,
+          'Quarter-Final':0,
+          'Semi-Final':1,
+          'Final':2,
           'Grand Final': 3,
         }
       }
@@ -202,7 +199,8 @@
                 if(set.startedAt > previousStartedAt) {
 
                   const eventRound = set.fullRoundText == null ? '' : set.fullRoundText
-                  const order = this.finalsOrder[eventRound]
+                  const order = this.finalsOrder[eventRound.replace(/Winners |Losers /g,'')]
+
                   var bestOfValue = 'Best of 3'
 
                   if(order != null) {
