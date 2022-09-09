@@ -124,7 +124,18 @@
         eventRound:"",
         bestOf:"",
         socket: socket,
-        type: 0
+        type: 0,
+        winnerBestOfStart: 0,
+        loserBestOfStart: 0,
+        finalsOrder : {
+          'Winners Quarter-Final':0,
+          'Winners Semi-Final':1,
+          'Winners Final':2,
+          'Losers Quarter-Final':0,
+          'Losers Semi-Final':1,
+          'Losers Final':2,
+          'Grand Final': 3,
+        }
       }
     },
     mounted() {
@@ -148,6 +159,16 @@
       const slug = urlParams.get('slug')
       const poll = urlParams.get('poll')
 
+      const winnerBestOfStart = urlParams.get('winnerBestOfStart') == null ? 0 : this.finalsOrder[urlParams.get('winnerBestOfStart')]
+      const loserBestOfStart = urlParams.get('loserBestOfStart') == null ? 0 : this.finalsOrder[urlParams.get('loserBestOfStart')]
+
+      if(winnerBestOfStart != null) {
+        this.winnerBestOfStart = winnerBestOfStart
+      }
+      if(loserBestOfStart != null) {
+        this.loserBestOfStart = loserBestOfStart
+      }
+
       if(slug != null && poll != null) {
         if(poll == 'true') {
           setInterval(function(){
@@ -169,20 +190,38 @@
             this.saveOverlayValuesToSession()
 
           } else {
+
+            const winnerBestOfStart = 'Final'
+            const loserBestOfStart = 'Final'
+
+            //var previousStartedAt = Date.now()
+            var previousStartedAt = 0
             data.forEach((set) => {
               if(set.state == 2) {
 
-                const eventRound = set.fullRoundText == null ? '' : set.fullRoundText
-                var bestOfValue = ''
-                if(eventRound.indexOf('Final') > 0) {
-                  this.bestOf = 'Best of 5'
-                } else {
-                  this.bestOf = 'Best of 3'
+                if(set.startedAt > previousStartedAt) {
+
+                  const eventRound = set.fullRoundText == null ? '' : set.fullRoundText
+                  const order = this.finalsOrder[eventRound]
+                  var bestOfValue = 'Best of 3'
+
+                  if(order != null) {
+                    if(eventRound.indexOf('Winner') >= 0) {
+                      if(order >= this.winnerBestOfStart) {
+                        bestOfValue = 'Best of 5'
+                      }
+                    } else {
+                      if(order >= this.loserBestOfStart) {
+                        bestOfValue = 'Best of 5'
+                      }
+                    }
+                  }
+
+                  this.setOverlayValues(set.teamOne,set.teamTwo,set.phaseName,eventRound,bestOfValue)
+                  this.saveOverlayValuesToSession()
                 }
 
-                this.setOverlayValues(set.teamOne,set.teamTwo,set.phaseName,eventRound,bestOfValue)
-                this.saveOverlayValuesToSession()
-
+                previousStartedAt = set.startedAt
               }
             })
 
@@ -191,7 +230,6 @@
         } catch(e) {
           console.log(e)
         }
-
       },
       async queryStreamQueueSmashGG(key,slug){
         const streamQueryData = []
@@ -207,18 +245,17 @@
               sets {
                 completedAt
                 createdAt
-                displayScore
                 event {
                   id
                   name
                 }
                 fullRoundText
                 games {
-                  state
                   orderNum
                   winnerId
                 }
                 phaseGroup {
+                  bracketType
                   phase {
                     name
                   }
@@ -233,7 +270,6 @@
                       gamerTag
                       user {
                         id
-                        bio
                         name
                         genderPronoun
                         authorizations {
@@ -269,8 +305,6 @@
           if(response.ok) {
             const data = await response.json()
 
-            console.log(data)
-
             if (data.data != null) {
               if (data.data.tournament != null) {
                 if(data.data.tournament.streamQueue != null) {
@@ -282,12 +316,12 @@
                         phaseName: '',
                         fullRoundText: '',
                         state: '',
-                        totalGames: '',
+                        startedAt: '',
                       }
 
                       s.fullRoundText = set.fullRoundText == null ? '' : set.fullRoundText
                       s.state = set.state == null ? '' : set.state
-                      s.totalGames = set.totalGames == null ? '' : set.totalGames
+                      s.startedAt = set.startedAt == null ? '' : set.startedAt
 
                       if(set.event != null) {
                         s.eventName = set.event.name == null ? '' : set.event.name
