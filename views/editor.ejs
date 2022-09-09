@@ -763,7 +763,7 @@
         const slug = this.tournamentSelection.slug == null ? '' : this.tournamentSelection.slug
 
         if(this.overlayRoom != null && this.overlayModule != null) {
-          return this.host +this.port+ "/" + this.overlayModule + "?id=" + this.overlayRoom + "&type=" + type + "&poll=" + polling + "&key=<%= apiKey %>" + "&slug=" + slug
+          return this.host +this.port+ "/" + this.overlayModule + "?id=" + this.overlayRoom + "&type=" + type + "&poll=" + polling + "&slug=" + slug
 
         } else {
           return ''

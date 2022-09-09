@@ -145,22 +145,22 @@
 
       this.setOverlayValues(teamOne,teamTwo,sessionStorage.getItem("bracketType"),sessionStorage.getItem("eventRound"),sessionStorage.getItem("bestOf"))
 
-      const key = urlParams.get('key')
       const slug = urlParams.get('slug')
       const poll = urlParams.get('poll')
 
-      if(key != null && slug != null && poll != null) {
+      if(slug != null && poll != null) {
         if(poll == 'true') {
           setInterval(function(){
-            overlayApp.pollSmashGGAPI(key,slug)
+            overlayApp.pollSmashGGAPI(slug)
           }, 5000);
         }
       }
 
     },
     methods : {
-      async pollSmashGGAPI(key,slug) {
+      async pollSmashGGAPI(slug) {
         try {
+          const key = '<%= apiKey %>'
           const data = await this.queryStreamQueueSmashGG(key,slug)
 
           if(data.length == 0) {
