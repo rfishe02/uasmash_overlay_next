@@ -797,6 +797,7 @@
           const slug = this.tournamentSelection.slug == null ? '' : this.tournamentSelection.slug
           return this.host +this.port+ "/" + this.overlayModule
             + "?type=" + type
+            + "&id=" + this.overlayRoom
             + "&poll=" + polling
             + "&winnerBestOfStart=" + this.selectedWinnerBestOfStart
             + "&loserBestOfStart=" + this.selectedLoserBestOfStart
@@ -804,7 +805,9 @@
 
         } else {
 
-          return this.host +this.port+ "/" + this.overlayModule + "?id=" + this.overlayRoom + "&type=" + type
+          return this.host +this.port+ "/" + this.overlayModule
+          + "?type=" + type
+          + "&id=" + this.overlayRoom
 
         }
 
