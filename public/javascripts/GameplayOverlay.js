@@ -65,7 +65,7 @@ export default {
 
   <transition>
     <div class="row justify-content-center" v-if="p1name.length > 0 || p2name.length > 0">
-      <div class="col header-col">
+      <div class="col shadow header-col">
         <div class="row h-100" style="background-color: white">
 
           <div class="col-12">
@@ -74,6 +74,7 @@ export default {
                 <li v-if="account.type == 'TWITCH'" class="list-group-item pt-0 pb-0" style="background-color: rgb(0,0,0,0); border-width: 0; font-size: 12pt; font-weight: bold; color: black; overflow-wrap: break-word;"><i class="bi bi-twitch"></i>  {{account.username}}</li>
                 <li v-if="account.type == 'TWITTER'" class="list-group-item pt-0 pb-0" style="background-color: rgb(0,0,0,0); border-width: 0; font-size: 12pt; font-weight: bold; color: black; overflow-wrap: break-word;"><i class="bi bi-twitter"></i>  {{account.username}}</li>
               </template>
+              <br v-if="p1members[0].socials.length > 0 || p2members[0].socials.length > 0">
             </ul>
           </div>
 
@@ -82,11 +83,12 @@ export default {
 
       <div class="col-2"> </div>
 
-      <div class="col header-col">
+      <div class="col shadow header-col">
         <div class="row h-100" style="background-color: white">
 
           <div class="col-12">
             <ul v-for="(item, index) in p2members" class="list-group list-group-horizontal justify-content-end">
+              <br v-if="p1members[0].socials.length > 0 || p2members[0].socials.length > 0">
               <template v-for="(account, index) in item.socials">
                 <li v-if="account.type == 'TWITCH'" class="list-group-item pt-0 pb-0" style="background-color: rgb(0,0,0,0); border-width: 0; font-size: 12pt; font-weight: bold; color: black; overflow-wrap: break-word;"><i class="bi bi-twitch"></i>  {{account.username}}</li>
                 <li v-if="account.type == 'TWITTER'" class="list-group-item pt-0 pb-0" style="background-color: rgb(0,0,0,0); border-width: 0; font-size: 12pt; font-weight: bold; color: black; overflow-wrap: break-word;"><i class="bi bi-twitter"></i>  {{account.username}}</li>

@@ -151,17 +151,19 @@ async function queryPlayersSmashGG(key,queryID) {
                     player.gamerTag.length
                   )
                   .trim()
+                item.socials = []
 
                 if (player.user != null) {
                   item.id = player.user.id
-                  item.socials = []
 
                   if (player.user.authorizations != null) {
                     player.user.authorizations.forEach((social) => {
-                      const account = {}
-                      account.username = social.externalUsername
-                      account.type = social.type
-                      item.socials.push(account)
+                      if(social.type == "TWITTER" || social.type == "TWITCH") {
+                        const account = {}
+                        account.username = social.externalUsername
+                        account.type = social.type
+                        item.socials.push(account)
+                      }
                     });
                   }
                   item.genderPronoun = player.user.genderPronoun

@@ -364,17 +364,19 @@
 
                   const item = {}
                   item.name = player.gamerTag.slice(player.gamerTag.indexOf("| ") + 1,player.gamerTag.length).trim()
+                  item.socials = []
 
                   if (player.user != null) {
                     item.id = player.user.id
-                    item.socials = []
 
                     if (player.user.authorizations != null) {
                       player.user.authorizations.forEach((social) => {
-                        const account = {}
-                        account.username = social.externalUsername
-                        account.type = social.type
-                        item.socials.push(account)
+                        if(social.type == "TWITTER" || social.type == "TWITCH") {
+                          const account = {}
+                          account.username = social.externalUsername
+                          account.type = social.type
+                          item.socials.push(account)
+                        }
                       });
                     }
                     item.genderPronoun = player.user.genderPronoun == null ? '' : player.user.genderPronoun
@@ -400,6 +402,22 @@
         return team
       },
       setOverlayValues(teamOne,teamTwo,bracketType,eventRound,bestOf) {
+
+        if(teamOne != null) {
+          if(teamOne.members != null) {
+            if(teamOne.members.length > 1) {
+              teamOne.members = []
+            }
+          }
+        }
+        if(teamTwo != null) {
+          if(teamTwo.members != null) {
+            if(teamTwo.members.length > 1) {
+              teamTwo.members = []
+            }
+          }
+        }
+
         this.p1 = teamOne == null ? {} : teamOne
         this.p2 = teamTwo == null ? {} : teamTwo
 
