@@ -349,7 +349,7 @@
         return streamQueryData
       },
       getTeamData(set, slotIndex) {
-        const team = { entrantID: '', name: '', score: 0, members: [] }
+        const team = { entrantID: '', name: '', score: '', members: [] }
 
         if(set.slots != null) {
           const slots = set.slots[slotIndex]
@@ -385,6 +385,7 @@
               }
 
               if(set.games != null) {
+                team.score = 0
                 set.games.forEach((game) => {
                   if(game.winnerId === team.entrantID){
                     team.score++
