@@ -364,40 +364,9 @@
             <div class="col-12 mb-3">
               <label for="module0nonpoll"><h6>Non-polling (Editor Entry)</h6></label>
               <div id="module0nonpoll" class="p-inputgroup">
-                <p-inputtext type="text" :value="getModuleURL(0,'false')"> </p-inputtext>
+                <p-inputtext type="text" :value="getModuleURL(0)"> </p-inputtext>
                 <p-button icon="pi pi-refresh" class="p-button-text" @click="regenerateKey()" ></p-button>
               </div>
-            </div>
-
-            <div class="col-12 mb-2">
-              <div class="row">
-                <label for="module1poll"><h6>Polling (Automatic)</h6></label>
-              </div>
-
-              <div class="row mb-2">
-                <div class="col">
-                  <label>Winners Bracket "Best Of 5" Starting Point</label>
-                  <div v-for="option of finalsStartOptions" :key="option" class="field-radiobutton">
-                    <p-radiobutton :inputId="winner + option" name="winnerStart" :value="option" v-model="selectedWinnerBestOfStart"></p-radiobutton>
-                    <label :for="winner + option"> {{option}}</label>
-                  </div>
-                </div>
-
-                <div class="col">
-                  <label>Losers Bracket "Best Of 5" Starting Point</label>
-                  <div v-for="option of finalsStartOptions" :key="option" class="field-radiobutton">
-                    <p-radiobutton :inputId="loser + option" name="loserStart" :value="option" v-model="selectedLoserBestOfStart"></p-radiobutton>
-                    <label :for="loser + option">{{option}}</label>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row">
-                <div id="module1poll" class="p-inputgroup">
-                  <p-inputtext type="text" :value="getModuleURL(0,'true')"> </p-inputtext>
-                </div>
-              </div>
-
             </div>
             <!--
             <div class="col-12">
@@ -491,14 +460,6 @@
         overlayRoom: "",
         overlayModule: "",
         socket: socket,
-        selectedWinnerBestOfStart: 'Quarter-Final',
-        selectedLoserBestOfStart: 'Quarter-Final',
-        finalsStartOptions : [
-          'Quarter-Final',
-          'Semi-Final',
-          'Final',
-          'Grand Final',
-        ],
         scoreOptions: [
           { name: "-", value: "" },
           { name: "0", value: "0" },
@@ -790,26 +751,11 @@
         this.teamOne = this.teamTwo
         this.teamTwo = tempTeam
       },
-      getModuleURL(type,polling) {
+      getModuleURL(type) {
 
-        if(polling == 'true') {
-
-          const slug = this.tournamentSelection.slug == null ? '' : this.tournamentSelection.slug
-          return this.host +this.port+ "/" + this.overlayModule
-            + "?type=" + type
-            + "&id=" + this.overlayRoom
-            + "&poll=" + polling
-            + "&winnerBestOfStart=" + this.selectedWinnerBestOfStart
-            + "&loserBestOfStart=" + this.selectedLoserBestOfStart
-            + "&slug=" + slug
-
-        } else {
-
-          return this.host +this.port+ "/" + this.overlayModule
-          + "?type=" + type
-          + "&id=" + this.overlayRoom
-
-        }
+        return this.host +this.port+ "/" + this.overlayModule
+        + "?type=" + type
+        + "&id=" + this.overlayRoom
 
       },
     },

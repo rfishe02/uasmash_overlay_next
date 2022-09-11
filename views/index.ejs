@@ -11,31 +11,17 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
 
+  <link href="https://unpkg.com/primevue@^3/resources/themes/saga-blue/theme.css" rel="stylesheet">
+  <link href="https://unpkg.com/primevue/resources/primevue.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/primeicons/primeicons.css" rel="stylesheet">
+
   <!--
   <link rel="stylesheet" href="/stylesheets/style.css">-->
 
   <style>
-    .list-move,
-    .list-enter-active,
-    .list-leave-active {
-      transition: all 0.2s ease;
+    .p-inputtext {
+      width: 100%;
     }
-
-    .list-enter-from {
-      opacity: 0;
-      transform: translateX(5px);
-    }
-
-    .list-leave-to {
-      opacity: 0;
-      transform: translateX(-5px);
-    }
-
-    .list-leave-active {
-      position: absolute;
-    }
-
-
   </style>
 
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -45,47 +31,109 @@
 
   <script src="https://unpkg.com/vue@3"></script>
 
+  <script src="https://unpkg.com/primevue/core/core.min.js"></script>
+  <script src="https://unpkg.com/primevue@^3/radiobutton/radiobutton.min.js"></script>
+
 </head>
 
 <body>
   <div id="app">
 
-    <div class="container">
-      <div class="row justify-content-center" style="padding-top: 125px;">
+    <div class="container" style="margin-top: 50px;">
 
-        <div class="col-6">
+      <div class="row justify-content-center">
 
-          <div class="card text-center p-0">
-            <div class="card-body">
+        <div class="col-6" style="padding-left: 50px; padding-right: 50px;">
 
-              <div class="row justify-content-center">
-                <div class="col-10" >
-                  <form>
-                    <div class="mb-3">
-                      <label for="exampleFormControlInput1" class="form-label">Username</label>
-                      <input v-model="username" type="text" class="form-control" id="exampleFormControlInput1" placeholder="">
-                    </div>
-                    <div class="mb-3">
-                      <label for="exampleFormControlInput2" class="form-label">Password</label>
-                      <input v-model="password" type="password" class="form-control" id="exampleFormControlInput2" placeholder="">
-                    </div>
+          <div class="row mb-3" style="text-align: center">
+            <h4>Module URL Generator</h4>
+          </div>
 
-                    <button style="width: 100px;" type="submit" class="btn btn-primary" @click.prevent="submitLogInForm">
-                      Log In
-                    </button>
-                    <button style="width: 100px;" type="submit" class="btn btn-link" @click.prevent="submitSignUpForm">
-                      Sign Up
-                    </button>
-                  </form>
-                </div>
+          <div class="row mb-3">
+            <div class="col">
+              <label>Winners "Best Of 5" Starting Point</label>
+              <div v-for="option of finalsStartOptions" :key="option" class="field-radiobutton">
+                <p-radiobutton :inputId="'winner' + option" name="winnerStart" :value="option" v-model="selectedWinnerBestOfStart"></p-radiobutton>
+                <label :for="'winner' + option">&nbsp;<i>{{option}}</i></label>
               </div>
+            </div>
 
+            <div class="col">
+              <label>Losers "Best Of 5" Starting Point</label>
+              <div v-for="option of finalsStartOptions" :key="option" class="field-radiobutton">
+                <p-radiobutton :inputId="'loser' + option" name="loserStart" :value="option" v-model="selectedLoserBestOfStart"></p-radiobutton>
+                <label :for="'loser' + option">&nbsp;<i>{{option}}</i></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <p-dropdown
+              v-model="tournamentSelection"
+              :options="tournamentList"
+              option-label="name"
+              placeholder="Select a Tournament"
+              @change="getOverlayModuleURLs()"
+            ></p-dropdown>
+          </div>
+
+          <div class="row">
+            <div class="col p-0">
+              <template v-for="(item,index) in overlayModuleURLs">
+                <label for="'modulepoll'+index">Overlay with Automatic Polling</label>
+                <div id="'modulepoll'+index" class="p-inputgroup mb-2">
+                  <p-inputtext type="text" :value="item"> </p-inputtext>
+                </div>
+              </template>
+
+              <template v-if="waitingModuleURL.length > 0">
+                <label for="waitingmodule">Waiting Screen</label>
+                <div id="waitingmodule" class="p-inputgroup mb-2">
+                  <p-inputtext type="text" :value="waitingModuleURL"> </p-inputtext>
+                </div>
+              </template>
             </div>
           </div>
 
         </div>
 
+        <div class="col-6" style="padding-left: 50px; padding-right: 50px;">
+          <div class="row mb-3" style="text-align: center">
+            <h4>Application Sign In</h4>
+          </div>
+
+          <div class="row">
+            <div class="card text-center p-0">
+              <div class="card-body">
+
+                <div class="row justify-content-center">
+                  <div class="col-10" >
+                    <form>
+                      <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Username</label>
+                        <input v-model="username" type="text" class="form-control" id="exampleFormControlInput1" placeholder="">
+                      </div>
+                      <div class="mb-3">
+                        <label for="exampleFormControlInput2" class="form-label">Password</label>
+                        <input v-model="password" type="password" class="form-control" id="exampleFormControlInput2" placeholder="">
+                      </div>
+                      <button style="width: 100px;" type="submit" class="btn btn-primary" @click.prevent="submitLogInForm">
+                        Log In
+                      </button>
+                      <button style="width: 100px;" type="submit" class="btn btn-link" @click.prevent="submitSignUpForm">
+                        Sign Up
+                      </button>
+                    </form>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
+
     </div>
 
   </div>
@@ -101,25 +149,33 @@
         port: ":3000",
         username: "",
         password: "",
-        accesstype: 2,
-        showSignUpForm: false,
+        tournamentList: [],
+        tournamentSelection: [],
+        overlayModule: "module/overlay",
+        waitingModule: "module/waiting",
+        selectedWinnerBestOfStart: 'Quarter-Final',
+        selectedLoserBestOfStart: 'Quarter-Final',
+        finalsStartOptions : [
+          'Quarter-Final',
+          'Semi-Final',
+          'Final',
+          'Grand Final',
+        ],
+        overlayTypes: [0],
+        overlayModuleURLs: [],
+        waitingModuleURL: ''
       }
     },
+    mounted() {
+      this.loadTournamentList()
+    },
     methods: {
-      changeTab() {
-        console.log(event)
-      },
-      toggleSignUpForm() {
-        this.showSignUpForm = !this.showSignUpForm
-      },
       async submitLogInForm() {
         if(this.username != null && this.password != null) {
           if(this.username.length > 0  && this.password.length > 0) {
 
             const data = {"username": this.username,"password": this.password};
             const path = 'http://' + this.host + this.port
-
-            console.log(path)
 
             try {
               const response = await fetch(path + '/users/login', {
@@ -149,8 +205,6 @@
             const data = {"username": this.username,"password": this.password};
             const path = 'http://' + this.host + this.port
 
-            console.log(path)
-
             try {
               const response = await fetch(path + '/users/signup', {
                 method: "post",
@@ -172,9 +226,48 @@
             alert("Username and password cannot be blank.")
           }
         }
-      }
+      },
+      async loadTournamentList() {
+        try {
+          const response = await fetch('http://'+this.host+this.port +'/smashgg/query_tournaments', {
+            method: "get",
+            headers: {
+              "Content-Type": "application/json; charset=UTF-8",
+            },
+          });
+
+          if(response.ok) {
+            const results = await response.json()
+            this.tournamentList = results
+          }
+        } catch (e) {
+          console.log(e)
+        }
+      },
+      getOverlayModuleURLs() {
+        const slug = this.tournamentSelection.slug == null ? '' : this.tournamentSelection.slug
+
+        for(var i = 0; i < this.overlayTypes.length; i++) {
+          const url =  this.host + this.port+ "/" + this.overlayModule
+            + "?type=" + this.overlayTypes[i]
+            + "&poll=true"
+            + "&winnerBestOfStart=" + this.selectedWinnerBestOfStart
+            + "&loserBestOfStart=" + this.selectedLoserBestOfStart
+            + "&slug=" + slug
+
+          this.overlayModuleURLs.push(url)
+        }
+
+        this.waitingModuleURL = this.host + this.port+ "/" + this.waitingModule
+          + "?slug=" + slug
+      },
+    },
+    components: {
+      "p-inputtext": primevue.inputtext,
+      "p-radiobutton": primevue.radiobutton,
+      "p-dropdown": primevue.dropdown,
     }
-  }).mount('#app')
+  }).use(primevue.config.default).mount('#app')
 
 </script>
 
