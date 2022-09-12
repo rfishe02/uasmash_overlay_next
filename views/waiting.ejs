@@ -27,11 +27,6 @@
     }
 
 
-    .standings-list {
-      max-width: 480px;
-      min-width: 480px;
-    }
-
     .social-media-list-item {
       background-color: rgba(0,0,0,0);
       color: white;
@@ -83,28 +78,25 @@
 
       <div class="container-fluid css-selector" style="width: 1920px; height: 1080px;">
 
-          <div class="row bg-dark text-light mb-3 justify-content-between border-bottom border-secondary" style="padding-top: 10px; padding-bottom: 10px;">
+          <div class="row bg-dark text-light justify-content-between border-bottom border-secondary" style="padding-top: 10px; padding-bottom: 10px;">
             <div class="col">
               <h1>{{tournamentName}}</h1>
             </div>
             <div class="col" style="text-align: right">
-              <!--<h1>Fort Smith Smash</h1>-->
               <img src="/fsmsmashlogo.png" style="height: 50px;"/>
             </div>
           </div>
 
-          <div class="row justify-content-between">
+          <div class="row justify-content-between" style="padding-left: 25px; padding-right: 25px; padding-top: 25px;">
 
-              <div class="col standings-list">
+              <div class="col-3">
+                <h3 class="text-light mb-3">Standings</h3>
 
-                <h3 class="text-light">Standings</h3>
-
-                <div v-if="selectedEvent.standings.length > 0" class="card bg-dark border-secondary standings-list"
-                  :class="{'fade-out': fadeOutAnimationEnabled, 'fade-in': fadeInAnimationEnabled}">
+                <div v-if="selectedEvent.standings.length > 0" class="card bg-dark border-secondary" :class="{'fade-out': fadeOutAnimationEnabled, 'fade-in': fadeInAnimationEnabled}">
                   <!--<div class="card-header bg-dark text-light">{{selectedEvent.name}}</div>-->
                   <div class="card-body">
-                    <h5 class="card-title" style="color: white;">{{selectedEvent.name}}</h5>
-                    <p class="card-text" style="font-style: italic; color: white;">{{selectedEvent.state}}</p>
+                    <h5 class="card-title text-light">{{selectedEvent.name}}</h5>
+                    <p class="card-text text-light" style="font-style: italic;">{{selectedEvent.state}}</p>
                   </div>
 
                   <ul class="list-group list-group-flush">
@@ -113,28 +105,46 @@
                     </li>
                   </ul>
                 </div>
-
               </div>
 
-              <div class="col-3">
+              <div class="col-4">
+                <h3 class="text-light mb-3">Upcoming Matches</h3>
 
+                <!--
+                <template v-for="(event, index) in matchList" :key="event">
+                  <h5 class="mb-2 text-light">{{event.eventName}}</h5>
+                  <template v-for="(match, index) in event.matches" :key="match">
+                    <div v-if="match.score != 'DQ'" class="card mb-3">
+                      <div class="card-body">
+                        <h5 class="card-title">{{match.eventName}}</h5>
+                        <p class="card-text">{{match.score}}</p>
+                        <p>{{match.stopTime}}</p>
+                      </div>
+                    </div>
+                  </template>-->
+
+                </template>
               </div>
 
-              <div class="col-3">
+              <div class="col-4">
 
               </div>
 
           </div>
 
-          <div class="row bg-dark text-light fixed-bottom border-top border-secondary" style="padding-top: 10px; padding-bottom: 10px; padding-left: 10px;">
+          <div class="row bg-dark text-light fixed-bottom border-top border-secondary" style="padding-top: 10px; padding-bottom: 10px; padding-left: 10px; padding-right: 10px;">
             <div class="col">
-              <h3 class="m-0">CONNECT WITH US!</h3>
+              <h4 class="m-0">CONNECT WITH US!</h4>
               <ul class="list-group list-group-horizontal">
                 <li class="list-group-item social-media-list-item"><i class="bi bi-facebook"></i> facebook.com/fsmsmash </li>
                 <li class="list-group-item social-media-list-item"><i class="bi bi-discord"></i> bit.ly/fsmsmash </li>
                 <li class="list-group-item social-media-list-item"><i class="bi bi-twitch"></i> twitch.tv/uafscs </li>
                 <li class="list-group-item social-media-list-item"><i class="bi bi-twitter"></i> twitter.com/fsmsmash </li>
               </ul>
+            </div>
+            <div class="col" style="text-align: right;">
+              <h4 class="mb-1">LOCAL TIME</h4>
+              <h4>{{getCurrentTimeAsString}}</h4>
             </div>
           </div>
 
@@ -154,10 +164,12 @@
         slug: '',
         tournamentName: '',
         eventList: [],
+        matchList: [],
         selectedEvent: { name: '', state: '', standings: [] },
         selectedEventIndex: 0,
         fadeOutAnimationEnabled: false,
         fadeInAnimationEnabled: false,
+        currentTime: new Date()
       }
     },
     mounted() {
@@ -177,16 +189,21 @@
 
         waitingApp.reloadEventData()
 
-      }, 15000);
+      }, 15000)
+
+      setInterval(function() {
+        waitingApp.currentTime = new Date()
+      }, 1000)
 
     },
     methods : {
       async queryTournamentEventsSmashGG(key,slug){
-        const queryData = { tournamentName: '', tournamentStandings: [] }
+        const queryData = { tournamentName: '', tournamentStandings: [], tournamentMatches: [] }
+        const updatedAfter = Math.floor(Date.now() / 1000) - 1800000
 
         try {
           const query = `
-          query TournamentQuery($slug: String) {
+          query TournamentQuery($slug: String, $updatedAfter:Timestamp) {
             tournament(slug: $slug){
               id
               name
@@ -195,14 +212,18 @@
                 name
                 state
                 sets(
+                  perPage: 30
                 	filters: {
-                    state: [1,2]
+                    state: [3]
                     hideEmpty: true
+                    updatedAfter:$updatedAfter
                   }
-                  sortType:CALL_ORDER
+                  sortType: RECENT
                 ) {
                   nodes{
                     state
+                    displayScore
+                    completedAt
                     slots {
                       entrant {
                         id
@@ -213,7 +234,7 @@
                 }
                 standings(
                   query: {
-                    perPage: 15
+                    perPage: 8
                 	}
               	){
               			nodes {
@@ -237,7 +258,7 @@
             },
             body: JSON.stringify({
               query,
-              variables: { slug: slug },
+              variables: { slug: slug, updatedAfter: updatedAfter },
             }),
           })
 
@@ -273,14 +294,41 @@
                       queryData.tournamentStandings.push(eventData)
                     }
 
+                    const eventMatches = {eventName: '', matches: []}
+                    eventMatches.eventName = e.name
+
                     if(e.sets != null) {
                       if(e.sets.nodes != null) {
                         e.sets.nodes.forEach((set) => {
+                          const match = {teamOne: '', teamTwo: '', score: '', stopTime: ''}
+                          match.score = set.displayScore
 
-                          console.log(set)
+                          const d = new Date(set.completedAt * 1000)
+                          match.stopTime = Math.round((new Date() - d) / (1000 * 60)) + " minutes ago"
+                          //match.stopTime = d
 
+                          if(set.slots != null) {
+                            if(set.slots[0] != null) {
+                              if(set.slots[0].entrant != null){
+                                match.teamOne = set.slots[0].entrant.name.slice(set.slots[0].entrant.name.indexOf("| ") + 1,set.slots[0].entrant.name.length).trim()
+                              }
+                            }
+                            if(set.slots[1] != null) {
+                              if(set.slots[1].entrant != null){
+                                match.teamTwo = set.slots[1].entrant.name.slice(set.slots[1].entrant.name.indexOf("| ") + 1,set.slots[1].entrant.name.length).trim()
+                              }
+                            }
+
+                            if(match.teamOne.length > 0 && match.teamTwo.length > 0) {
+                              eventMatches.matches.push(match)
+                            }
+                          }
                         })
                       }
+                    }
+
+                    if(eventMatches.matches.length > 0) {
+                      queryData.tournamentMatches.push(eventMatches)
                     }
 
                   })
@@ -295,6 +343,7 @@
             console.log(e)
         }
 
+        console.log(queryData)
         return queryData
       },
       async loadStandingsData(slug) {
@@ -303,23 +352,37 @@
 
         this.tournamentName = data.tournamentName
         this.eventList = data.tournamentStandings
+        this.matchList = data.tournamentMatches
 
         this.reloadEventData()
 
         // TODO: Save to session data
       },
       reloadEventData() {
-        this.fadeOutAnimationEnabled = true
-        setTimeout(() => {
-          this.selectedEvent = this.eventList[this.selectedEventIndex]
-          this.fadeOutAnimationEnabled = false
+        if(this.eventList.length > 0) {
 
-          this.fadeInAnimationEnabled = true
+          this.fadeOutAnimationEnabled = true
           setTimeout(() => {
-            this.fadeInAnimationEnabled = false
+            this.selectedEvent = this.eventList[this.selectedEventIndex]
+            this.fadeOutAnimationEnabled = false
+
+            this.fadeInAnimationEnabled = true
+            setTimeout(() => {
+              this.fadeInAnimationEnabled = false
+            }, 1000)
+
           }, 1000)
 
-        }, 1000)
+        }
+      }
+    },
+    computed: {
+      getCurrentTimeAsString() {
+        const dateString =
+        this.currentTime.getHours().toString().padStart(2, '0') + ":" +
+        this.currentTime.getMinutes().toString().padStart(2, '0') + ":" +
+        this.currentTime.getSeconds().toString().padStart(2, '0')
+        return dateString
       }
     },
     components: {
