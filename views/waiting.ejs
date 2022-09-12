@@ -83,12 +83,13 @@
 
       <div class="container-fluid css-selector" style="width: 1920px; height: 1080px;">
 
-          <div class="row bg-dark text-light mb-3 justify-content-between border-bottom border-secondary">
+          <div class="row bg-dark text-light mb-3 justify-content-between border-bottom border-secondary" style="padding-top: 10px; padding-bottom: 10px;">
             <div class="col">
               <h1>{{tournamentName}}</h1>
             </div>
             <div class="col" style="text-align: right">
-              <h1>Fort Smith Smash</h1>
+              <!--<h1>Fort Smith Smash</h1>-->
+              <img src="/fsmsmashlogo.png" style="height: 50px;"/>
             </div>
           </div>
 
@@ -96,16 +97,19 @@
 
               <div class="col standings-list">
 
-                <div v-if="selectedEvent.standings.length > 0" class="card border-light mb-3 standings-list" :class="{'fade-out': fadeOutAnimationEnabled, 'fade-in': fadeInAnimationEnabled}">
-                  <div class="card-header bg-dark text-light">Standings</div>
+                <h3 class="text-light">Standings</h3>
+
+                <div v-if="selectedEvent.standings.length > 0" class="card bg-dark border-secondary standings-list"
+                  :class="{'fade-out': fadeOutAnimationEnabled, 'fade-in': fadeInAnimationEnabled}">
+                  <!--<div class="card-header bg-dark text-light">{{selectedEvent.name}}</div>-->
                   <div class="card-body">
-                    <h5 class="card-title">{{selectedEvent.name}}</h5>
-                    <transition><p class="card-text text-secondary">{{selectedEvent.state}}</p></transition>
+                    <h5 class="card-title" style="color: white;">{{selectedEvent.name}}</h5>
+                    <p class="card-text" style="font-style: italic; color: white;">{{selectedEvent.state}}</p>
                   </div>
 
                   <ul class="list-group list-group-flush">
-                    <li class="list-group-item" style="background-color: rgba(0,0,0,0); border-color: rgba(0,0,0,0);" v-for="(standing, index) in selectedEvent.standings" :key="standing.name">
-                      <span class="badge bg-light rounded me-3 text-dark" style="font-size: 12pt;">{{standing.placement}}</span> {{standing.name}}
+                    <li class="list-group-item" style="background-color: rgba(255,255,255,1); border-color: rgba(0,0,0,0);" v-for="(standing, index) in selectedEvent.standings" :key="standing.name">
+                      <span class="badge bg-light text-dark me-3" style="font-size: 12pt;">{{standing.placement}}</span> {{standing.name}}
                     </li>
                   </ul>
                 </div>
@@ -122,8 +126,8 @@
 
           </div>
 
-          <div class="row bg-dark text-light fixed-bottom border-top border-secondary">
-            <div class="col" style="padding-top: 5px; padding-left: 25px;">
+          <div class="row bg-dark text-light fixed-bottom border-top border-secondary" style="padding-top: 10px; padding-bottom: 10px; padding-left: 10px;">
+            <div class="col">
               <h3 class="m-0">CONNECT WITH US!</h3>
               <ul class="list-group list-group-horizontal">
                 <li class="list-group-item social-media-list-item"><i class="bi bi-facebook"></i> facebook.com/fsmsmash </li>
@@ -209,7 +213,7 @@
                 }
                 standings(
                   query: {
-                    perPage: 10
+                    perPage: 15
                 	}
               	){
               			nodes {
