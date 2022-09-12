@@ -12,9 +12,6 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
 
   <style>
-    p {
-      color: white;
-    }
 
     .css-selector {
       background: linear-gradient(269deg, #ff4600, #46a2fb, #ffffff);
@@ -28,6 +25,48 @@
       50%{background-position:9% 100%}
       100%{background-position:92% 0%}
     }
+
+
+    .list-move, /* apply transition to moving elements */
+    .list-enter-active,
+    .list-leave-active {
+      transition: all 1s ease;
+    }
+
+    /* ensure leaving items are taken out of layout flow so that moving
+    animations can be calculated correctly. */
+    .list-leave-active {
+      position: absolute;
+    }
+
+    .list-enter-from,
+    .list-leave-to {
+      opacity: 0;
+    }
+
+
+    .fade-enter-active,
+    .fade-leave-active {
+      transition: opacity 0.5s ease;
+    }
+
+    .fade-enter-from,
+    .fade-leave-to {
+      opacity: 0;
+    }
+
+
+    .standings-list {
+      max-width: 475px;
+      min-width: 475px;
+    }
+
+    .social-media-list-item {
+      background-color: rgba(0,0,0,0);
+      color: white;
+      border-color: rgba(0,0,0,0);
+    }
+
   </style>
 
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -44,17 +83,51 @@
 
       <div class="container-fluid css-selector" style="width: 1920px; height: 1080px;">
 
+          <div class="row bg-dark text-light mb-3 justify-content-between border-bottom border-secondary">
+            <div class="col">
+              <h1>{{tournamentName}}</h1>
+            </div>
+            <div class="col" style="text-align: right">
+              <h1>Fort Smith Smash</h1>
+            </div>
+          </div>
+
           <div class="row">
 
-              <div class="col-6">
-                <p style="font-weight: bold; font-size: 16pt;">{{selectedStandingsList.name}}</p>
-                <ul class="list-group list-group-flush" v-for="(standing, index) in selectedStandingsList.standings">
-                  <li class="list-group-item" style="background-color: rgba(0,0,0,0); color: white;">
-                    <span class="badge bg-light rounded-pill me-3 text-dark" style="font-size: 12pt;">{{standing.placement}}</span> {{standing.name}}
-                  </li>
-                </ul>
+              <div class="col standings-list">
+                <transition-group name="list">
+                  <template v-for="(event, index) in selectedStandingsList" :key="event">
+                    <div class="card border-secondary mb-3 standings-list">
+                      <div class="card-header bg-dark text-light">{{event.name}}</div>
+                      <div class="card-body">
+                        <ul class="list-group list-group-flush" v-for="(standing, index) in event.standings">
+                          <li class="list-group-item" style="background-color: rgba(0,0,0,0);">
+                            <span class="badge bg-light rounded me-3 text-dark" style="font-size: 12pt;">{{standing.placement}}</span>
+                            {{standing.name}}
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </template>
+                </transition-group>
               </div>
 
+              <div class="col-3">
+
+              </div>
+
+          </div>
+
+          <div class="row bg-dark text-light fixed-bottom border-top border-secondary">
+            <div class="col" style="padding-top: 5px; padding-left: 25px;">
+              <h3 class="m-0">CONNECT WITH US!</h3>
+              <ul class="list-group list-group-horizontal">
+                <li class="list-group-item social-media-list-item"><i class="bi bi-facebook"></i> facebook.com/fsmsmash</li>
+                <li class="list-group-item social-media-list-item"><i class="bi bi-discord"></i> bit.ly/fsmsmash </li>
+                <li class="list-group-item social-media-list-item"><i class="bi bi-twitch"></i> uafscs </li>
+                <li class="list-group-item social-media-list-item"><i class="bi bi-twitter"></i> @fsmsmash</li>
+              </ul>
+            </div>
           </div>
 
       </div>
@@ -71,8 +144,9 @@
         host: window.location.hostname,
         port: ":3000",
         slug: '',
+        tournamentName: '',
         eventsStandingsList: [],
-        selectedStandingsList: {name: '', standings: []},
+        selectedStandingsList: [],
         selectedStandingsIndex: 0,
       }
     },
@@ -91,13 +165,16 @@
           waitingApp.selectedStandingsIndex = 0
         }
 
-        waitingApp.selectedStandingsList = waitingApp.eventsStandingsList[waitingApp.selectedStandingsIndex]
+        waitingApp.selectedStandingsList.pop()
+        waitingApp.selectedStandingsList.push(waitingApp.eventsStandingsList[waitingApp.selectedStandingsIndex])
+
       }, 10000);
 
     },
     methods : {
       async queryEventStandingsSmashGG(key,slug){
-        const standingsQueryData = []
+        const standingsQueryData = { tournamentName: '', tournamentStandings: [] }
+
         try {
           const query = `
           query TournamentQuery($slug: String) {
@@ -143,6 +220,7 @@
 
             if (data.data != null) {
               if (data.data.tournament != null) {
+                standingsQueryData.tournamentName = data.data.tournament.name
 
                 if(data.data.tournament.events != null) {
                   data.data.tournament.events.forEach((e) => {
@@ -167,7 +245,7 @@
                     }
 
                     if(eventStanding.standings.length > 0) {
-                      standingsQueryData.push(eventStanding)
+                      standingsQueryData.tournamentStandings.push(eventStanding)
                     }
                   })
                 }
@@ -185,10 +263,16 @@
       },
       async loadStandingsData(slug) {
         const key = '<%= apiKey %>'
-        this.eventsStandingsList = await this.queryEventStandingsSmashGG(key,slug)
+        const data = await this.queryEventStandingsSmashGG(key,slug)
+
+        this.tournamentName = data.tournamentName
+        this.eventsStandingsList = data.tournamentStandings
+
         if(this.eventsStandingsList.length > 0){
-          this.selectedStandingsList = this.eventsStandingsList[0]
+          this.selectedStandingsList.push(this.eventsStandingsList[0])
         }
+
+        // TODO: Save to session data
       }
     },
     components: {
