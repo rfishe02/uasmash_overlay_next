@@ -108,10 +108,10 @@
             <h1 class="text-light">We'll Be Right Back...</h1>
           </div>
 
-          <div class="row justify-content-between" style="padding-left: 50px; padding-right: 50px; padding-top: 25px;">
+          <div class="row justify-content-around" style="padding-left: 50px; padding-right: 50px; padding-top: 25px;">
 
               <transition>
-                <div class="col-3">
+                <div class="col-3" v-if="streamQueue.length > 0">
                   <h3 class="text-light mb-3">Upcoming Matches</h3>
                   <template v-for="(set, index) in streamQueue" :key="set">
                     <div class="card mb-2">
@@ -144,23 +144,25 @@
                 </div>
               </transition>-->
 
-              <div class="col-3" > <!-- v-if="selectedEvent.standings.length > 0" -->
-                <h3 class="text-light mb-3">Standings</h3>
+              <transition>
+                <div class="col-3" v-if="selectedEvent.standings.length > 0"> <!-- v-if="selectedEvent.standings.length > 0" -->
+                  <h3 class="text-light mb-3">Standings</h3>
 
-                <div class="card bg-dark border-secondary" :class="{'fade-out': fadeOutAnimationEnabled, 'fade-in': fadeInAnimationEnabled}">
-                  <!--<div class="card-header bg-dark text-light">{{selectedEvent.name}}</div>-->
-                  <div class="card-body">
-                    <h5 class="card-title text-light">{{selectedEvent.name}}</h5>
-                    <p class="card-text text-light" style="font-style: italic;">{{selectedEvent.state}}</p>
+                  <div class="card bg-dark border-secondary" :class="{'fade-out': fadeOutAnimationEnabled, 'fade-in': fadeInAnimationEnabled}">
+                    <!--<div class="card-header bg-dark text-light">{{selectedEvent.name}}</div>-->
+                    <div class="card-body">
+                      <h5 class="card-title text-light">{{selectedEvent.name}}</h5>
+                      <p class="card-text text-light" style="font-style: italic;">{{selectedEvent.state}}</p>
+                    </div>
+
+                    <ul class="list-group list-group-flush">
+                      <li class="list-group-item" style="background-color: rgba(255,255,255,1); border-width: 0; border-color: rgba(0,0,0,0);" v-for="(standing, index) in selectedEvent.standings" :key="standing.name">
+                        <span class="badge bg-light text-dark me-3" style="font-size: 12pt;">{{standing.placement}}</span> {{standing.name}}
+                      </li>
+                    </ul>
                   </div>
-
-                  <ul class="list-group list-group-flush">
-                    <li class="list-group-item" style="background-color: rgba(255,255,255,1); border-width: 0; border-color: rgba(0,0,0,0);" v-for="(standing, index) in selectedEvent.standings" :key="standing.name">
-                      <span class="badge bg-light text-dark me-3" style="font-size: 12pt;">{{standing.placement}}</span> {{standing.name}}
-                    </li>
-                  </ul>
                 </div>
-              </div>
+              </transition>
 
               <div class="col-4">
                 <h3 class="text-light mb-3">Highlights</h3>
