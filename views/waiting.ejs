@@ -13,6 +13,17 @@
 
   <style>
 
+    /* we will explain what these classes do next! */
+    .v-enter-active,
+    .v-leave-active {
+      transition: opacity 1s ease;
+    }
+
+    .v-enter-from,
+    .v-leave-to {
+      opacity: 0;
+    }
+
     .css-selector {
       background: linear-gradient(225deg, #0098ff, #ff2f00);
       background-size: 400% 400%;
@@ -78,21 +89,25 @@
 
       <div class="container-fluid css-selector" style="width: 1920px; height: 1080px;">
 
-          <div class="row bg-dark text-light justify-content-between border-bottom border-secondary" style="padding-top: 10px; padding-bottom: 10px;">
+          <div class="row bg-dark text-light justify-content-between border-bottom border-secondary mb-3" style="padding-top: 15px; padding-bottom: 15px; padding-left: 10px; padding-right: 10px;">
             <div class="col">
-              <h1>{{tournamentName}}</h1>
+              <h2 class="m-0 pt-2">{{tournamentName}}</h2>
             </div>
             <div class="col" style="text-align: right">
               <img src="/fsmsmashlogo.png" style="height: 50px;"/>
             </div>
           </div>
 
-          <div class="row justify-content-between" style="padding-left: 25px; padding-right: 25px; padding-top: 25px;">
+          <div class="row" style="padding-left: 50px; padding-top: 25px;">
+            <h1 class="text-light">We'll Be Right Back...</h1>
+          </div>
 
-              <div class="col-3">
+          <div class="row" style="padding-left: 50px; padding-right: 50px; padding-top: 25px;">
+
+              <div class="col-3" v-if="selectedEvent.standings.length > 0">
                 <h3 class="text-light mb-3">Standings</h3>
 
-                <div v-if="selectedEvent.standings.length > 0" class="card bg-dark border-secondary" :class="{'fade-out': fadeOutAnimationEnabled, 'fade-in': fadeInAnimationEnabled}">
+                <div class="card bg-dark border-secondary" :class="{'fade-out': fadeOutAnimationEnabled, 'fade-in': fadeInAnimationEnabled}">
                   <!--<div class="card-header bg-dark text-light">{{selectedEvent.name}}</div>-->
                   <div class="card-body">
                     <h5 class="card-title text-light">{{selectedEvent.name}}</h5>
@@ -107,34 +122,48 @@
                 </div>
               </div>
 
-              <div class="col-4">
-                <h3 class="text-light mb-3">Upcoming Matches</h3>
+              <transition>
+                <div class="col-3" v-if="matchList.length > 0">
+                  <h3 class="text-light mb-3">Recent Matches</h3>
 
-                <!--
-                <template v-for="(event, index) in matchList" :key="event">
-                  <h5 class="mb-2 text-light">{{event.eventName}}</h5>
-                  <template v-for="(match, index) in event.matches" :key="match">
-                    <div v-if="match.score != 'DQ'" class="card mb-3">
+                  <template v-for="(event, index) in matchList" :key="event">
+                    <template v-for="(match, index) in event.matches" :key="match">
+
+                      <div v-if="match.score != 'DQ'" class="card border-secondary mb-3">
+                        <!--<div class="card-header bg-dark text-light"></div>-->
+                        <div class="card-body">
+                          <h5 class="card-title">{{match.score}}</h5>
+                          <p class="card-text text-secondary"><b>{{event.eventName}} {{match.phaseName}}</b> <br> {{match.fullRoundText}}</p>
+                        </div>
+                        <div class="card-footer">
+                          <small class="text-muted">{{match.stopTime}}</small>
+                        </div>
+                      </div>
+
+                    </template>
+                  </template>
+                </div>
+              </transition>
+
+              <transition>
+                <div class="col-3" v-if="streamQueue.length > 0">
+                  <h3 class="text-light mb-3">Upcoming Matches</h3>
+                  <template v-for="(set, index) in streamQueue" :key="set">
+                    <div class="card mb-2">
                       <div class="card-body">
-                        <h5 class="card-title">{{match.eventName}}</h5>
-                        <p class="card-text">{{match.score}}</p>
-                        <p>{{match.stopTime}}</p>
+                        <h5 class="card-title">{{set.teamOne}} vs. {{set.teamTwo}}</h5>
+                        <p class="card-text text-secondary"><b>{{set.eventName}} {{set.phaseName}}</b> <br> {{set.fullRoundText}}</p>
                       </div>
                     </div>
-                  </template>-->
-
-                </template>
-              </div>
-
-              <div class="col-4">
-
-              </div>
+                  </template>
+                </div>
+              </transition>
 
           </div>
 
-          <div class="row bg-dark text-light fixed-bottom border-top border-secondary" style="padding-top: 10px; padding-bottom: 10px; padding-left: 10px; padding-right: 10px;">
+          <div class="row bg-dark text-light fixed-bottom border-top border-secondary" style="padding-top: 15px; padding-bottom: 15px; padding-left: 25px; padding-right: 25px;">
             <div class="col">
-              <h4 class="m-0">CONNECT WITH US!</h4>
+              <h4 class="mb-0">CONNECT WITH US!</h4>
               <ul class="list-group list-group-horizontal">
                 <li class="list-group-item social-media-list-item"><i class="bi bi-facebook"></i> facebook.com/fsmsmash </li>
                 <li class="list-group-item social-media-list-item"><i class="bi bi-discord"></i> bit.ly/fsmsmash </li>
@@ -165,6 +194,7 @@
         tournamentName: '',
         eventList: [],
         matchList: [],
+        streamQueue: [],
         selectedEvent: { name: '', state: '', standings: [] },
         selectedEventIndex: 0,
         fadeOutAnimationEnabled: false,
@@ -178,7 +208,7 @@
 
       if(slug != null) {
         this.slug = slug
-        this.loadStandingsData(this.slug)
+        this.loadTournamentData(this.slug)
       }
 
       setInterval(function () {
@@ -198,8 +228,8 @@
     },
     methods : {
       async queryTournamentEventsSmashGG(key,slug){
-        const queryData = { tournamentName: '', tournamentStandings: [], tournamentMatches: [] }
-        const updatedAfter = Math.floor(Date.now() / 1000) - 1800000
+        const queryData = { tournamentName: '', tournamentStandings: [], tournamentMatches: [], tournamentStreamQueue: [] }
+        const updatedAfter = Math.floor(Date.now() / 1000) - 9000
 
         try {
           const query = `
@@ -207,12 +237,28 @@
             tournament(slug: $slug){
               id
               name
+              streamQueue {
+                sets {
+                  event {
+                    name
+                    phases {
+                      name
+                    }
+                  }
+                  fullRoundText
+                 	slots{
+                    entrant {
+                      id
+                      name
+                    }
+                  }
+                }
+              }
               events {
-                id
                 name
                 state
                 sets(
-                  perPage: 30
+                  perPage: 8
                 	filters: {
                     state: [3]
                     hideEmpty: true
@@ -222,6 +268,12 @@
                 ) {
                   nodes{
                     state
+                    event {
+                      phases {
+                        name
+                      }
+                    }
+                    fullRoundText
                     displayScore
                     completedAt
                     slots {
@@ -234,7 +286,7 @@
                 }
                 standings(
                   query: {
-                    perPage: 8
+                    perPage: 12
                 	}
               	){
               			nodes {
@@ -269,13 +321,48 @@
               if (data.data.tournament != null) {
                 queryData.tournamentName = data.data.tournament.name
 
+                if(data.data.tournament.streamQueue != null) {
+                  data.data.tournament.streamQueue.forEach((queue) => {
+
+                    if(queue.sets != null) {
+                      queue.sets.forEach((set) => {
+                        const queueData = {eventName: '', phaseName: '', fullRoundText: set.fullRoundText, teamOne: '', teamTwo: ''}
+
+                        if(set.event != null){
+                          queueData.eventName = set.event.name
+                          if(set.event.phases != null) {
+                            if(set.event.phases.length > 0){
+                              queueData.phaseName = set.event.phases[0].name
+                            }
+                          }
+                        }
+
+                        if(set.slots != null) {
+                          if(set.slots.length > 0) {
+                            if(set.slots[0].entrant != null) {
+                              queueData.teamOne = set.slots[0].entrant.name
+                            }
+                            if(set.slots[1].entrant != null) {
+                              queueData.teamTwo = set.slots[1].entrant.name
+                            }
+                            queryData.tournamentStreamQueue.push(queueData)
+                          }
+                        }
+
+                      })
+                    }
+
+                  })
+                }
+
                 if(data.data.tournament.events != null) {
                   data.data.tournament.events.forEach((e) => {
 
-                    const eventData = {}
-                    eventData.name = e.name
-                    eventData.state = e.state
-                    eventData.standings = []
+                    const eventStandings = {name: e.name, state: e.state, phase: '', standings: []}
+
+                    if(e.phases != null) {
+
+                    }
 
                     if(e.standings != null){
                       if(e.standings.nodes != null){
@@ -284,28 +371,32 @@
                             const entrant = {}
                             entrant.name = standing.entrant.name.slice(standing.entrant.name.indexOf("| ") + 1,standing.entrant.name.length).trim()
                             entrant.placement = standing.placement
-                            eventData.standings.push(entrant)
+                            eventStandings.standings.push(entrant)
                           }
                         })
                       }
                     }
-
-                    if(eventData.standings.length > 0) {
-                      queryData.tournamentStandings.push(eventData)
+                    if(eventStandings.standings.length > 0) {
+                      queryData.tournamentStandings.push(eventStandings)
                     }
 
-                    const eventMatches = {eventName: '', matches: []}
-                    eventMatches.eventName = e.name
+                    const eventMatches = {eventName: e.name, matches: []}
 
                     if(e.sets != null) {
                       if(e.sets.nodes != null) {
                         e.sets.nodes.forEach((set) => {
-                          const match = {teamOne: '', teamTwo: '', score: '', stopTime: ''}
-                          match.score = set.displayScore
-
                           const d = new Date(set.completedAt * 1000)
-                          match.stopTime = Math.round((new Date() - d) / (1000 * 60)) + " minutes ago"
-                          //match.stopTime = d
+                          const match = {teamOne: '', teamTwo: '', phaseName: '', fullRoundText: '', score: set.displayScore, stopTime: Math.round((new Date() - d) / (1000 * 60)) + " minutes ago"}
+
+                          match.fullRoundText = set.fullRoundText
+
+                          if(set.event != null){
+                            if(set.event.phases != null){
+                              if(set.event.phases.length > 0) {
+                                match.phaseName = set.event.phases[0].name
+                              }
+                            }
+                          }
 
                           if(set.slots != null) {
                             if(set.slots[0] != null) {
@@ -318,7 +409,6 @@
                                 match.teamTwo = set.slots[1].entrant.name.slice(set.slots[1].entrant.name.indexOf("| ") + 1,set.slots[1].entrant.name.length).trim()
                               }
                             }
-
                             if(match.teamOne.length > 0 && match.teamTwo.length > 0) {
                               eventMatches.matches.push(match)
                             }
@@ -326,7 +416,6 @@
                         })
                       }
                     }
-
                     if(eventMatches.matches.length > 0) {
                       queryData.tournamentMatches.push(eventMatches)
                     }
@@ -346,13 +435,14 @@
         console.log(queryData)
         return queryData
       },
-      async loadStandingsData(slug) {
+      async loadTournamentData(slug) {
         const key = '<%= apiKey %>'
         const data = await this.queryTournamentEventsSmashGG(key,slug)
 
         this.tournamentName = data.tournamentName
         this.eventList = data.tournamentStandings
         this.matchList = data.tournamentMatches
+        this.streamQueue = data.tournamentStreamQueue
 
         this.reloadEventData()
 
