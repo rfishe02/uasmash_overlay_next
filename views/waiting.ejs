@@ -13,6 +13,8 @@
 
   <style>
 
+    body { background-color: rgba(0, 0, 0, 0); margin: 0px auto; overflow: hidden; }
+
     /* we will explain what these classes do next! */
     .v-enter-active,
     .v-leave-active {
@@ -22,6 +24,10 @@
     .v-enter-from,
     .v-leave-to {
       opacity: 0;
+    }
+
+    .dark-overlay {
+      background-color: rgba(0,0,0,0.7)
     }
 
     .css-selector {
@@ -87,7 +93,7 @@
 <body>
   <div id="app">
 
-      <div class="container-fluid css-selector" style="width: 1920px; height: 1080px;">
+      <div class="container-fluid dark-overlay" style="width: 1920px; height: 1080px;">
 
           <div class="row bg-dark text-light justify-content-between border-bottom border-secondary mb-3" style="padding-top: 15px; padding-bottom: 15px; padding-left: 10px; padding-right: 10px;">
             <div class="col">
@@ -102,51 +108,10 @@
             <h1 class="text-light">We'll Be Right Back...</h1>
           </div>
 
-          <div class="row" style="padding-left: 50px; padding-right: 50px; padding-top: 25px;">
-
-              <div class="col-3" v-if="selectedEvent.standings.length > 0">
-                <h3 class="text-light mb-3">Standings</h3>
-
-                <div class="card bg-dark border-secondary" :class="{'fade-out': fadeOutAnimationEnabled, 'fade-in': fadeInAnimationEnabled}">
-                  <!--<div class="card-header bg-dark text-light">{{selectedEvent.name}}</div>-->
-                  <div class="card-body">
-                    <h5 class="card-title text-light">{{selectedEvent.name}}</h5>
-                    <p class="card-text text-light" style="font-style: italic;">{{selectedEvent.state}}</p>
-                  </div>
-
-                  <ul class="list-group list-group-flush">
-                    <li class="list-group-item" style="background-color: rgba(255,255,255,1); border-color: rgba(0,0,0,0);" v-for="(standing, index) in selectedEvent.standings" :key="standing.name">
-                      <span class="badge bg-light text-dark me-3" style="font-size: 12pt;">{{standing.placement}}</span> {{standing.name}}
-                    </li>
-                  </ul>
-                </div>
-              </div>
+          <div class="row justify-content-between" style="padding-left: 50px; padding-right: 50px; padding-top: 25px;">
 
               <transition>
-                <div class="col-3" v-if="matchList.length > 0">
-                  <h3 class="text-light mb-3">Recent Matches</h3>
-
-                  <template v-for="(event, index) in matchList" :key="event">
-                    <template v-for="(match, index) in event.matches" :key="match">
-
-                      <div v-if="match.score != 'DQ'" class="card border-secondary mb-3">
-                        <!--<div class="card-header bg-dark text-light"></div>-->
-                        <div class="card-body">
-                          <h5 class="card-title">{{match.score}}</h5>
-                          <p class="card-text text-secondary"><b>{{event.eventName}} {{match.phaseName}}</b> <br> {{match.fullRoundText}}</p>
-                        </div>
-                        <div class="card-footer">
-                          <small class="text-muted">{{match.stopTime}}</small>
-                        </div>
-                      </div>
-
-                    </template>
-                  </template>
-                </div>
-              </transition>
-
-              <transition>
-                <div class="col-3" v-if="streamQueue.length > 0">
+                <div class="col-3">
                   <h3 class="text-light mb-3">Upcoming Matches</h3>
                   <template v-for="(set, index) in streamQueue" :key="set">
                     <div class="card mb-2">
@@ -158,6 +123,66 @@
                   </template>
                 </div>
               </transition>
+
+              <!--
+              <transition>
+                <div class="col-3" v-if="matchList.length > 0">
+                  <h3 class="text-light mb-3">Reported Matches</h3>
+                  <template v-for="(event, index) in matchList" :key="event">
+                    <template v-for="(match, index) in event.matches" :key="match">
+                      <div v-if="match.score != 'DQ'" class="card border-secondary mb-3">
+                        <div class="card-body">
+                          <h5 class="card-title">{{match.score}}</h5>
+                          <p class="card-text text-secondary"><b>{{event.eventName}} {{match.phaseName}}</b> <br> {{match.fullRoundText}}</p>
+                        </div>
+                        <div class="card-footer">
+                          <small class="text-muted">{{match.stopTime}}</small>
+                        </div>
+                      </div>
+                    </template>
+                  </template>
+                </div>
+              </transition>-->
+
+              <div class="col-3" > <!-- v-if="selectedEvent.standings.length > 0" -->
+                <h3 class="text-light mb-3">Standings</h3>
+
+                <div class="card bg-dark border-secondary" :class="{'fade-out': fadeOutAnimationEnabled, 'fade-in': fadeInAnimationEnabled}">
+                  <!--<div class="card-header bg-dark text-light">{{selectedEvent.name}}</div>-->
+                  <div class="card-body">
+                    <h5 class="card-title text-light">{{selectedEvent.name}}</h5>
+                    <p class="card-text text-light" style="font-style: italic;">{{selectedEvent.state}}</p>
+                  </div>
+
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item" style="background-color: rgba(255,255,255,1); border-width: 0; border-color: rgba(0,0,0,0);" v-for="(standing, index) in selectedEvent.standings" :key="standing.name">
+                      <span class="badge bg-light text-dark me-3" style="font-size: 12pt;">{{standing.placement}}</span> {{standing.name}}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="col-4">
+                <h3 class="text-light mb-3">Highlights</h3>
+
+                <!-- Add a placeholder for the Twitch embed -->
+                <div id="twitch-embed"></div>
+
+                <!-- Load the Twitch embed script -->
+                <script src="https://player.twitch.tv/js/embed/v1.js"></script>
+
+                <!-- Create a Twitch.Player object. This will render within the placeholder div -->
+                <script type="text/javascript">
+                  new Twitch.Player("twitch-embed", {
+                    width: 576,
+                    height: 324,
+                    autoplay: true,
+                    muted: true,
+                    video: "1587603710",
+                    allowfullscreen: false,
+                  });
+                </script>
+              </div>
 
           </div>
 
@@ -208,7 +233,11 @@
 
       if(slug != null) {
         this.slug = slug
-        this.loadTournamentData(this.slug)
+
+        this.fetchTournamentDataAndSave()
+
+        //setInterval(function() { waitingApp.fetchTournamentDataAndSave() }, 30000)
+
       }
 
       setInterval(function () {
@@ -217,7 +246,7 @@
           waitingApp.selectedEventIndex = 0
         }
 
-        waitingApp.reloadEventData()
+        waitingApp.reloadStandingsData()
 
       }, 15000)
 
@@ -229,7 +258,7 @@
     methods : {
       async queryTournamentEventsSmashGG(key,slug){
         const queryData = { tournamentName: '', tournamentStandings: [], tournamentMatches: [], tournamentStreamQueue: [] }
-        const updatedAfter = Math.floor(Date.now() / 1000) - 9000
+        const updatedAfter = Math.floor(Date.now() / 1000) - 1800
 
         try {
           const query = `
@@ -258,7 +287,7 @@
                 name
                 state
                 sets(
-                  perPage: 8
+                  perPage: 3
                 	filters: {
                     state: [3]
                     hideEmpty: true
@@ -319,20 +348,22 @@
 
             if (data.data != null) {
               if (data.data.tournament != null) {
-                queryData.tournamentName = data.data.tournament.name
+                queryData.tournamentName = data.data.tournament.name == null ? '' : data.data.tournament.name
+
 
                 if(data.data.tournament.streamQueue != null) {
                   data.data.tournament.streamQueue.forEach((queue) => {
 
                     if(queue.sets != null) {
                       queue.sets.forEach((set) => {
-                        const queueData = {eventName: '', phaseName: '', fullRoundText: set.fullRoundText, teamOne: '', teamTwo: ''}
+                        const queueData = {eventName: '', phaseName: '', fullRoundText: '', teamOne: '', teamTwo: ''}
+                        queueData.fullRoundText = set.fullRoundText == null ? '' : set.fullRoundText
 
                         if(set.event != null){
-                          queueData.eventName = set.event.name
+                          queueData.eventName = set.event.name == null ? '' : set.event.name
                           if(set.event.phases != null) {
                             if(set.event.phases.length > 0){
-                              queueData.phaseName = set.event.phases[0].name
+                              queueData.phaseName = set.event.phases[0].name == null ? '' : set.event.phases[0].name
                             }
                           }
                         }
@@ -340,37 +371,38 @@
                         if(set.slots != null) {
                           if(set.slots.length > 0) {
                             if(set.slots[0].entrant != null) {
-                              queueData.teamOne = set.slots[0].entrant.name
+                              queueData.teamOne = set.slots[0].entrant.name == null ? '' : set.slots[0].entrant.name
                             }
                             if(set.slots[1].entrant != null) {
-                              queueData.teamTwo = set.slots[1].entrant.name
+                              queueData.teamTwo = set.slots[1].entrant.name == null ? '' : set.slots[1].entrant.name
                             }
-                            queryData.tournamentStreamQueue.push(queueData)
+                            if(queueData.teamOne.length > 0 && queueData.teamTwo.length > 0){
+                              queryData.tournamentStreamQueue.push(queueData)
+                            }
                           }
                         }
-
                       })
                     }
 
                   })
                 }
 
+
                 if(data.data.tournament.events != null) {
                   data.data.tournament.events.forEach((e) => {
 
-                    const eventStandings = {name: e.name, state: e.state, phase: '', standings: []}
 
-                    if(e.phases != null) {
-
-                    }
+                    const eventStandings = {name: '', state: '', standings: []}
+                    eventStandings.name = e.name == null ? '' : e.name
+                    eventStandings.state = e.state == null ? '' : e.state
 
                     if(e.standings != null){
                       if(e.standings.nodes != null){
                         e.standings.nodes.forEach((standing) => {
                           if(standing.entrant != null) {
-                            const entrant = {}
-                            entrant.name = standing.entrant.name.slice(standing.entrant.name.indexOf("| ") + 1,standing.entrant.name.length).trim()
-                            entrant.placement = standing.placement
+                            const entrant = { name: '', placement: ''}
+                            entrant.name = standing.entrant.name == null ? '' : standing.entrant.name.slice(standing.entrant.name.indexOf("| ") + 1,standing.entrant.name.length).trim()
+                            entrant.placement = standing.placement == null ? '' : standing.placement
                             eventStandings.standings.push(entrant)
                           }
                         })
@@ -380,20 +412,25 @@
                       queryData.tournamentStandings.push(eventStandings)
                     }
 
-                    const eventMatches = {eventName: e.name, matches: []}
+
+                    const eventMatches = {eventName: '', matches: []}
+                    eventMatches.eventName = e.name == null ? '' : e.name
 
                     if(e.sets != null) {
                       if(e.sets.nodes != null) {
                         e.sets.nodes.forEach((set) => {
-                          const d = new Date(set.completedAt * 1000)
-                          const match = {teamOne: '', teamTwo: '', phaseName: '', fullRoundText: '', score: set.displayScore, stopTime: Math.round((new Date() - d) / (1000 * 60)) + " minutes ago"}
+                          const match = {teamOne: '', teamTwo: '', phaseName: '', fullRoundText: '', score: '', stopTime: ''}
+                          match.score = set.displayScore == null ? '' : set.displayScore
+                          match.fullRoundText = set.fullRoundText == null ? '' : set.fullRoundText
 
-                          match.fullRoundText = set.fullRoundText
-
+                          if(set.completedAt != null) {
+                            const d = new Date(set.completedAt * 1000)
+                            match.stopTime = Math.round((new Date() - d) / (1000 * 60)) + " minutes ago"
+                          }
                           if(set.event != null){
                             if(set.event.phases != null){
                               if(set.event.phases.length > 0) {
-                                match.phaseName = set.event.phases[0].name
+                                match.phaseName = set.event.phases[0].name == null ? '' : set.event.phases[0].name
                               }
                             }
                           }
@@ -401,18 +438,19 @@
                           if(set.slots != null) {
                             if(set.slots[0] != null) {
                               if(set.slots[0].entrant != null){
-                                match.teamOne = set.slots[0].entrant.name.slice(set.slots[0].entrant.name.indexOf("| ") + 1,set.slots[0].entrant.name.length).trim()
+                                match.teamOne = set.slots[0].entrant.name == null ? '' : set.slots[0].entrant.name.slice(set.slots[0].entrant.name.indexOf("| ") + 1,set.slots[0].entrant.name.length).trim()
                               }
                             }
                             if(set.slots[1] != null) {
                               if(set.slots[1].entrant != null){
-                                match.teamTwo = set.slots[1].entrant.name.slice(set.slots[1].entrant.name.indexOf("| ") + 1,set.slots[1].entrant.name.length).trim()
+                                match.teamTwo = set.slots[1].entrant.name == null ? '' : set.slots[1].entrant.name.slice(set.slots[1].entrant.name.indexOf("| ") + 1,set.slots[1].entrant.name.length).trim()
                               }
                             }
                             if(match.teamOne.length > 0 && match.teamTwo.length > 0) {
                               eventMatches.matches.push(match)
                             }
                           }
+
                         })
                       }
                     }
@@ -432,23 +470,22 @@
             console.log(e)
         }
 
-        console.log(queryData)
         return queryData
       },
-      async loadTournamentData(slug) {
+      async fetchTournamentDataAndSave() {
         const key = '<%= apiKey %>'
-        const data = await this.queryTournamentEventsSmashGG(key,slug)
+        const data = await this.queryTournamentEventsSmashGG(key,this.slug)
 
         this.tournamentName = data.tournamentName
         this.eventList = data.tournamentStandings
         this.matchList = data.tournamentMatches
         this.streamQueue = data.tournamentStreamQueue
 
-        this.reloadEventData()
+        this.reloadStandingsData()
 
-        // TODO: Save to session data
+        // TODO: Save to session data?
       },
-      reloadEventData() {
+      reloadStandingsData() {
         if(this.eventList.length > 0) {
 
           this.fadeOutAnimationEnabled = true

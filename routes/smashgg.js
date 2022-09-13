@@ -6,7 +6,7 @@ const smashGG = require('../modules/SmashGG')
 var express = require('express');
 var router = express.Router();
 
-router.get('/query_tournaments', isLoggedIn, async function(req, res, next) {
+router.get('/query_tournaments', async function(req, res, next) {
 
   const result = await smashGG.queryTournamentsSmashGG(process.env.SMASHGG_KEY)
   res.json(result)
