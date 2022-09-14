@@ -63,32 +63,29 @@
   height: 0px;
 }
 
+
 .white-border {
   border-style: solid;
   border-color: rgba(255,255,255,1);
   border-width: 5px 5px 5px 5px;
 }
 
-.upper-border{
-  border-style: solid;
-  border-color: rgba(255,255,255,1);
+.player-style{
   border-radius: 0.5rem 0.5rem 0rem 0rem;
   border-width: 5px 5px 0px 5px;
 }
 
-.lower-border {
-  border-style: solid;
-  border-color: rgba(255,255,255,1);
+.title-style {
   border-radius: 0rem 0rem 0.5rem 0.5rem;
   border-width: 0px 5px 5px 5px;
 }
+
 
 .camera-boxes {
   height: 200px;
   border :solid;
   border-color: white;
-  border-radius: .5rem .5rem .5rem .5rem;
-  border-width: 5px;
+  border-width: 2px;
   max-width: 300px;
   margin-bottom: 15px;
 }
@@ -98,7 +95,7 @@
 }
 
 .player-name {
-  font-size: 16pt;
+  font-size: 18pt;
   font-weight: bold;
   padding: 5px;
   color: white;
@@ -106,7 +103,7 @@
 }
 
 .player-score {
-  font-size: 16pt;
+  font-size: 18pt;
   font-weight: bold;
   padding-top: 5px;
   padding-left: 0;

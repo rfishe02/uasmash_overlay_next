@@ -88,6 +88,9 @@
 
   <script src="https://unpkg.com/vue@3"></script>
 
+  <!-- Load the Twitch embed script -->
+  <script src="https://player.twitch.tv/js/embed/v1.js"></script>
+
 </head>
 
 <body>
@@ -145,7 +148,7 @@
               </transition>-->
 
               <transition>
-                <div class="col-3" v-if="selectedEvent.standings.length > 0"> <!-- v-if="selectedEvent.standings.length > 0" -->
+                <div class="col-3" v-if="selectedEvent.standings.length > 0">
                   <h3 class="text-light mb-3">Standings</h3>
 
                   <div class="card bg-dark border-secondary" :class="{'fade-out': fadeOutAnimationEnabled, 'fade-in': fadeInAnimationEnabled}">
@@ -170,20 +173,6 @@
                 <!-- Add a placeholder for the Twitch embed -->
                 <div id="twitch-embed"></div>
 
-                <!-- Load the Twitch embed script -->
-                <script src="https://player.twitch.tv/js/embed/v1.js"></script>
-
-                <!-- Create a Twitch.Player object. This will render within the placeholder div -->
-                <script type="text/javascript">
-                  new Twitch.Player("twitch-embed", {
-                    width: 576,
-                    height: 324,
-                    autoplay: true,
-                    muted: true,
-                    video: "1587603710",
-                    allowfullscreen: false,
-                  });
-                </script>
               </div>
 
           </div>
@@ -192,10 +181,10 @@
             <div class="col">
               <h4 class="mb-0">CONNECT WITH US!</h4>
               <ul class="list-group list-group-horizontal">
-                <li class="list-group-item social-media-list-item"><i class="bi bi-facebook"></i> facebook.com/fsmsmash </li>
-                <li class="list-group-item social-media-list-item"><i class="bi bi-discord"></i> bit.ly/fsmsmash </li>
-                <li class="list-group-item social-media-list-item"><i class="bi bi-twitch"></i> twitch.tv/uafscs </li>
-                <li class="list-group-item social-media-list-item"><i class="bi bi-twitter"></i> twitter.com/fsmsmash </li>
+                <li class="list-group-item social-media-list-item" style="font-size: 14pt;"><i class="bi bi-facebook"></i> facebook.com/fsmsmash </li>
+                <li class="list-group-item social-media-list-item" style="font-size: 14pt;"><i class="bi bi-discord"></i> bit.ly/fsmsmash </li>
+                <li class="list-group-item social-media-list-item" style="font-size: 14pt;"><i class="bi bi-twitch"></i> twitch.tv/uafscs </li>
+                <li class="list-group-item social-media-list-item" style="font-size: 14pt;"><i class="bi bi-twitter"></i> twitter.com/fsmsmash </li>
               </ul>
             </div>
             <div class="col" style="text-align: right;">
@@ -211,6 +200,16 @@
 
 <script type="module">
   const { createApp} = Vue
+
+  // Create a Twitch.Player object. This will render within the placeholder div
+  new Twitch.Player("twitch-embed", {
+    width: 576,
+    height: 324,
+    autoplay: true,
+    muted: true,
+    video: "1587603710",
+    allowfullscreen: false,
+  });
 
   const waitingApp = createApp({
     data() {
@@ -317,7 +316,7 @@
                 }
                 standings(
                   query: {
-                    perPage: 12
+                    perPage: 8
                 	}
               	){
               			nodes {
