@@ -26,6 +26,24 @@
       opacity: 0;
     }
 
+    .list-move, /* apply transition to moving elements */
+    .list-enter-active,
+    .list-leave-active {
+      transition: all .5s ease;
+    }
+
+    .list-enter-from,
+    .list-leave-to {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+
+    /* ensure leaving items are taken out of layout flow so that moving
+    animations can be calculated correctly. */
+    .list-leave-active {
+      position: absolute;
+    }
+
     .dark-overlay {
       background-color: rgba(0,0,0,0.7)
     }
@@ -100,75 +118,66 @@
 
           <div class="row bg-dark text-light justify-content-between border-bottom border-secondary mb-3" style="padding-top: 15px; padding-bottom: 15px; padding-left: 10px; padding-right: 10px;">
             <div class="col">
-              <h2 class="m-0 pt-2">{{tournamentName}}</h2>
+              <h1 class="m-0 pt-1">{{tournamentName}}</h1>
             </div>
             <div class="col" style="text-align: right">
               <img src="/fsmsmashlogo.png" style="height: 50px;"/>
             </div>
           </div>
 
-          <div class="row" style="padding-left: 50px; padding-top: 25px;">
-            <h1 class="text-light">We'll Be Right Back...</h1>
+          <div class="row row-cols-5" style="padding-left: 50px; padding-right: 50px; padding-top: 15px;">
+              <div class="col-12">
+                <h2 class="text-light mb-3">UP NEXT</h2>
+              </div>
+              <div class="col pb-3 pe-2" v-for="(set, index) in streamQueue" :key="set">
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title">{{set.teamOne}} vs. {{set.teamTwo}}</h5>
+                      <p class="card-text text-secondary"><b>{{set.eventName}} {{set.phaseName}}</b> <br> {{set.fullRoundText}}</p>
+                    </div>
+                  </div>
+              </div>
           </div>
 
-          <div class="row justify-content-around" style="padding-left: 50px; padding-right: 50px; padding-top: 25px;">
+          <div class="row justify-content-between" style="padding-left: 50px; padding-right: 50px; padding-top: 15px;">
 
-              <transition>
-                <div class="col-3" v-if="streamQueue.length > 0">
-                  <h3 class="text-light mb-3">Upcoming Matches</h3>
-                  <template v-for="(set, index) in streamQueue" :key="set">
-                    <div class="card mb-2">
+              <div class="col-3 p-3">
+                <h2 class="text-light mb-3">RECENT MATCHES</h2>
+                <transition-group name="list">
+                  <template v-for="(match, index) in matchList" :key="match">
+                    <div class="card border-secondary mb-3">
                       <div class="card-body">
-                        <h5 class="card-title">{{set.teamOne}} vs. {{set.teamTwo}}</h5>
-                        <p class="card-text text-secondary"><b>{{set.eventName}} {{set.phaseName}}</b> <br> {{set.fullRoundText}}</p>
+                        <h5 class="card-title">{{match.score}}</h5>
+                        <p class="card-text text-secondary"><b>{{match.eventName}} {{match.phaseName}}</b> <br> {{match.fullRoundText}}</p>
+                      </div>
+                      <div class="card-footer">
+                        <small class="text-muted">{{match.stopTime}}</small>
                       </div>
                     </div>
                   </template>
-                </div>
-              </transition>
+                </transition-group>
+              </div>
 
-              <!--
-              <transition>
-                <div class="col-3" v-if="matchList.length > 0">
-                  <h3 class="text-light mb-3">Reported Matches</h3>
-                  <template v-for="(event, index) in matchList" :key="event">
-                    <template v-for="(match, index) in event.matches" :key="match">
-                      <div v-if="match.score != 'DQ'" class="card border-secondary mb-3">
-                        <div class="card-body">
-                          <h5 class="card-title">{{match.score}}</h5>
-                          <p class="card-text text-secondary"><b>{{event.eventName}} {{match.phaseName}}</b> <br> {{match.fullRoundText}}</p>
-                        </div>
-                        <div class="card-footer">
-                          <small class="text-muted">{{match.stopTime}}</small>
-                        </div>
-                      </div>
-                    </template>
-                  </template>
-                </div>
-              </transition>-->
+              <div class="col-3 p-3">
+                <h2 class="text-light mb-3">STANDINGS</h2>
 
-              <transition>
-                <div class="col-3" v-if="selectedEvent.standings.length > 0">
-                  <h3 class="text-light mb-3">Standings</h3>
-
-                  <div class="card bg-dark border-secondary" :class="{'fade-out': fadeOutAnimationEnabled, 'fade-in': fadeInAnimationEnabled}">
-                    <!--<div class="card-header bg-dark text-light">{{selectedEvent.name}}</div>-->
-                    <div class="card-body">
-                      <h5 class="card-title text-light">{{selectedEvent.name}}</h5>
-                      <p class="card-text text-light" style="font-style: italic;">{{selectedEvent.state}}</p>
-                    </div>
-
-                    <ul class="list-group list-group-flush">
-                      <li class="list-group-item" style="background-color: rgba(255,255,255,1); border-width: 0; border-color: rgba(0,0,0,0);" v-for="(standing, index) in selectedEvent.standings" :key="standing.name">
-                        <span class="badge bg-light text-dark me-3" style="font-size: 12pt;">{{standing.placement}}</span> {{standing.name}}
-                      </li>
-                    </ul>
+                <div v-if="selectedEvent.standings.length > 0" class="card bg-dark border-secondary" :class="{'fade-out': fadeOutAnimationEnabled, 'fade-in': fadeInAnimationEnabled}">
+                  <!--<div class="card-header bg-dark text-light">{{selectedEvent.name}}</div>-->
+                  <div class="card-body">
+                    <h5 class="card-title text-light">{{selectedEvent.name}}</h5>
+                    <p class="card-text text-light" style="font-style: italic;">{{selectedEvent.state}}</p>
                   </div>
-                </div>
-              </transition>
 
-              <div class="col-4">
-                <h3 class="text-light mb-3">Highlights</h3>
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item" style="background-color: rgba(255,255,255,1); border-width: 0; border-color: rgba(0,0,0,0);" v-for="(standing, index) in selectedEvent.standings" :key="standing.name">
+                      <span class="badge bg-light text-dark me-3" style="font-size: 12pt;">{{standing.placement}}</span> {{standing.name}}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="col-6 p-3">
+                <h2 class="text-light mb-3">HIGHLIGHTS</h2>
 
                 <!-- Add a placeholder for the Twitch embed -->
                 <div id="twitch-embed"></div>
@@ -177,7 +186,7 @@
 
           </div>
 
-          <div class="row bg-dark text-light fixed-bottom border-top border-secondary" style="padding-top: 15px; padding-bottom: 15px; padding-left: 25px; padding-right: 25px;">
+          <div class="row bg-dark text-light fixed-bottom border-top border-secondary" style="padding-top: 15px; padding-bottom: 10px; padding-left: 25px; padding-right: 25px;">
             <div class="col">
               <h4 class="mb-0">CONNECT WITH US!</h4>
               <ul class="list-group list-group-horizontal">
@@ -203,8 +212,8 @@
 
   // Create a Twitch.Player object. This will render within the placeholder div
   new Twitch.Player("twitch-embed", {
-    width: 576,
-    height: 324,
+    width: 854,
+    height: 480,
     autoplay: true,
     muted: true,
     video: "1587603710",
@@ -219,6 +228,7 @@
         slug: '',
         tournamentName: '',
         eventList: [],
+        previousMatchList: [],
         matchList: [],
         streamQueue: [],
         selectedEvent: { name: '', state: '', standings: [] },
@@ -237,7 +247,7 @@
 
         this.fetchTournamentDataAndSave()
 
-        //setInterval(function() { waitingApp.fetchTournamentDataAndSave() }, 30000)
+        setInterval(function() { waitingApp.fetchTournamentDataAndSave() }, 10000)
 
       }
 
@@ -288,7 +298,7 @@
                 name
                 state
                 sets(
-                  perPage: 3
+                  perPage: 10
                 	filters: {
                     state: [3]
                     hideEmpty: true
@@ -414,17 +424,16 @@
                     }
 
 
-                    const eventMatches = {eventName: '', matches: []}
-                    eventMatches.eventName = e.name == null ? '' : e.name
-
                     if(e.sets != null) {
                       if(e.sets.nodes != null) {
                         e.sets.nodes.forEach((set) => {
-                          const match = {teamOne: '', teamTwo: '', phaseName: '', fullRoundText: '', score: '', stopTime: ''}
+                          const match = {teamOne: '', teamTwo: '', eventName: '', phaseName: '', fullRoundText: '', score: '', completedAt: '', stopTime: ''}
                           match.score = set.displayScore == null ? '' : set.displayScore
+                          match.eventName = e.name == null ? '' : e.name
                           match.fullRoundText = set.fullRoundText == null ? '' : set.fullRoundText
 
                           if(set.completedAt != null) {
+                            match.completedAt = set.completedAt
                             const d = new Date(set.completedAt * 1000)
                             match.stopTime = Math.round((new Date() - d) / (1000 * 60)) + " minutes ago"
                           }
@@ -447,16 +456,14 @@
                                 match.teamTwo = set.slots[1].entrant.name == null ? '' : set.slots[1].entrant.name.slice(set.slots[1].entrant.name.indexOf("| ") + 1,set.slots[1].entrant.name.length).trim()
                               }
                             }
-                            if(match.teamOne.length > 0 && match.teamTwo.length > 0) {
-                              eventMatches.matches.push(match)
+
+                            if(match.teamOne.length > 0 && match.teamTwo.length > 0 && match.score != 'DQ') {
+                              queryData.tournamentMatches.push(match)
                             }
                           }
 
                         })
                       }
-                    }
-                    if(eventMatches.matches.length > 0) {
-                      queryData.tournamentMatches.push(eventMatches)
                     }
 
                   })
@@ -479,10 +486,52 @@
 
         this.tournamentName = data.tournamentName
         this.eventList = data.tournamentStandings
-        this.matchList = data.tournamentMatches
         this.streamQueue = data.tournamentStreamQueue
 
-        this.reloadStandingsData()
+        /*
+        data.tournamentMatches = [
+          {teamOne: 'The Professor', teamTwo: 'Arkansauce', eventName: '', phaseName: 'Bracket', fullRoundText: 'Quarter-Final', score: 'Professor 1 - Arkansas - 3', stopTime: '5 minutes ago'},
+          {teamOne: 'Illidan', teamTwo: 'Phantom', eventName: '', phaseName: 'Bracket', fullRoundText: 'Quarter-Final', score: 'Illidan 1 - Phantom - 3', stopTime: '5 minutes ago'},
+          {teamOne: 'LumaDooma', teamTwo: 'Brit', eventName: '', phaseName: 'Bracket', fullRoundText: 'Quarter-Final', score: 'LumaDooma 1 - Brit - 3', stopTime: '5 minutes ago'},
+          {teamOne: 'KingIBC', teamTwo: 'TopHatTitan', eventName: '', phaseName: 'Bracket', fullRoundText: 'Quarter-Final', score: 'KingIBC 1 - TopHatTitan - 3', stopTime: '5 minutes ago'},
+          {teamOne: 'SAW', teamTwo: 'The Professor', eventName: '', phaseName: 'Bracket', fullRoundText: 'Quarter-Final', score: 'SAW 1 - The Professor - 3', stopTime: '5 minutes ago'},
+        ]*/
+
+        //const prevMatches = []
+
+        for(var i = data.tournamentMatches.length-1; i >= 0; i--){
+          const newMatch = data.tournamentMatches[i]
+
+          const match = this.previousMatchList.find(
+            m => m.eventName == newMatch.eventName &&
+            m.phaseName == newMatch.phaseName &&
+            m.fullRoundText == newMatch.fullRoundText &&
+            m.score == newMatch.score)
+
+          if(match == null) {
+            this.matchList.splice(0,0,newMatch)
+            //prevMatches.push(newMatch)
+            this.previousMatchList.push(newMatch)
+
+            if(this.matchList.length > 3){
+              this.matchList.pop()
+            }
+          } else {
+            match.stopTime = newMatch.stopTime
+          }
+
+          console.log(match)
+        }
+
+        /*
+        this.matchList.forEach(match => {
+          prevMatches.push(match)
+        })
+        this.previousMatchList = prevMatches*/
+
+        //this.streamQueue = [{eventName: 'Ultimate Singles', phaseName: 'Bracket', fullRoundText: 'Grand Final', teamOne: 'Phantom', teamTwo: 'Illidan'},]
+
+        //this.reloadStandingsData()
 
         // TODO: Save to session data?
       },
