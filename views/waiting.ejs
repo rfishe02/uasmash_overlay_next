@@ -26,10 +26,11 @@
       opacity: 0;
     }
 
+
     .list-move, /* apply transition to moving elements */
     .list-enter-active,
     .list-leave-active {
-      transition: all .5s ease;
+      transition: all 0.5s ease;
     }
 
     .list-enter-from,
@@ -40,9 +41,10 @@
 
     /* ensure leaving items are taken out of layout flow so that moving
     animations can be calculated correctly. */
-    .list-leave-active {
+    /*.list-leave-active {
       position: absolute;
-    }
+    }*/
+
 
     .dark-overlay {
       background-color: rgba(0,0,0,0.7)
@@ -51,7 +53,6 @@
     .css-selector {
       background: linear-gradient(225deg, #0098ff, #ff2f00);
       background-size: 400% 400%;
-
       animation: waitingScreenBackground 31s ease infinite;
     }
 
@@ -70,7 +71,7 @@
 
 
     .fade-out {
-      animation-duration: 1s;
+      animation-duration: 0.5s;
       animation-name: fadeOut;
     }
 
@@ -84,7 +85,7 @@
     }
 
     .fade-in {
-      animation-duration: 1s;
+      animation-duration: 0.5s;
       animation-name: fadeIn;
     }
 
@@ -125,35 +126,45 @@
             </div>
           </div>
 
-          <div class="row row-cols-5" style="padding-left: 50px; padding-right: 50px; padding-top: 15px;">
+          <div class="row row-cols-5" style="padding-left: 50px; padding-right: 50px; padding-top: 15px; padding-bottom: 15px;">
               <div class="col-12">
                 <h2 class="text-light mb-3">UP NEXT</h2>
               </div>
-              <div class="col pb-3 pe-2" v-for="(set, index) in streamQueue" :key="set">
-                  <div class="card">
-                    <div class="card-body">
-                      <h5 class="card-title">{{set.teamOne}} vs. {{set.teamTwo}}</h5>
-                      <p class="card-text text-secondary"><b>{{set.eventName}} {{set.phaseName}}</b> <br> {{set.fullRoundText}}</p>
+              <transition-group name="list">
+                <div class="col pb-3 pe-2" v-for="(set, index) in streamQueue" :key="set">
+
+                    <div class="card">
+                      <div class="card-header">
+                        {{set.eventName}} {{set.phaseName}}
+                      </div>
+                      <div class="card-body">
+                        <h5 class="card-title">{{set.teamOne}} vs. {{set.teamTwo}}</h5>
+                        <p class="card-text text-secondary">{{set.fullRoundText}} <br> </p>
+                      </div>
                     </div>
-                  </div>
-              </div>
+
+                </div>
+              </transition-group>
           </div>
 
-          <div class="row justify-content-between" style="padding-left: 50px; padding-right: 50px; padding-top: 15px;">
+          <div class="row justify-content-between" style="padding-left: 50px; padding-right: 50px;">
 
               <div class="col-3 p-3">
                 <h2 class="text-light mb-3">RECENT MATCHES</h2>
                 <transition-group name="list">
                   <template v-for="(match, index) in matchList" :key="match">
-                    <div class="card border-secondary mb-3">
+
+                    <div class="card mb-3">
+                      <div class="card-header">
+                        {{match.eventName}} {{match.phaseName}}
+                      </div>
                       <div class="card-body">
                         <h5 class="card-title">{{match.score}}</h5>
-                        <p class="card-text text-secondary"><b>{{match.eventName}} {{match.phaseName}}</b> <br> {{match.fullRoundText}}</p>
-                      </div>
-                      <div class="card-footer">
+                        <p class="card-text text-secondary">{{match.fullRoundText}}</p>
                         <small class="text-muted">{{match.stopTime}}</small>
                       </div>
                     </div>
+
                   </template>
                 </transition-group>
               </div>
@@ -161,16 +172,15 @@
               <div class="col-3 p-3">
                 <h2 class="text-light mb-3">STANDINGS</h2>
 
-                <div v-if="selectedEvent.standings.length > 0" class="card bg-dark border-secondary" :class="{'fade-out': fadeOutAnimationEnabled, 'fade-in': fadeInAnimationEnabled}">
-                  <!--<div class="card-header bg-dark text-light">{{selectedEvent.name}}</div>-->
+                <div v-if="selectedEvent.standings.length > 0" class="card" :class="{'fade-out': fadeOutAnimationEnabled, 'fade-in': fadeInAnimationEnabled}">
                   <div class="card-body">
-                    <h5 class="card-title text-light">{{selectedEvent.name}}</h5>
-                    <p class="card-text text-light" style="font-style: italic;">{{selectedEvent.state}}</p>
+                    <h5 class="card-title">{{selectedEvent.name}}</h5>
+                    <p class="card-text text-secondary" style="font-style: italic;">{{selectedEvent.state}}</p>
                   </div>
 
                   <ul class="list-group list-group-flush">
-                    <li class="list-group-item" style="background-color: rgba(255,255,255,1); border-width: 0; border-color: rgba(0,0,0,0);" v-for="(standing, index) in selectedEvent.standings" :key="standing.name">
-                      <span class="badge bg-light text-dark me-3" style="font-size: 12pt;">{{standing.placement}}</span> {{standing.name}}
+                    <li class="list-group-item" style="background-color: rgba(255,255,255,1); border-color: rgba(0,0,0,0);" v-for="(standing, index) in selectedEvent.standings" :key="standing.name">
+                      <span class="badge bg-light text-dark me-3" style="font-weight: bold; font-size: 12pt;">{{standing.placement}}</span> {{standing.name}}
                     </li>
                   </ul>
                 </div>
@@ -179,9 +189,10 @@
               <div class="col-6 p-3">
                 <h2 class="text-light mb-3">HIGHLIGHTS</h2>
 
-                <!-- Add a placeholder for the Twitch embed -->
-                <div id="twitch-embed"></div>
-
+                <transition>
+                  <!-- Add a placeholder for the Twitch embed -->
+                  <div id="twitch-embed" v-if="showTwitchEmbed"></div>
+                </transition>
               </div>
 
           </div>
@@ -235,7 +246,8 @@
         selectedEventIndex: 0,
         fadeOutAnimationEnabled: false,
         fadeInAnimationEnabled: false,
-        currentTime: new Date()
+        currentTime: new Date(),
+        showTwitchEmbed: false,
       }
     },
     mounted() {
@@ -245,11 +257,22 @@
       if(slug != null) {
         this.slug = slug
 
-        this.fetchTournamentDataAndSave()
+        this.fetchTournamentDataAndSave().then(() => {
+          waitingApp.reloadStandingsData()
+        })
 
         setInterval(function() { waitingApp.fetchTournamentDataAndSave() }, 10000)
 
       }
+
+      setTimeout(function() {
+        waitingApp.showTwitchEmbed = true
+      }, 1000) // Fade in the video content after a second. Otherwise, it's a bit jarring.
+
+      setInterval(function() {
+        waitingApp.currentTime = new Date()
+      }, 1000)
+
 
       setInterval(function () {
         waitingApp.selectedEventIndex++;
@@ -261,9 +284,6 @@
 
       }, 15000)
 
-      setInterval(function() {
-        waitingApp.currentTime = new Date()
-      }, 1000)
 
     },
     methods : {
@@ -402,7 +422,6 @@
                 if(data.data.tournament.events != null) {
                   data.data.tournament.events.forEach((e) => {
 
-
                     const eventStandings = {name: '', state: '', standings: []}
                     eventStandings.name = e.name == null ? '' : e.name
                     eventStandings.state = e.state == null ? '' : e.state
@@ -486,15 +505,33 @@
 
         this.tournamentName = data.tournamentName
         this.eventList = data.tournamentStandings
-        this.streamQueue = data.tournamentStreamQueue
+
+        //this.streamQueue = data.tournamentStreamQueue
+        if(data.tournamentStreamQueue.length == 0) {
+          this.streamQueue = []
+        } else {
+          data.tournamentStreamQueue.forEach(queueItem => {
+            const itemInQueue = this.streamQueue.find(s => s.eventName == queueItem.eventName && s.phaseName == queueItem.phaseName &&
+              s.fullRoundText == queueItem.fullRoundText && s.teamOne == queueItem.teamOne && s.teamTwo == queueItem.teamTwo)
+
+            if(itemInQueue == null) {
+              this.streamQueue.push(queueItem)
+            }
+          })
+        }
 
         /*
         data.tournamentMatches = [
-          {teamOne: 'The Professor', teamTwo: 'Arkansauce', eventName: '', phaseName: 'Bracket', fullRoundText: 'Quarter-Final', score: 'Professor 1 - Arkansas - 3', stopTime: '5 minutes ago'},
-          {teamOne: 'Illidan', teamTwo: 'Phantom', eventName: '', phaseName: 'Bracket', fullRoundText: 'Quarter-Final', score: 'Illidan 1 - Phantom - 3', stopTime: '5 minutes ago'},
-          {teamOne: 'LumaDooma', teamTwo: 'Brit', eventName: '', phaseName: 'Bracket', fullRoundText: 'Quarter-Final', score: 'LumaDooma 1 - Brit - 3', stopTime: '5 minutes ago'},
-          {teamOne: 'KingIBC', teamTwo: 'TopHatTitan', eventName: '', phaseName: 'Bracket', fullRoundText: 'Quarter-Final', score: 'KingIBC 1 - TopHatTitan - 3', stopTime: '5 minutes ago'},
-          {teamOne: 'SAW', teamTwo: 'The Professor', eventName: '', phaseName: 'Bracket', fullRoundText: 'Quarter-Final', score: 'SAW 1 - The Professor - 3', stopTime: '5 minutes ago'},
+          {teamOne: 'Illidan', teamTwo: 'Phantom', eventName: '', phaseName: 'Ultimate Singles Bracket', fullRoundText: 'Losers Final', score: 'Illidan 1 - Phantom - 3', stopTime: '5 minutes ago'},
+          {teamOne: 'LumaDooma', teamTwo: 'Brit', eventName: '', phaseName: 'Ultimate Singles Bracket', fullRoundText: 'Losers Quarter-Final', score: 'LumaDooma 1 - Brit - 3', stopTime: '5 minutes ago'},
+          {teamOne: 'KingIBC', teamTwo: 'TopHatTitan', eventName: '', phaseName: 'Ultimate Singles Bracket', fullRoundText: 'Losers Semi-Final', score: 'KingIBC 1 - TopHatTitan - 3', stopTime: '5 minutes ago'},
+          {teamOne: 'SAW', teamTwo: 'The Professor', eventName: '', phaseName: 'Ultimate Singles Bracket', fullRoundText: 'Losers Round 4', score: 'SAW 1 - The Professor - 3', stopTime: '5 minutes ago'},
+        ]
+        this.streamQueue = [{eventName: 'Ultimate Singles', phaseName: 'Bracket', fullRoundText: 'Grand Final', teamOne: 'Phantom', teamTwo: 'Illidan'},]
+
+        this.eventList = [
+          {name: 'Melee Singles', state: 'COMPLETED', standings: [{ name: 'Jojo', placement: '1'},{ name: 'TopHatTitan', placement: '2'},{ name: 'Naruto', placement: '3'}]},
+          {name: 'Ultimate Singles', state: 'ACTIVE', standings: [{ name: 'Illidan', placement: '1'},{ name: 'The Professor', placement: '2'},{ name: 'Phantom', placement: '3'}]}
         ]*/
 
         //const prevMatches = []
@@ -502,19 +539,17 @@
         for(var i = data.tournamentMatches.length-1; i >= 0; i--){
           const newMatch = data.tournamentMatches[i]
 
-          const match = this.previousMatchList.find(
-            m => m.eventName == newMatch.eventName &&
-            m.phaseName == newMatch.phaseName &&
-            m.fullRoundText == newMatch.fullRoundText &&
-            m.score == newMatch.score)
+          const match = this.previousMatchList.find(m => m.eventName == newMatch.eventName && m.phaseName == newMatch.phaseName &&
+            m.fullRoundText == newMatch.fullRoundText && m.score == newMatch.score)
 
           if(match == null) {
-            this.matchList.splice(0,0,newMatch)
-            //prevMatches.push(newMatch)
-            this.previousMatchList.push(newMatch)
+            waitingApp.matchList.splice(0,0,newMatch)
+            waitingApp.previousMatchList.push(newMatch)
 
-            if(this.matchList.length > 3){
-              this.matchList.pop()
+            //prevMatches.push(newMatch)
+
+            if(waitingApp.matchList.length > 3){
+              waitingApp.matchList.pop()
             }
           } else {
             match.stopTime = newMatch.stopTime
@@ -529,11 +564,8 @@
         })
         this.previousMatchList = prevMatches*/
 
-        //this.streamQueue = [{eventName: 'Ultimate Singles', phaseName: 'Bracket', fullRoundText: 'Grand Final', teamOne: 'Phantom', teamTwo: 'Illidan'},]
-
-        //this.reloadStandingsData()
-
         // TODO: Save to session data?
+
       },
       reloadStandingsData() {
         if(this.eventList.length > 0) {
@@ -546,9 +578,9 @@
             this.fadeInAnimationEnabled = true
             setTimeout(() => {
               this.fadeInAnimationEnabled = false
-            }, 1000)
+            }, 500)
 
-          }, 1000)
+          }, 500)
 
         }
       }
