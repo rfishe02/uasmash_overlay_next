@@ -3,19 +3,14 @@ async function queryTournamentsSmashGG(key) {
   const tournamentQueryData = []
 
   try {
-    const distanceFrom = "35.3815365, -94.3746986"
-    const distance = "25mi"
-    const afterDate = Math.floor(Date.now() / 1000) - 604800//000
+    const addrState = 'AR'
     const query = `
-    query LocalTournaments($distanceFrom: String, $distance: String, $afterDate: Timestamp) {
+    query LocalTournaments($addrState:String) {
       tournaments(
         query: {
+          sort: startAt
           filter: {
-            afterDate:$afterDate
-            location:{
-              distanceFrom: $distanceFrom
-              distance: $distance
-            }
+            addrState:$addrState
           }
       }) {
         nodes {
@@ -27,6 +22,8 @@ async function queryTournamentsSmashGG(key) {
           addrState
           postalCode
           startAt
+          createdAt
+          state
           numAttendees
           events {
             id
@@ -47,9 +44,7 @@ async function queryTournamentsSmashGG(key) {
       body: JSON.stringify({
         query,
         variables: {
-          distanceFrom: distanceFrom,
-          distance: distance,
-          afterDate: afterDate,
+          addrState: addrState
         },
       }),
     })

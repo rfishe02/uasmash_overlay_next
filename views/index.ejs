@@ -51,6 +51,16 @@
 
           <div class="row mb-3">
             <div class="col">
+              <label>Start.gg API Key</label>
+              <div class="p-inputgroup">
+                <p-inputtext v-model="apiKey" @change="saveAPIKey"></p-inputtext>
+                <!--<p-button label="Save Key" @click="saveAPIKey"></p-button>-->
+              </div>
+            </div>
+          </div>
+
+          <div class="row mb-3" v-if="apiKey.length > 0">
+            <div class="col">
               <label>Winners "Best Of 5" Starting Point</label>
               <div v-for="option of finalsStartOptions" :key="option" class="field-radiobutton">
                 <p-radiobutton :inputId="'winner' + option" name="winnerStart" :value="option" v-model="selectedWinnerBestOfStart"></p-radiobutton>
@@ -67,7 +77,7 @@
             </div>
           </div>
 
-          <div class="row mb-3">
+          <div class="row mb-3" v-if="apiKey.length > 0">
             <p-dropdown
               v-model="tournamentSelection"
               :options="tournamentList"
@@ -156,6 +166,11 @@
         selectedWinnerBestOfStart: 'Quarter-Final',
         selectedLoserBestOfStart: 'Quarter-Final',
         finalsStartOptions : [
+          'Round 1',
+          'Round 2',
+          'Round 3',
+          'Round 4',
+          'Round 5',
           'Quarter-Final',
           'Semi-Final',
           'Final',
@@ -163,11 +178,19 @@
         ],
         overlayTypes: [0],
         overlayModuleURLs: [],
-        waitingModuleURL: ''
+        waitingModuleURL: '',
+        apiKey: '',
       }
     },
     mounted() {
-      this.loadTournamentList()
+
+      const key = localStorage.getItem('apiKey')
+
+      if(key != null) {
+        this.apiKey = key
+        this.loadTournamentList()
+      }
+
     },
     methods: {
       async submitLogInForm() {
@@ -229,7 +252,7 @@
       },
       async loadTournamentList() {
         try {
-          const response = await fetch('http://'+this.host+this.port +'/smashgg/query_tournaments', {
+          const response = await fetch('http://'+ this.host+this.port +'/smashgg/query_tournaments?' + new URLSearchParams({"smashgg_key":this.apiKey}), {
             method: "get",
             headers: {
               "Content-Type": "application/json; charset=UTF-8",
@@ -247,25 +270,36 @@
       getOverlayModuleURLs() {
         const slug = this.tournamentSelection.slug == null ? '' : this.tournamentSelection.slug
 
+        this.overlayModuleURLs = []
         for(var i = 0; i < this.overlayTypes.length; i++) {
-          const url =  this.host + this.port+ "/" + this.overlayModule
-            + "?type=" + this.overlayTypes[i]
-            + "&poll=true"
-            + "&winnerBestOfStart=" + this.selectedWinnerBestOfStart
-            + "&loserBestOfStart=" + this.selectedLoserBestOfStart
-            + "&slug=" + slug
+          const url = this.host + this.port + "/" + this.overlayModule + "?" + new URLSearchParams({
+            "type": this.overlayTypes[i],
+            "poll": true,
+            "winnerBestOfStart": this.selectedWinnerBestOfStart,
+            "loserBestOfStart": this.selectedLoserBestOfStart,
+            "slug": slug,
+            "smashgg_key": this.apiKey,
+          })
 
           this.overlayModuleURLs.push(url)
         }
 
-        this.waitingModuleURL = this.host + this.port+ "/" + this.waitingModule
-          + "?slug=" + slug
+        this.waitingModuleURL = this.host + this.port + "/" + this.waitingModule + "?" + new URLSearchParams({
+          "slug": slug,
+          "smashgg_key": this.apiKey,
+        })
+
       },
+      saveAPIKey() {
+        localStorage.setItem('apiKey',this.apiKey)
+        this.loadTournamentList()
+      }
     },
     components: {
       "p-inputtext": primevue.inputtext,
       "p-radiobutton": primevue.radiobutton,
       "p-dropdown": primevue.dropdown,
+      "p-button": primevue.button,
     }
   }).use(primevue.config.default).mount('#app')
 

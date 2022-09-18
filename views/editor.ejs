@@ -77,6 +77,16 @@
 
     <div class="container-fluid" style="padding-bottom: 25px; padding-top: 15px">
 
+      <div class="row mb-3">
+        <div class="col-6">
+          <label>Start.gg API Key</label>
+          <div class="p-inputgroup">
+            <p-inputtext v-model="apiKey" @change="saveAPIKey"></p-inputtext>
+            <!--<p-button label="Save Key" @click="saveAPIKey"></p-button>-->
+          </div>
+        </div>
+      </div>
+
       <div class="row">
         <div class="col-12 col-lg-6 pb-3" style="height: 500px">
           <p-datatable
@@ -504,10 +514,17 @@
           "Best of 3",
           "Best of 5",
         ],
+        apiKey: '',
       }
     },
     mounted() {
-      this.setInitialState()
+
+      const key = localStorage.getItem('apiKey')
+
+      if(key != null) {
+        this.apiKey = key
+        this.setInitialState()
+      }
 
       this.importKeyOrGenerate().then((room) => {
         if(room.length > 0) {
@@ -518,12 +535,13 @@
           this.socket.emit("subscribe",room)
         }
       })
+
     },
     methods: {
       async setInitialState() {
 
         try {
-          const response = await fetch('http://'+this.host+this.port +'/smashgg/query_tournaments', {
+          const response = await fetch('http://'+this.host+this.port +'/smashgg/query_tournaments?' + new URLSearchParams({"smashgg_key":this.apiKey}), {
             method: "get",
             headers: {
               "Content-Type": "application/json; charset=UTF-8",
@@ -568,7 +586,7 @@
           //this.clearOverlayForm()
 
           try {
-            const response = await fetch('http://'+this.host+this.port +'/smashgg/query_sets?' + new URLSearchParams({"event_id":this.eventSelection.id}), {
+            const response = await fetch('http://'+this.host+this.port +'/smashgg/query_sets?' + new URLSearchParams({"event_id":this.eventSelection.id, "smashgg_key":this.apiKey}), {
               method: "get",
               headers: {
                 "Content-Type": "application/json; charset=UTF-8",
@@ -592,7 +610,7 @@
             const playerDictionary = {}
 
             try {
-              const response = await fetch('http://'+this.host+this.port+'/smashgg/query_players?' + new URLSearchParams({"tourney_id":this.tournamentSelection.id}), {
+              const response = await fetch('http://'+this.host+this.port+'/smashgg/query_players?' + new URLSearchParams({"tourney_id":this.tournamentSelection.id, "smashgg_key":this.apiKey}), {
                 method: "get",
                 headers: {
                   "Content-Type": "application/json; charset=UTF-8",
@@ -753,11 +771,18 @@
       },
       getModuleURL(type) {
 
-        return this.host +this.port+ "/" + this.overlayModule
-        + "?type=" + type
-        + "&id=" + this.overlayRoom
+        console.log(this.overlayRoom)
+
+        return this.host +this.port+ "/" + this.overlayModule + "?" + new URLSearchParams({
+          "type": type,
+          "id": this.overlayRoom,
+        })
 
       },
+      saveAPIKey() {
+        localStorage.setItem('apiKey',this.apiKey)
+        this.setInitialState()
+      }
     },
     computed: {
       getTeamOneName() {

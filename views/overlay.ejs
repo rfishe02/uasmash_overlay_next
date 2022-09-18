@@ -129,11 +129,17 @@
         winnerBestOfStart: 0,
         loserBestOfStart: 0,
         finalsOrder : {
-          'Quarter-Final':0,
-          'Semi-Final':1,
-          'Final':2,
-          'Grand Final': 3,
-        }
+          'Round 1':0,
+          'Round 2':1,
+          'Round 3':2,
+          'Round 4':3,
+          'Round 5':4,
+          'Quarter-Final':5,
+          'Semi-Final':6,
+          'Final':7,
+          'Grand Final': 8
+        },
+        apiKey: ''
       }
     },
     mounted() {
@@ -167,19 +173,23 @@
         this.loserBestOfStart = loserBestOfStart
       }
 
-      if(slug != null && poll != null) {
+      const key = urlParams.get('smashgg_key')
+
+      if(slug != null && poll != null && key != null) {
+        this.apiKey = key
+
         if(poll == 'true') {
           setInterval(function(){
-            overlayApp.pollSmashGGAPI(slug)
+
+            overlayApp.pollSmashGGAPI(key,slug)
           }, 5000);
         }
       }
 
     },
     methods : {
-      async pollSmashGGAPI(slug) {
+      async pollSmashGGAPI(key,slug) {
         try {
-          const key = '<%= apiKey %>'
           const data = await this.queryStreamQueueSmashGG(key,slug)
 
           if(data.length == 0) {
@@ -188,9 +198,6 @@
             this.saveOverlayValuesToSession()
 
           } else {
-
-            const winnerBestOfStart = 'Final'
-            const loserBestOfStart = 'Final'
 
             //var previousStartedAt = Date.now()
             var previousStartedAt = 0

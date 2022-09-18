@@ -5,7 +5,7 @@ const db = require('../bin/db')
 
 function generateRandomString() {
   var result           = ''
-  var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-._~-._~-._~01234567890123456789'
+  var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-._-._-._01234567890123456789'
   var charactersLength = characters.length
   for ( var i = 0; i < 25; i++ ) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength))
