@@ -6,8 +6,7 @@ var router = express.Router();
 router.get('/', isLoggedIn, function(req, res, next) {
   res.render('editor',{
     user: req.user,
-    isLoggedIn: req.isLoggedIn,
-    apiKey: process.env.SMASHGG_KEY });
+    isLoggedIn: req.isLoggedIn});
 });
 
 function isLoggedIn(req, res, next) {

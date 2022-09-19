@@ -187,7 +187,7 @@
               </div>
 
               <div class="col-6 p-3">
-                <h2 class="text-light mb-3">HIGHLIGHTS</h2>
+                <h2 class="text-light mb-3">SEASON HIGHLIGHTS</h2>
 
                 <transition>
                   <!-- Add a placeholder for the Twitch embed -->
@@ -227,8 +227,8 @@
     height: 480,
     autoplay: true,
     muted: true,
-    video: "1587603710",
-    allowfullscreen: false,
+    collection: "vtjKNGXLFRfY1Q",
+    allowfullscreen: true,
   });
 
   const waitingApp = createApp({
@@ -239,7 +239,7 @@
         slug: '',
         tournamentName: '',
         eventList: [],
-        previousMatchList: [],
+        previousMatchList: {},
         matchList: [],
         streamQueue: [],
         selectedEvent: { name: '', state: '', standings: [] },
@@ -248,14 +248,17 @@
         fadeInAnimationEnabled: false,
         currentTime: new Date(),
         showTwitchEmbed: false,
+        apiKey: '',
       }
     },
     mounted() {
       const urlParams = new URLSearchParams(window.location.search)
       const slug = urlParams.get('slug')
+      const key = urlParams.get('smashgg_key')
 
-      if(slug != null) {
+      if(slug != null && key != null) {
         this.slug = slug
+        this.apiKey = key
 
         this.fetchTournamentDataAndSave().then(() => {
           waitingApp.reloadStandingsData()
@@ -299,6 +302,8 @@
               name
               streamQueue {
                 sets {
+                  id
+                  state
                   event {
                     name
                     phases {
@@ -327,6 +332,7 @@
                   sortType: RECENT
                 ) {
                   nodes{
+                    id
                     state
                     event {
                       phases {
@@ -381,34 +387,37 @@
               if (data.data.tournament != null) {
                 queryData.tournamentName = data.data.tournament.name == null ? '' : data.data.tournament.name
 
-
                 if(data.data.tournament.streamQueue != null) {
                   data.data.tournament.streamQueue.forEach((queue) => {
 
                     if(queue.sets != null) {
                       queue.sets.forEach((set) => {
-                        const queueData = {eventName: '', phaseName: '', fullRoundText: '', teamOne: '', teamTwo: ''}
-                        queueData.fullRoundText = set.fullRoundText == null ? '' : set.fullRoundText
+                        if(set.state != null){
+                          if(set.state != 2){
 
-                        if(set.event != null){
-                          queueData.eventName = set.event.name == null ? '' : set.event.name
-                          if(set.event.phases != null) {
-                            if(set.event.phases.length > 0){
-                              queueData.phaseName = set.event.phases[0].name == null ? '' : set.event.phases[0].name
-                            }
-                          }
-                        }
+                            const queueData = {id:'', eventName: '', phaseName: '', fullRoundText: '', teamOne: '?', teamTwo: '?'}
+                            queueData.id = set.id
+                            queueData.fullRoundText = set.fullRoundText == null ? '' : set.fullRoundText
 
-                        if(set.slots != null) {
-                          if(set.slots.length > 0) {
-                            if(set.slots[0].entrant != null) {
-                              queueData.teamOne = set.slots[0].entrant.name == null ? '' : set.slots[0].entrant.name
+                            if(set.event != null){
+                              queueData.eventName = set.event.name == null ? '' : set.event.name
+                              if(set.event.phases != null) {
+                                if(set.event.phases.length > 0){
+                                  queueData.phaseName = set.event.phases[0].name == null ? '' : set.event.phases[0].name
+                                }
+                              }
                             }
-                            if(set.slots[1].entrant != null) {
-                              queueData.teamTwo = set.slots[1].entrant.name == null ? '' : set.slots[1].entrant.name
-                            }
-                            if(queueData.teamOne.length > 0 && queueData.teamTwo.length > 0){
-                              queryData.tournamentStreamQueue.push(queueData)
+
+                            if(set.slots != null) {
+                              if(set.slots.length > 0) {
+                                if(set.slots[0].entrant != null) {
+                                  queueData.teamOne = set.slots[0].entrant.name == null ? '' : set.slots[0].entrant.name.slice(set.slots[0].entrant.name.indexOf("| ") + 1,set.slots[0].entrant.name.length).trim()
+                                }
+                                if(set.slots[1].entrant != null) {
+                                  queueData.teamTwo  = set.slots[1].entrant.name == null ? '' : set.slots[1].entrant.name.slice(set.slots[1].entrant.name.indexOf("| ") + 1,set.slots[1].entrant.name.length).trim()
+                                }
+                                queryData.tournamentStreamQueue.push(queueData)
+                              }
                             }
                           }
                         }
@@ -417,7 +426,6 @@
 
                   })
                 }
-
 
                 if(data.data.tournament.events != null) {
                   data.data.tournament.events.forEach((e) => {
@@ -446,7 +454,8 @@
                     if(e.sets != null) {
                       if(e.sets.nodes != null) {
                         e.sets.nodes.forEach((set) => {
-                          const match = {teamOne: '', teamTwo: '', eventName: '', phaseName: '', fullRoundText: '', score: '', completedAt: '', stopTime: ''}
+                          const match = {id:'', teamOne: '', teamTwo: '', eventName: '', phaseName: '', fullRoundText: '', score: '', completedAt: '', stopTime: ''}
+                          match.id = set.id
                           match.score = set.displayScore == null ? '' : set.displayScore
                           match.eventName = e.name == null ? '' : e.name
                           match.fullRoundText = set.fullRoundText == null ? '' : set.fullRoundText
@@ -476,7 +485,7 @@
                               }
                             }
 
-                            if(match.teamOne.length > 0 && match.teamTwo.length > 0 && match.score != 'DQ') {
+                            if(match.score != 'DQ') {
                               queryData.tournamentMatches.push(match)
                             }
                           }
@@ -500,8 +509,7 @@
         return queryData
       },
       async fetchTournamentDataAndSave() {
-        const key = '<%= apiKey %>'
-        const data = await this.queryTournamentEventsSmashGG(key,this.slug)
+        const data = await this.queryTournamentEventsSmashGG(this.apiKey,this.slug)
 
         this.tournamentName = data.tournamentName
         this.eventList = data.tournamentStandings
@@ -510,15 +518,57 @@
         if(data.tournamentStreamQueue.length == 0) {
           this.streamQueue = []
         } else {
-          data.tournamentStreamQueue.forEach(queueItem => {
-            const itemInQueue = this.streamQueue.find(s => s.eventName == queueItem.eventName && s.phaseName == queueItem.phaseName &&
-              s.fullRoundText == queueItem.fullRoundText && s.teamOne == queueItem.teamOne && s.teamTwo == queueItem.teamTwo)
 
-            if(itemInQueue == null) {
-              this.streamQueue.push(queueItem)
-            }
+          const priorQueue = {}
+          const newQueueIdSet = new Set()
+          const removeIndex = []
+
+          this.streamQueue.forEach(item => {
+            priorQueue[item.id] = item
           })
+
+          data.tournamentStreamQueue.forEach(item => {
+            const match = priorQueue[item.id]
+
+            if(match == null){
+              this.streamQueue.push(item)
+            } else {
+              match.teamOne = item.teamOne
+              match.teamTwo = item.teamTwo
+            }
+
+            newQueueIdSet.add(item.id) 
+          })
+
+          for(var i = 0; i < this.streamQueue.length; i++){
+            if(!newQueueIdSet.has(this.streamQueue[i].id)){
+              removeIndex.push(i)
+            }
+          }
+
+          removeIndex.forEach(index => {
+            this.streamQueue.splice(index,1)
+          })
+
         }
+
+        for(var i = data.tournamentMatches.length-1; i >= 0; i--){
+          const newMatch = data.tournamentMatches[i]
+          const match = this.previousMatchList[newMatch.id]
+ 
+          if(match == null) {
+            this.matchList.splice(0,0,newMatch)
+            this.previousMatchList[newMatch.id] = newMatch
+
+            if(this.matchList.length > 3){
+              this.matchList.pop()
+            }
+          } else {
+            match.stopTime = newMatch.stopTime
+          }
+        }
+
+        // TODO: Save to session data?
 
         /*
         data.tournamentMatches = [
@@ -533,38 +583,6 @@
           {name: 'Melee Singles', state: 'COMPLETED', standings: [{ name: 'Jojo', placement: '1'},{ name: 'TopHatTitan', placement: '2'},{ name: 'Naruto', placement: '3'}]},
           {name: 'Ultimate Singles', state: 'ACTIVE', standings: [{ name: 'Illidan', placement: '1'},{ name: 'The Professor', placement: '2'},{ name: 'Phantom', placement: '3'}]}
         ]*/
-
-        //const prevMatches = []
-
-        for(var i = data.tournamentMatches.length-1; i >= 0; i--){
-          const newMatch = data.tournamentMatches[i]
-
-          const match = this.previousMatchList.find(m => m.eventName == newMatch.eventName && m.phaseName == newMatch.phaseName &&
-            m.fullRoundText == newMatch.fullRoundText && m.score == newMatch.score)
-
-          if(match == null) {
-            waitingApp.matchList.splice(0,0,newMatch)
-            waitingApp.previousMatchList.push(newMatch)
-
-            //prevMatches.push(newMatch)
-
-            if(waitingApp.matchList.length > 3){
-              waitingApp.matchList.pop()
-            }
-          } else {
-            match.stopTime = newMatch.stopTime
-          }
-
-          console.log(match)
-        }
-
-        /*
-        this.matchList.forEach(match => {
-          prevMatches.push(match)
-        })
-        this.previousMatchList = prevMatches*/
-
-        // TODO: Save to session data?
 
       },
       reloadStandingsData() {

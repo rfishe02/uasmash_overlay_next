@@ -5,7 +5,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/overlay', function(req, res, next) {
-  res.render('overlay', { apiKey: process.env.SMASHGG_KEY });
+  res.render('overlay', { });
 });
 
 module.exports = router;
