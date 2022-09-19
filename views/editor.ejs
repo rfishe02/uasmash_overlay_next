@@ -81,10 +81,16 @@
           </div>
           <div class="row">
             <p-button
-              label="Load Players"
+              label="Save Players"
               class="p-button-outlined"
               @click="loadPlayerList"
-              style="width: 200px;"
+              style="width: 150px;"
+            ></p-button>
+            <p-button
+              label="Clear List"
+              class="p-button-text"
+              @click="clearPlayerList"
+              style="width: 150px; margin-right: 7px;"
             ></p-button>
           </div>
         </div>
@@ -419,6 +425,14 @@
 
         localStorage.setItem('playerEntry',this.playerEntry)
         localStorage.setItem('playerList',JSON.stringify(this.playerList))
+
+      },
+      clearPlayerList() {
+
+        this.playerList = []
+        this.playerEntry = ''
+        localStorage.removeItem('playerEntry')
+        localStorage.removeItem('playerEntry')
 
       },
       filterPlayers(event) {
