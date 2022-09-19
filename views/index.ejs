@@ -50,7 +50,7 @@
         <div class="col-6" style="padding-left: 50px; padding-right: 50px;">
 
           <div class="row mb-3" style="text-align: center">
-            <h4>Module URL Generator</h4>
+            <h4>Browser Source URL Generator</h4>
           </div>
 
           <div class="row mb-3">
@@ -94,7 +94,7 @@
           <div class="row">
             <div class="col p-0">
               <template v-for="(item,index) in overlayModuleURLs">
-                <label for="'modulepoll'+index">Overlay with Automatic Polling</label>
+                <label for="'modulepoll'+index">Player Overlay</label>
                 <div id="'modulepoll'+index" class="p-inputgroup mb-2">
                   <p-inputtext type="text" :value="item"> </p-inputtext>
                 </div>
@@ -104,6 +104,13 @@
                 <label for="waitingmodule">Waiting Screen</label>
                 <div id="waitingmodule" class="p-inputgroup mb-2">
                   <p-inputtext type="text" :value="waitingModuleURL"> </p-inputtext>
+                </div>
+              </template>
+
+              <template v-if="waitingModuleURL.length > 0">
+                <label for="upcomingModule">Upcoming Matches</label>
+                <div id="upcomingModule" class="p-inputgroup mb-2">
+                  <p-inputtext type="text" :value="upcomingModuleURL"> </p-inputtext>
                 </div>
               </template>
             </div>
@@ -167,6 +174,7 @@
         tournamentSelection: [],
         overlayModule: "module/overlay",
         waitingModule: "module/waiting",
+        upcomingModule: "module/upcoming",
         selectedWinnerBestOfStart: 'Quarter-Final',
         selectedLoserBestOfStart: 'Quarter-Final',
         finalsStartOptions : [
@@ -183,6 +191,7 @@
         overlayTypes: [0],
         overlayModuleURLs: [],
         waitingModuleURL: '',
+        upcomingModuleURL: '',
         apiKey: '',
       }
     },
@@ -289,6 +298,11 @@
         }
 
         this.waitingModuleURL = this.host + this.port + "/" + this.waitingModule + "?" + new URLSearchParams({
+          "slug": slug,
+          "smashgg_key": this.apiKey,
+        })
+
+        this.upcomingModuleURL = this.host + this.port + "/" + this.upcomingModule + "?" + new URLSearchParams({
           "slug": slug,
           "smashgg_key": this.apiKey,
         })

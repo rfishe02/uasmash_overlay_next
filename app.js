@@ -19,6 +19,7 @@ var keysRouter = require('./routes/keys');
 var editorRouter = require('./routes/editor');
 var overlayRouter = require('./routes/overlay');
 var waitingRouter = require('./routes/waiting');
+var upcomingRouter = require('./routes/upcoming');
 
 var strikerRouter = require('./routes/striker');
 var stageStrikesRouter = require('./routes/stage_strikes');
@@ -85,6 +86,7 @@ app.use('/striker', strikerRouter);
 app.use('/module',stageStrikesRouter)
 
 app.use('/module', waitingRouter);
+app.use('/module', upcomingRouter);
 
 app.use('/users', usersRouter);
 app.use('/keys', keysRouter);
