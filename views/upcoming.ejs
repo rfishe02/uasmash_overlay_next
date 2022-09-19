@@ -119,11 +119,38 @@
     },
     methods : {
       async querySets(key,slug) {
+
         const sets = await this.querySetsSmashGG(key,slug)
-        this.setList = sets
+        const priorQueue = {}
+        const newQueueIdSet = new Set()
+        const removeIndex = []
 
         this.setList.forEach(item => {
+          priorQueue[item.id] = item
+        })
+
+        sets.forEach(item => {
+          const match = priorQueue[item.id] 
+
+          if(match == null) {
+            this.setList.push(item)
+          } else {
+            match.teamOne = item.teamOne
+            match.teamTwo = item.teamTwo
+          }
+
+          newQueueIdSet.add(item.id)
           this.preReqList[item.id] = item
+        })
+
+        for(var i = 0; i < this.setList.length; i++){
+          if(!newQueueIdSet.has(this.setList[i].id)) {
+            removeIndex.push(this.setList[i].id)
+          }
+        }
+
+        removeIndex.forEach(index => {
+          this.setList.splice(index,1)
         })
 
       },
