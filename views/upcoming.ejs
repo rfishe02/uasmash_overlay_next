@@ -33,28 +33,26 @@
 
       <div class="container-fluid" style="width: 1920px; height: 1080px;">
 
-        <div class="row justify-content-left row-cols-1" style="padding-top: 25px; padding-right: 15px; padding-left: 15px;">
+        <div class="row justify-content-left row-cols-1" style="padding-top: 15px; padding-right: 5px; padding-left: 5px;">
           <template v-for="(item,index) in setList">
 
-            <div class="col mb-3">
-
+            <div class="col mb-2">
               <div class="card" style="width: 18rem; background-color: rgba(255, 255, 255, 1);">
-                <div class="card-body">
+                <div class="card-body p-2">
                   <h5 class="card-title">{{item.teamOne}} vs. {{item.teamTwo}}</h5>
                   <h6 class="card-subtitle mb-2 text-muted">{{item.eventName}}: {{item.fullRoundText}}</h6>
 
-                  <p class="card-text mb-0" v-if="item.teamOne == '?' || item.teamTwo == '?'">
+                  <p class="card-text m-0" v-if="item.teamOne == '?' || item.teamTwo == '?'">
                     Waiting On:
                   </p>
                   
-                  <ul class="list-group list-group-flush" v-if="item.teamOne == '?' || item.teamTwo == '?'">
-                    <li class="list-group-item" v-if="getPreReqMatch(item.preReqId1).length > 0">{{getPreReqMatch(item.preReqId1)}}</li>
-                    <li class="list-group-item" v-if="getPreReqMatch(item.preReqId2).length > 0">{{getPreReqMatch(item.preReqId2)}}</li>
+                  <ul class="list-group list-group-flush p-0" v-if="item.teamOne == '?' || item.teamTwo == '?'">
+                    <li class="list-group-item pt-0 pb-0" v-if="getPreReqMatch(item.preReqId1).length > 0">{{getPreReqMatch(item.preReqId1)}}</li>
+                    <li class="list-group-item pt-0 pb-0" v-if="getPreReqMatch(item.preReqId2).length > 0">{{getPreReqMatch(item.preReqId2)}}</li>
                   </ul>
 
                 </div>
               </div>
-
             </div>
   
           </template>
