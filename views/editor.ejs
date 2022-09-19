@@ -77,149 +77,7 @@
 
     <div class="container-fluid" style="padding-bottom: 25px; padding-top: 15px">
 
-      <div class="row mb-3">
-        <div class="col-6">
-          <label>Start.gg API Key</label>
-          <div class="p-inputgroup">
-            <p-inputtext v-model="apiKey" @change="saveAPIKey"></p-inputtext>
-            <!--<p-button label="Save Key" @click="saveAPIKey"></p-button>-->
-          </div>
-        </div>
-      </div>
-
       <div class="row">
-        <div class="col-12 col-lg-6 pb-3" style="height: 500px">
-          <p-datatable
-            :value="setList"
-            v-model:selection="setSelection"
-            selection-mode="single"
-            class="p-datatable-sm border"
-            data-key="id"
-            :scrollable="true"
-            scroll-height="flex"
-            filter-display="menu"
-            v-model:filters="filters2"
-            :loading="loading2"
-            responsive-layout="scroll"
-            :global-filter-fields="['phaseName', 'fullRoundText', 'versusBanner']">
-            <template #header>
-
-              <div class="row mb-2">
-                <div class="col">
-                  <div class="p-inputgroup">
-                    <p-dropdown
-                      v-model="tournamentSelection"
-                      :options="tournamentList"
-                      option-label="name"
-                      placeholder="Select a Tournament"
-                      @change="importPlayerList()"
-                    ></p-dropdown>
-                    <p-dropdown
-                      v-model="eventSelection"
-                      :options="getEventList(tournamentSelection)"
-                      option-label="name"
-                      placeholder="Select an Event"
-                    ></p-dropdown>
-                    <p-button icon="pi pi-refresh" @click="importSetList()" ></p-button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col-3 me-3">
-                  <span class="p-input-icon-left">
-                    <i class="pi pi-search"></i>
-                    <p-inputtext v-model="filters2['global'].value" placeholder="Keyword Search"></p-inputtext>
-                  </span>
-                </div>
-              </div>
-
-            </template>
-
-            <template #empty> No sets to show. </template>
-            <template #loading> Loading set data. Please wait. </template>
-
-            <p-column header="Bracket & Round" filter-field="bracketAndRound">
-              <template #body="{ data }">
-                <p v-if="data.state == 3" style="margin: 0; color: #D3D3D3;"> {{ data.bracketAndRound }} </p>
-                <p v-if="data.state == 1 || data.state == 2" style="margin: 0; color: black;"> {{ data.bracketAndRound }} </p>
-              </template>
-              <template #filter="{ filterModel, filterCallback }">
-                <p-inputtext
-                  type="text"
-                  v-model="filterModel.value"
-                  @input="filterCallback()"
-                  class="p-column-filter"
-                  placeholder="Search Round"
-                ></p-inputtext>
-              </template>
-            </p-column>
-
-            <p-column header="Team One" filter-field="teamOne.name">
-              <template #body="{ data }">
-                <p v-if="data.state == 3" style="margin: 0; color: #D3D3D3">{{data.teamOne.name}}</p>
-                <p v-if="data.state == 1 || data.state == 2" style="margin: 0; color: black;">{{data.teamOne.name}}</p>
-              </template>
-              <template #filter="{ filterModel, filterCallback }">
-                <p-inputtext
-                  type="text"
-                  v-model="filterModel.value"
-                  @input="filterCallback()"
-                  class="p-column-filter"
-                  placeholder="Search Match"
-                ></p-inputtext>
-              </template>
-            </p-column>
-
-            <p-column style="max-width: 7.25rem; padding: 0;">
-              <template #body="{ data }">
-                  <template v-if="data.state == 3">
-                    <p-button @click="onSetSelection(data, 'Player 1 Left')" icon="bi bi-arrow-left-circle" class="p-button-secondary p-button-text" style="font-size: 14pt;"></p-button>
-                    <p-button @click="onSetSelection(data, 'No Order')" icon="bi bi-question-circle" class="p-button-secondary p-button-text" style="font-size: 14pt;"></p-button>
-                    <p-button @click="onSetSelection(data, 'Player 1 Right')" icon="bi bi-arrow-right-circle" class="p-button-secondary p-button-text" style="font-size: 14pt;"></p-button>
-                  </template>
-                  <template v-if="data.state == 1 || data.state == 2">
-                    <p-button @click="onSetSelection(data, 'Player 1 Left')" icon="bi bi-arrow-left-circle-fill" class="p-button-secondary p-button-text" style="font-size: 14pt;"></p-button>
-                    <p-button @click="onSetSelection(data, 'No Order')" icon="bi bi-question-circle-fill" class="p-button-secondary p-button-text" style="font-size: 14pt;"></p-button>
-                    <p-button @click="onSetSelection(data, 'Player 1 Right')" icon="bi bi-arrow-right-circle-fill" class="p-button-secondary p-button-text" style="font-size: 14pt;"></p-button>
-                  </template>
-              </template>
-            </p-column>
-
-            <p-column header="Team Two" filter-field="teamTwo.name">
-              <template #body="{ data }">
-                <p v-if="data.state == 3" style="margin: 0; color: #D3D3D3">{{data.teamTwo.name}}</p>
-                <p v-if="data.state == 1 || data.state == 2" style="margin: 0; color: black;">{{data.teamTwo.name}}</p>
-              </template>
-              <template #filter="{ filterModel, filterCallback }">
-                <p-inputtext
-                  type="text"
-                  v-model="filterModel.value"
-                  @input="filterCallback()"
-                  class="p-column-filter"
-                  placeholder="Search Match"
-                ></p-inputtext>
-              </template>
-            </p-column>
-
-            <p-column style="max-width: 7.25rem; padding: 0;">
-              <template #body="{ data }">
-                  <template v-if="data.state == 3">
-                    <p-button @click="onSetSelection(data, 'Player 1 Right')" icon="bi bi-arrow-left-circle" class="p-button-secondary p-button-text" style="font-size: 14pt;"></p-button>
-                    <p-button @click="onSetSelection(data, 'No Order')" icon="bi bi-question-circle" class="p-button-secondary p-button-text" style="font-size: 14pt;"></p-button>
-                    <p-button @click="onSetSelection(data, 'Player 1 Left')" icon="bi bi-arrow-right-circle" class="p-button-secondary p-button-text" style="font-size: 14pt;"></p-button>
-                  </template>
-                  <template v-if="data.state == 1 || data.state == 2">
-                    <p-button @click="onSetSelection(data, 'Player 1 Right')" icon="bi bi-arrow-left-circle-fill" class="p-button-secondary p-button-text" style="font-size: 14pt;"></p-button>
-                    <p-button @click="onSetSelection(data, 'No Order')" icon="bi bi-question-circle-fill" class="p-button-secondary p-button-text" style="font-size: 14pt;"></p-button>
-                    <p-button @click="onSetSelection(data, 'Player 1 Left')" icon="bi bi-arrow-right-circle-fill" class="p-button-secondary p-button-text" style="font-size: 14pt;"></p-button>
-                  </template>
-              </template>
-            </p-column>
-
-          </p-datatable>
-        </div>
-
 
         <div class="col-12 col-lg-6">
 
@@ -301,16 +159,14 @@
               </div>
 
               <div class="col-6 col-md-4 mb-2">
-                <p-selectbutton :unselectable="false" v-model="bestOf" :options="matchList" aria-labelledby="">
-                </p-selectbutton>
-                <!--
+                <!--<p-selectbutton :unselectable="false" v-model="bestOf" :options="matchList" aria-labelledby=""></p-selectbutton>-->
                 <p-dropdown
                   class="w-100"
                   v-model="bestOf"
                   :options="matchList"
                   placeholder="Best of"
                   :editable="true"
-                ></p-dropdown>-->
+                ></p-dropdown>
               </div>
 
             </div>
@@ -441,16 +297,10 @@
       return {
         host: window.location.hostname,
         port: ":3000",
-        tournamentList: [],
-        setList: [],
         playerList: [],
         filteredPlayers: [],
         filteredBrackets: [],
         filteredRounds: [],
-        tournamentSelection: [],
-        eventSelection: [],
-        setSelection: [],
-        seatingChoice: false,
         teamOne: {name: ''},
         teamTwo: {name: ''},
         p1Score: {name: '-', value: ''},
@@ -523,7 +373,6 @@
 
       if(key != null) {
         this.apiKey = key
-        this.setInitialState()
       }
 
       this.importKeyOrGenerate().then((room) => {
@@ -538,101 +387,6 @@
 
     },
     methods: {
-      async setInitialState() {
-
-        try {
-          const response = await fetch('http://'+this.host+this.port +'/smashgg/query_tournaments?' + new URLSearchParams({"smashgg_key":this.apiKey}), {
-            method: "get",
-            headers: {
-              "Content-Type": "application/json; charset=UTF-8",
-            },
-          });
-
-          if(response.ok) {
-            const results = await response.json()
-            this.tournamentList = results
-          }
-        } catch (e) {
-          console.log(e)
-        }
-
-      },
-      getEventList(input) {
-        if (input == null) {
-          return []
-        } else if (input.events != null) {
-          return input.events
-        } else {
-          return []
-        }
-      },
-      onSetSelection(data, seatingChoice) {
-        this.setSelection = data
-
-        if (this.setSelection != null) {
-          this.teamOne = Editor.getTeamOneObject(data,this.playerList,seatingChoice)
-          this.teamTwo = Editor.getTeamTwoObject(data,this.playerList,seatingChoice)
-
-          this.p1Score = { name: "-", value: "" }
-          this.p2Score = { name: "-", value: "" }
-
-          this.bracketType = this.setSelection.phaseName
-          this.eventRound = this.setSelection.fullRoundText
-          this.bestOf = this.setSelection.fullRoundText.indexOf("Final") > 0 ? 'Best of 5' : 'Best of 3'
-        }
-      },
-      async importSetList() {
-        if (this.eventSelection != null) {
-          //this.clearOverlayForm()
-
-          try {
-            const response = await fetch('http://'+this.host+this.port +'/smashgg/query_sets?' + new URLSearchParams({"event_id":this.eventSelection.id, "smashgg_key":this.apiKey}), {
-              method: "get",
-              headers: {
-                "Content-Type": "application/json; charset=UTF-8",
-              },
-            });
-
-            if(response.ok) {
-              const results = await response.json()
-              this.setList = results
-            }
-          } catch (e) {
-            console.log(e)
-          }
-
-        }
-      },
-      async importPlayerList() {
-        if (this.tournamentSelection != null) {
-          if (this.tournamentSelection.id != null) {
-
-            const playerDictionary = {}
-
-            try {
-              const response = await fetch('http://'+this.host+this.port+'/smashgg/query_players?' + new URLSearchParams({"tourney_id":this.tournamentSelection.id, "smashgg_key":this.apiKey}), {
-                method: "get",
-                headers: {
-                  "Content-Type": "application/json; charset=UTF-8",
-                },
-              });
-
-              if(response.ok) {
-                const results = await response.json()
-
-                for(var i = 0; i < results.length; i++) {
-                  playerDictionary[results[i].name] = results[i]
-                }
-
-                this.playerList = playerDictionary
-              }
-            } catch (e) {
-              console.log(e)
-            }
-
-          }
-        }
-      },
       filterPlayers(event) {
         const items = this.playerList
 
@@ -739,8 +493,6 @@
         this.bracketType = ""
         this.eventRound = ""
         this.bestOf = "Best of 3"
-
-        this.setSelection = {}
       },
       clearScoreForm() {
         this.p1ScoreIncrement = { name: "-", value: "" }
@@ -763,15 +515,7 @@
         }
 
       },
-      reverseTeams() {
-        const tempTeam = this.teamOne
-
-        this.teamOne = this.teamTwo
-        this.teamTwo = tempTeam
-      },
       getModuleURL(type) {
-
-        console.log(this.overlayRoom)
 
         return this.host +this.port+ "/" + this.overlayModule + "?" + new URLSearchParams({
           "type": type,
@@ -779,10 +523,6 @@
         })
 
       },
-      saveAPIKey() {
-        localStorage.setItem('apiKey',this.apiKey)
-        this.setInitialState()
-      }
     },
     computed: {
       getTeamOneName() {
