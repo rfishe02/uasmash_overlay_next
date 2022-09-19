@@ -126,8 +126,8 @@
         bestOf:"",
         socket: socket,
         type: 0,
-        winnerBestOfStart: 0,
-        loserBestOfStart: 0,
+        winnerBestOfStart: 5,
+        loserBestOfStart: 5,
         finalsOrder : {
           'Round 1':0,
           'Round 2':1,
@@ -163,8 +163,8 @@
       const slug = urlParams.get('slug')
       const poll = urlParams.get('poll')
 
-      const winnerBestOfStart = urlParams.get('winnerBestOfStart') == null ? 0 : this.finalsOrder[urlParams.get('winnerBestOfStart')]
-      const loserBestOfStart = urlParams.get('loserBestOfStart') == null ? 0 : this.finalsOrder[urlParams.get('loserBestOfStart')]
+      const winnerBestOfStart = urlParams.get('winnerBestOfStart') == null ? 5 : this.finalsOrder[urlParams.get('winnerBestOfStart')]
+      const loserBestOfStart = urlParams.get('loserBestOfStart') == null ? 5 : this.finalsOrder[urlParams.get('loserBestOfStart')]
 
       if(winnerBestOfStart != null) {
         this.winnerBestOfStart = winnerBestOfStart

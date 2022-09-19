@@ -303,6 +303,8 @@
         })
 
         this.upcomingModuleURL = this.host + this.port + "/" + this.upcomingModule + "?" + new URLSearchParams({
+          "winnerBestOfStart": this.selectedWinnerBestOfStart,
+          "loserBestOfStart": this.selectedLoserBestOfStart,
           "slug": slug,
           "smashgg_key": this.apiKey,
         })

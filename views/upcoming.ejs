@@ -33,9 +33,32 @@
 
       <div class="container-fluid" style="width: 1920px; height: 1080px;">
 
-        <template v-for="(item,index) in setList">
-          {{item.teamOne}} vs. {{item.teamTwo}} <br>
-        </template>
+        <div class="row justify-content-left row-cols-1" style="padding-top: 25px; padding-right: 15px; padding-left: 15px;">
+          <template v-for="(item,index) in setList">
+
+            <div class="col mb-3">
+
+              <div class="card" style="width: 18rem; background-color: rgba(255, 255, 255, 1);">
+                <div class="card-body">
+                  <h5 class="card-title">{{item.teamOne}} vs. {{item.teamTwo}}</h5>
+                  <h6 class="card-subtitle mb-2 text-muted">{{item.eventName}}: {{item.fullRoundText}}</h6>
+
+                  <p class="card-text mb-0" v-if="item.teamOne == '?' || item.teamTwo == '?'">
+                    Waiting On:
+                  </p>
+                  
+                  <ul class="list-group list-group-flush" v-if="item.teamOne == '?' || item.teamTwo == '?'">
+                    <li class="list-group-item" v-if="getPreReqMatch(item.preReqId1).length > 0">{{getPreReqMatch(item.preReqId1)}}</li>
+                    <li class="list-group-item" v-if="getPreReqMatch(item.preReqId2).length > 0">{{getPreReqMatch(item.preReqId2)}}</li>
+                  </ul>
+
+                </div>
+              </div>
+
+            </div>
+  
+          </template>
+        </div>
 
       </div>
 
@@ -54,7 +77,21 @@
         host: window.location.hostname,
         port: ":3000",
         apiKey: '',
-        setList: []
+        setList: [],
+        preReqList: {},
+        winnerBestOfStart: 5,
+        loserBestOfStart: 5,
+        finalsOrder : {
+          'Round 1':0,
+          'Round 2':1,
+          'Round 3':2,
+          'Round 4':3,
+          'Round 5':4,
+          'Quarter-Final':5,
+          'Semi-Final':6,
+          'Final':7,
+          'Grand Final': 8
+        },
       }
     },
     mounted() {
@@ -71,11 +108,26 @@
         this.querySets(key,slug)
       }
 
+      const winnerBestOfStart = urlParams.get('winnerBestOfStart') == null ? 5 : this.finalsOrder[urlParams.get('winnerBestOfStart')]
+      const loserBestOfStart = urlParams.get('loserBestOfStart') == null ? 5 : this.finalsOrder[urlParams.get('loserBestOfStart')]
+
+      if(winnerBestOfStart != null) {
+        this.winnerBestOfStart = winnerBestOfStart
+      }
+      if(loserBestOfStart != null) {
+        this.loserBestOfStart = loserBestOfStart
+      }
+
     },
     methods : {
       async querySets(key,slug) {
         const sets = await this.querySetsSmashGG(key,slug)
         this.setList = sets
+
+        this.setList.forEach(item => {
+          this.preReqList[item.id] = item
+        })
+
       },
       async querySetsSmashGG(key,slug) {
         const setQueryData = []
@@ -83,8 +135,9 @@
         query MyQuery($slug: String) {
           tournament(slug:$slug){
             name
-            events{
+            events {
               name
+              state
             sets (
               sortType: CALL_ORDER
               filters: {
@@ -138,37 +191,64 @@
                 if(data.data.tournament.events != null){
                   data.data.tournament.events.forEach(event => {
                     
-                    if(event.sets != null){
-                      if(event.sets.nodes != null) {
-                        event.sets.nodes.forEach(set => {
-                          const s = {id: '', preReqId1: '', preReqId2: '', fullRoundText: '', phaseName: '', teamOne: '?', teamTwo: '?'}
-                          s.id = set.id 
-                          s.fullRoundText = set.fullRoundText
+                    if(event.state != null) {
+                      if(event.state == 'ACTIVE'){
+                        
+                        if(event.sets != null){
+                          if(event.sets.nodes != null) {
+                            event.sets.nodes.forEach(set => {
+                              const s = {id: '', preReqId1: '', preReqId2: '', eventName:'', fullRoundText: '', phaseName: '', teamOne: '?', teamTwo: '?', bestOf: 'Best of 3'}
+                              s.id = set.id 
 
-                          if(set.phaseGroup != null){
-                            if(set.phaseGroup.phase != null){
-                              s.phaseName = set.phaseGroup.phase.name
-                            }
-                          }
-
-                          if(set.slots != null){
-                            if(set.slots[0] != null){
-                              s.preReqId1 = set.slots[0].prereqId
-                              if(set.slots[0].entrant != null) {
-                                s.teamOne = set.slots[0].entrant.name
+                              s.eventName = event.name == null ? '' : event.name
+                              if(s.eventName.length > 30) {
+                                s.eventName = s.eventName.slice(0,30) + "... "
                               }
-                            }
 
-                            if(set.slots[1] != null){
-                              s.preReqId2 = set.slots[1].prereqId
-                              if(set.slots[1].entrant != null) {
-                                s.teamTwo = set.slots[1].entrant.name
+                              s.fullRoundText = set.fullRoundText == null ? '' : set.fullRoundText
+                            
+                              if(set.phaseGroup != null){
+                                if(set.phaseGroup.phase != null){
+                                  s.phaseName = set.phaseGroup.phase.name == null ? '' : set.phaseGroup.phase.name
+                                }
                               }
-                            }
+                            
+                              if(set.slots != null){
+                                if(set.slots[0] != null){
+                                  s.preReqId1 = set.slots[0].prereqId
+                                  if(set.slots[0].entrant != null) {
+                                    s.teamOne = set.slots[0].entrant.name.slice(set.slots[0].entrant.name.indexOf("| ") + 1,set.slots[0].entrant.name.length).trim()
+                                  }
+                                }
+                              
+                                if(set.slots[1] != null){
+                                  s.preReqId2 = set.slots[1].prereqId
+                                  if(set.slots[1].entrant != null) {
+                                    s.teamTwo = set.slots[1].entrant.name.slice(set.slots[1].entrant.name.indexOf("| ") + 1,set.slots[1].entrant.name.length).trim()
+                                  }
+                                }
+                              }
+                            
+                              const eventRound = set.fullRoundText == null ? '' : set.fullRoundText
+                              const order = this.finalsOrder[eventRound.replace(/Winners |Losers /g,'')]
+                            
+                              if(order != null) {
+                                if(eventRound.indexOf('Winner') >= 0) {
+                                  if(order >= this.winnerBestOfStart) {
+                                    s.bestOf = 'Best of 5'
+                                  }
+                                } else {
+                                  if(order >= this.loserBestOfStart) {
+                                    s.bestOf = 'Best of 5'
+                                  }
+                                }
+                              }
+                            
+                              setQueryData.push(s)
+                            })
                           }
+                        }
 
-                          setQueryData.push(s)
-                        })
                       }
                     }
 
@@ -185,6 +265,13 @@
 
         console.log(setQueryData)
         return setQueryData
+      },
+      getPreReqMatch(id) { 
+        if(this.preReqList[id] != null) {
+          return this.preReqList[id].teamOne + " vs. " + this.preReqList[id].teamTwo
+        } else {
+          return ''
+        }
       }
     },
     components: {
