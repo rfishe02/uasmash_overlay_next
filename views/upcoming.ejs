@@ -66,6 +66,7 @@
 </body>
 
 <script type="module">
+  import StartGGAPI from '/javascripts/StartGGAPI.js'
   import QueueManager from '/javascripts/QueueManager.js'
   const { createApp } = Vue
 
@@ -121,154 +122,29 @@
     methods : {
       async querySets(key,slug) {
 
-        const sets = await this.querySetsStartGG(key,slug)
+        const sets = await StartGGAPI.queryUpcomingMatches(key,slug)
 
         QueueManager.refreshQueue(this.setList,sets)
 
         this.setList.forEach(item => {
+          
           this.preReqList[item.id] = item
+
+          const order = this.finalsOrder[item.fullRoundText.replace(/Winners |Losers /g,'')]              
+          if(order != null) {
+            if(item.fullRoundText.indexOf('Winner') >= 0) {
+              if(order >= this.winnerBestOfStart) {
+                item.bestOf = 'Best of 5'
+              }
+            } else {
+              if(order >= this.loserBestOfStart) {
+                item.bestOf = 'Best of 5'
+              }
+            }
+          }
+
         })
 
-      },
-      async querySetsStartGG(key,slug) {
-        const setQueryData = []
-        const query = `
-        query MyQuery($slug: String) {
-          tournament(slug:$slug){
-            name
-            events {
-              name
-              state
-            sets (
-              sortType: CALL_ORDER
-              filters: {
-                hideEmpty: true
-                state: [1,2]
-              }
-            ) {
-                nodes {
-                  id 
-                  state 
-                  identifier
-                  fullRoundText
-                  phaseGroup {
-                    phase {
-                      name
-                    }
-                  }
-                  slots {
-                    prereqId
-                    entrant {
-                      name
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }`
-
-        try {
-
-          const response = await fetch("https://api.start.gg/gql/alpha", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-              Authorization: "Bearer " + key,
-            },
-            body: JSON.stringify({
-              query,
-              variables: { slug: slug },
-            }),
-          })
-
-          if(response.ok){
-            const data = await response.json()
-
-            if(data.data != null){
-              if(data.data.tournament != null){
-
-                if(data.data.tournament.events != null){
-                  data.data.tournament.events.forEach(event => {
-                    
-                    if(event.state != null) {
-                      if(event.state == 'ACTIVE'){
-                        
-                        if(event.sets != null){
-                          if(event.sets.nodes != null) {
-                            event.sets.nodes.forEach(set => {
-                              const s = {id: '', preReqId1: '', preReqId2: '', state: '', eventName:'', fullRoundText: '', phaseName: '', teamOne: '?', teamTwo: '?', bestOf: 'Best of 3'}
-                              s.id = set.id 
-                              s.state = set.state == null ? '' : set.state
-
-                              s.eventName = event.name == null ? '' : event.name
-                              if(s.eventName.length > 30) {
-                                s.eventName = s.eventName.slice(0,30) + "... "
-                              }
-
-                              s.fullRoundText = set.fullRoundText == null ? '' : set.fullRoundText
-                            
-                              if(set.phaseGroup != null){
-                                if(set.phaseGroup.phase != null){
-                                  s.phaseName = set.phaseGroup.phase.name == null ? '' : set.phaseGroup.phase.name
-                                }
-                              }
-                            
-                              if(set.slots != null){
-                                if(set.slots[0] != null){
-                                  s.preReqId1 = set.slots[0].prereqId
-                                  if(set.slots[0].entrant != null) {
-                                    s.teamOne = set.slots[0].entrant.name.slice(set.slots[0].entrant.name.indexOf("| ") + 1,set.slots[0].entrant.name.length).trim()
-                                  }
-                                }
-                              
-                                if(set.slots[1] != null){
-                                  s.preReqId2 = set.slots[1].prereqId
-                                  if(set.slots[1].entrant != null) {
-                                    s.teamTwo = set.slots[1].entrant.name.slice(set.slots[1].entrant.name.indexOf("| ") + 1,set.slots[1].entrant.name.length).trim()
-                                  }
-                                }
-                              }
-                            
-                              const eventRound = set.fullRoundText == null ? '' : set.fullRoundText
-                              const order = this.finalsOrder[eventRound.replace(/Winners |Losers /g,'')]
-                            
-                              if(order != null) {
-                                if(eventRound.indexOf('Winner') >= 0) {
-                                  if(order >= this.winnerBestOfStart) {
-                                    s.bestOf = 'Best of 5'
-                                  }
-                                } else {
-                                  if(order >= this.loserBestOfStart) {
-                                    s.bestOf = 'Best of 5'
-                                  }
-                                }
-                              }
-                            
-                              if(s.state != 3){
-                                setQueryData.push(s)
-                              }
-                            })
-                          }
-                        }
-
-                      }
-                    }
-
-                  })
-                }
-
-              }
-            }
-          }
-
-        } catch(e){
-          console.log(e)
-        }
-
-        console.log(setQueryData)
-        return setQueryData
       },
       getPreReqMatch(id) { 
         if(this.preReqList[id] != null) {

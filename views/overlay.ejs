@@ -68,10 +68,8 @@
 </body>
 
 <script type="module">
-
-
   import GameplayOverlay from '/javascripts/GameplayOverlay.js'
-
+  import StartGGAPI from '/javascripts/StartGGAPI.js'
   const { createApp} = Vue
 
   const socket = io("http://" + window.location.hostname + ":3000", {
@@ -190,7 +188,7 @@
     methods : {
       async pollStartGGAPI(key,slug) {
         try {
-          const data = await this.queryStreamQueueStartGG(key,slug)
+          const data = await StartGGAPI.queryStreamQueue(key,slug)
 
           if(data.length == 0) {
 
@@ -235,179 +233,6 @@
         } catch(e) {
           console.log(e)
         }
-      },
-      async queryStreamQueueStartGG(key,slug){
-        const streamQueryData = []
-        try {
-          const query = `
-          query TournamentQuery($slug: String) {
-      		tournament(slug: $slug){
-      			id
-      			name
-          	slug
-          	state
-          	streamQueue {
-              sets {
-                completedAt
-                createdAt
-                event {
-                  id
-                  name
-                }
-                fullRoundText
-                games {
-                  orderNum
-                  winnerId
-                }
-                phaseGroup {
-                  bracketType
-                  phase {
-                    name
-                  }
-                }
-                setGamesType
-                slots {
-                  entrant {
-                    id
-                    name
-                    participants {
-                      prefix
-                      gamerTag
-                      user {
-                        id
-                        name
-                        genderPronoun
-                        authorizations {
-                          externalUsername
-                          type
-                        }
-                      }
-                    }
-                  }
-                }
-                startAt
-                startedAt
-                state
-                totalGames
-              }
-          	}
-      		}
-      	}`
-
-          const response = await fetch("https://api.start.gg/gql/alpha", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-              Authorization: "Bearer " + key,
-            },
-            body: JSON.stringify({
-              query,
-              variables: { slug: slug },
-            }),
-          })
-
-          if(response.ok) {
-            const data = await response.json()
-
-            if (data.data != null) {
-              if (data.data.tournament != null) {
-                if(data.data.tournament.streamQueue != null) {
-                  if(data.data.tournament.streamQueue[0].sets != null){
-
-                    data.data.tournament.streamQueue[0].sets.forEach((set) => {
-                      const s = {
-                        eventName: '',
-                        phaseName: '',
-                        fullRoundText: '',
-                        state: '',
-                        startedAt: '',
-                      }
-
-                      s.fullRoundText = set.fullRoundText == null ? '' : set.fullRoundText
-                      s.state = set.state == null ? '' : set.state
-                      s.startedAt = set.startedAt == null ? '' : set.startedAt
-
-                      if(set.event != null) {
-                        s.eventName = set.event.name == null ? '' : set.event.name
-                      }
-                      if(set.phaseGroup != null) {
-                        if(set.phaseGroup.phase != null) {
-                          s.phaseName = set.phaseGroup.phase.name == null ? '' : set.phaseGroup.phase.name
-                        }
-                      }
-
-                      s.teamOne = this.getTeamData(set,0)
-                      s.teamTwo = this.getTeamData(set,1)
-
-                      streamQueryData.push(s)
-                    })
-
-                  }
-                }
-              }
-            }
-
-          }
-
-        } catch(e) {
-            console.log(e)
-        }
-
-        return streamQueryData
-      },
-      getTeamData(set, slotIndex) {
-        const team = { entrantID: '', name: '', score: '', members: [] }
-
-        if(set.slots != null) {
-          const slots = set.slots[slotIndex]
-
-          if (slots != null) {
-            if (slots.entrant != null) {
-              team.entrantID = slots.entrant.id
-              team.name = slots.entrant.name.slice(slots.entrant.name.indexOf("| ") + 1,slots.entrant.name.length).trim()
-
-              if (slots.entrant.participants != null) {
-                slots.entrant.participants.forEach((player) => {
-
-                  const item = {}
-                  item.name = player.gamerTag.slice(player.gamerTag.indexOf("| ") + 1,player.gamerTag.length).trim()
-                  item.socials = []
-
-                  if (player.user != null) {
-                    item.id = player.user.id
-
-                    if (player.user.authorizations != null) {
-                      player.user.authorizations.forEach((social) => {
-                        if(social.type == "TWITTER" || social.type == "TWITCH") {
-                          const account = {}
-                          account.username = social.externalUsername
-                          account.type = social.type
-                          item.socials.push(account)
-                        }
-                      });
-                    }
-                    item.genderPronoun = player.user.genderPronoun == null ? '' : player.user.genderPronoun
-                  }
-
-                  team.members.push(item)
-                })
-              }
-
-              if(set.games != null) {
-                team.score = 0
-                set.games.forEach((game) => {
-                  if(game.winnerId === team.entrantID){
-                    team.score++
-                  }
-                })
-              }
-
-            }
-          }
-        }
-
-        return team
       },
       setOverlayValues(teamOne,teamTwo,bracketType,eventRound,bestOf) {
 
