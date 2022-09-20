@@ -255,7 +255,7 @@
     mounted() {
       const urlParams = new URLSearchParams(window.location.search)
       const slug = urlParams.get('slug')
-      const key = urlParams.get('smashgg_key')
+      const key = urlParams.get('startgg_key')
 
       if(slug != null && key != null) {
         this.slug = slug
@@ -291,7 +291,7 @@
 
     },
     methods : {
-      async queryTournamentEventsSmashGG(key,slug){
+      async queryTournamentEventsStartGG(key,slug){
         const queryData = { tournamentName: '', tournamentStandings: [], tournamentMatches: [], tournamentStreamQueue: [] }
         const updatedAfter = Math.floor(Date.now() / 1000) - 1800
 
@@ -513,7 +513,7 @@
         return queryData
       },
       async fetchTournamentDataAndSave() {
-        const data = await this.queryTournamentEventsSmashGG(this.apiKey,this.slug)
+        const data = await this.queryTournamentEventsStartGG(this.apiKey,this.slug)
 
         this.tournamentName = data.tournamentName
         this.eventList = data.tournamentStandings

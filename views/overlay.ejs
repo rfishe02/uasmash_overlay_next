@@ -173,7 +173,7 @@
         this.loserBestOfStart = loserBestOfStart
       }
 
-      const key = urlParams.get('smashgg_key')
+      const key = urlParams.get('startgg_key')
 
       if(slug != null && poll != null && key != null) {
         this.apiKey = key
@@ -181,16 +181,16 @@
         if(poll == 'true') {
           setInterval(function(){
 
-            overlayApp.pollSmashGGAPI(key,slug)
+            overlayApp.pollStartGGAPI(key,slug)
           }, 5000);
         }
       }
 
     },
     methods : {
-      async pollSmashGGAPI(key,slug) {
+      async pollStartGGAPI(key,slug) {
         try {
-          const data = await this.queryStreamQueueSmashGG(key,slug)
+          const data = await this.queryStreamQueueStartGG(key,slug)
 
           if(data.length == 0) {
 
@@ -236,7 +236,7 @@
           console.log(e)
         }
       },
-      async queryStreamQueueSmashGG(key,slug){
+      async queryStreamQueueStartGG(key,slug){
         const streamQueryData = []
         try {
           const query = `

@@ -160,7 +160,8 @@
   </div>
 </body>
 
-<script>
+<script type="module">
+  import StartGGAPI from '/javascripts/StartGGAPI.js'
   const { createApp } = Vue
 
   createApp({
@@ -265,17 +266,10 @@
       },
       async loadTournamentList() {
         try {
-          const response = await fetch('http://'+ this.host+this.port +'/smashgg/query_tournaments?' + new URLSearchParams({"smashgg_key":this.apiKey}), {
-            method: "get",
-            headers: {
-              "Content-Type": "application/json; charset=UTF-8",
-            },
-          });
 
-          if(response.ok) {
-            const results = await response.json()
-            this.tournamentList = results
-          }
+          const results = await StartGGAPI.queryTournaments(this.apiKey)
+          this.tournamentList = results
+
         } catch (e) {
           console.log(e)
         }
@@ -291,7 +285,7 @@
             "winnerBestOfStart": this.selectedWinnerBestOfStart,
             "loserBestOfStart": this.selectedLoserBestOfStart,
             "slug": slug,
-            "smashgg_key": this.apiKey,
+            "startgg_key": this.apiKey,
           })
 
           this.overlayModuleURLs.push(url)
@@ -299,14 +293,14 @@
 
         this.waitingModuleURL = this.host + this.port + "/" + this.waitingModule + "?" + new URLSearchParams({
           "slug": slug,
-          "smashgg_key": this.apiKey,
+          "startgg_key": this.apiKey,
         })
 
         this.upcomingModuleURL = this.host + this.port + "/" + this.upcomingModule + "?" + new URLSearchParams({
           "winnerBestOfStart": this.selectedWinnerBestOfStart,
           "loserBestOfStart": this.selectedLoserBestOfStart,
           "slug": slug,
-          "smashgg_key": this.apiKey,
+          "startgg_key": this.apiKey,
         })
 
       },

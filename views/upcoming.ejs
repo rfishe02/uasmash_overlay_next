@@ -100,7 +100,7 @@
       const loserBestOfStart = urlParams.get('loserBestOfStart') == null ? 5 : this.finalsOrder[urlParams.get('loserBestOfStart')]
 
       const slug = urlParams.get('slug')
-      const key = urlParams.get('smashgg_key')
+      const key = urlParams.get('startgg_key')
 
       if(winnerBestOfStart != null) {
         this.winnerBestOfStart = winnerBestOfStart
@@ -121,7 +121,7 @@
     methods : {
       async querySets(key,slug) {
 
-        const sets = await this.querySetsSmashGG(key,slug)
+        const sets = await this.querySetsStartGG(key,slug)
 
         QueueManager.refreshQueue(this.setList,sets)
 
@@ -130,7 +130,7 @@
         })
 
       },
-      async querySetsSmashGG(key,slug) {
+      async querySetsStartGG(key,slug) {
         const setQueryData = []
         const query = `
         query MyQuery($slug: String) {
