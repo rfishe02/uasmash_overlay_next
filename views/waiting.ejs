@@ -313,6 +313,7 @@
                   }
                   fullRoundText
                  	slots{
+                    prereqId
                     entrant {
                       id
                       name
@@ -344,6 +345,7 @@
                     displayScore
                     completedAt
                     slots {
+                      prereqId
                       entrant {
                         id
                         name
@@ -393,34 +395,34 @@
 
                     if(queue.sets != null) {
                       queue.sets.forEach((set) => {
-                        if(set.state != null){
-                          if(set.state != 2){
+                        
+                        const queueData = {id:'', state:'', eventName: '', phaseName: '', fullRoundText: '', teamOne: '?', teamTwo: '?'}
+                        queueData.id = set.id
+                        queueData.state = set.state == null ? '' : set.state
+                        queueData.fullRoundText = set.fullRoundText == null ? '' : set.fullRoundText
 
-                            const queueData = {id:'', eventName: '', phaseName: '', fullRoundText: '', teamOne: '?', teamTwo: '?'}
-                            queueData.id = set.id
-                            queueData.fullRoundText = set.fullRoundText == null ? '' : set.fullRoundText
-
-                            if(set.event != null){
-                              queueData.eventName = set.event.name == null ? '' : set.event.name
-                              if(set.event.phases != null) {
-                                if(set.event.phases.length > 0){
-                                  queueData.phaseName = set.event.phases[0].name == null ? '' : set.event.phases[0].name
-                                }
-                              }
-                            }
-
-                            if(set.slots != null) {
-                              if(set.slots.length > 0) {
-                                if(set.slots[0].entrant != null) {
-                                  queueData.teamOne = set.slots[0].entrant.name == null ? '' : set.slots[0].entrant.name.slice(set.slots[0].entrant.name.indexOf("| ") + 1,set.slots[0].entrant.name.length).trim()
-                                }
-                                if(set.slots[1].entrant != null) {
-                                  queueData.teamTwo  = set.slots[1].entrant.name == null ? '' : set.slots[1].entrant.name.slice(set.slots[1].entrant.name.indexOf("| ") + 1,set.slots[1].entrant.name.length).trim()
-                                }
-                                queryData.tournamentStreamQueue.push(queueData)
-                              }
+                        if(set.event != null){
+                          queueData.eventName = set.event.name == null ? '' : set.event.name
+                          if(set.event.phases != null) {
+                            if(set.event.phases.length > 0){
+                              queueData.phaseName = set.event.phases[0].name == null ? '' : set.event.phases[0].name
                             }
                           }
+                        }
+
+                        if(set.slots != null) {
+                          if(set.slots.length > 0) {
+                            if(set.slots[0].entrant != null) {
+                              queueData.teamOne = set.slots[0].entrant.name == null ? '' : set.slots[0].entrant.name.slice(set.slots[0].entrant.name.indexOf("| ") + 1,set.slots[0].entrant.name.length).trim()
+                            }
+                            if(set.slots[1].entrant != null) {
+                              queueData.teamTwo  = set.slots[1].entrant.name == null ? '' : set.slots[1].entrant.name.slice(set.slots[1].entrant.name.indexOf("| ") + 1,set.slots[1].entrant.name.length).trim()
+                            }
+                          }
+                        }
+
+                        if(queueData.state != 2) {
+                          queryData.tournamentStreamQueue.push(queueData)
                         }
                       })
                     }
@@ -431,32 +433,12 @@
                 if(data.data.tournament.events != null) {
                   data.data.tournament.events.forEach((e) => {
 
-                    const eventStandings = {name: '', state: '', standings: []}
-                    eventStandings.name = e.name == null ? '' : e.name
-                    eventStandings.state = e.state == null ? '' : e.state
-
-                    if(e.standings != null){
-                      if(e.standings.nodes != null){
-                        e.standings.nodes.forEach((standing) => {
-                          if(standing.entrant != null) {
-                            const entrant = { name: '', placement: ''}
-                            entrant.name = standing.entrant.name == null ? '' : standing.entrant.name.slice(standing.entrant.name.indexOf("| ") + 1,standing.entrant.name.length).trim()
-                            entrant.placement = standing.placement == null ? '' : standing.placement
-                            eventStandings.standings.push(entrant)
-                          }
-                        })
-                      }
-                    }
-                    if(eventStandings.standings.length > 0) {
-                      queryData.tournamentStandings.push(eventStandings)
-                    }
-
-
                     if(e.sets != null) {
                       if(e.sets.nodes != null) {
                         e.sets.nodes.forEach((set) => {
-                          const match = {id:'', teamOne: '', teamTwo: '', eventName: '', phaseName: '', fullRoundText: '', score: '', completedAt: '', stopTime: ''}
+                          const match = {id:'', state:'', eventName: '', phaseName: '', fullRoundText: '', teamOne: '', teamTwo: '', score: '', completedAt: '', stopTime: ''}
                           match.id = set.id
+                          match.state = set.state
                           match.score = set.displayScore == null ? '' : set.displayScore
                           match.eventName = e.name == null ? '' : e.name
                           match.fullRoundText = set.fullRoundText == null ? '' : set.fullRoundText
@@ -493,6 +475,27 @@
 
                         })
                       }
+                    }
+
+
+                    const eventStandings = {name: '', state: '', standings: []}
+                    eventStandings.name = e.name == null ? '' : e.name
+                    eventStandings.state = e.state == null ? '' : e.state
+
+                    if(e.standings != null){
+                      if(e.standings.nodes != null){
+                        e.standings.nodes.forEach((standing) => {
+                          if(standing.entrant != null) {
+                            const entrant = { name: '', placement: ''}
+                            entrant.name = standing.entrant.name == null ? '' : standing.entrant.name.slice(standing.entrant.name.indexOf("| ") + 1,standing.entrant.name.length).trim()
+                            entrant.placement = standing.placement == null ? '' : standing.placement
+                            eventStandings.standings.push(entrant)
+                          }
+                        })
+                      }
+                    }
+                    if(eventStandings.standings.length > 0) {
+                      queryData.tournamentStandings.push(eventStandings)
                     }
 
                   })

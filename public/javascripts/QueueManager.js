@@ -16,8 +16,14 @@ export default {
       if(match == null){
         priorQueue.push(item)
       } else {
+        
+        match.state = item.state 
+        match.eventName = item.eventName
+        match.fullRoundText = item.fullRoundText
+        match.phaseName = item.phaseName
         match.teamOne = item.teamOne
         match.teamTwo = item.teamTwo
+
       }
 
       updatedQueueIdSet.add(item.id) 
