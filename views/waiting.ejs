@@ -41,9 +41,9 @@
 
     /* ensure leaving items are taken out of layout flow so that moving
     animations can be calculated correctly. */
-    /*.list-leave-active {
+    .list-leave-active {
       position: absolute;
-    }*/
+    }
 
 
     .dark-overlay {
@@ -219,6 +219,7 @@
 </body>
 
 <script type="module">
+  import QueueManager from '/javascripts/QueueManager.js'
   const { createApp} = Vue
 
   // Create a Twitch.Player object. This will render within the placeholder div
@@ -519,36 +520,7 @@
           this.streamQueue = []
         } else {
 
-          const priorQueue = {}
-          const newQueueIdSet = new Set()
-          const removeIndex = []
-
-          this.streamQueue.forEach(item => {
-            priorQueue[item.id] = item
-          })
-
-          data.tournamentStreamQueue.forEach(item => {
-            const match = priorQueue[item.id]
-
-            if(match == null){
-              this.streamQueue.push(item)
-            } else {
-              match.teamOne = item.teamOne
-              match.teamTwo = item.teamTwo
-            }
-
-            newQueueIdSet.add(item.id) 
-          })
-
-          for(var i = 0; i < this.streamQueue.length; i++){
-            if(!newQueueIdSet.has(this.streamQueue[i].id)){
-              removeIndex.push(i)
-            }
-          }
-
-          removeIndex.forEach(index => {
-            this.streamQueue.splice(index,1)
-          })
+          QueueManager.refreshQueue(this.streamQueue,data.tournamentStreamQueue)
 
         }
 

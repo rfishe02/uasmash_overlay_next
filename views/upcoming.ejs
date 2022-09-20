@@ -33,22 +33,22 @@
 
       <div class="container-fluid" style="width: 1920px; height: 1080px;">
 
-        <div class="row justify-content-left row-cols-1" style="padding-top: 15px; padding-right: 5px; padding-left: 5px;">
+        <div class="row justify-content-left row-cols-1" style="padding-top: 80px;">
           <template v-for="(item,index) in setList">
 
-            <div class="col mb-2">
-              <div class="card" style="width: 18rem; background-color: rgba(255, 255, 255, 1);">
+            <div class="col mb-2" v-if="item.state == 1">
+              <div class="card shadow" style="width: 17rem; background-color: rgba(255, 255, 255, 1);">
                 <div class="card-body p-2">
                   <h5 class="card-title">{{item.teamOne}} vs. {{item.teamTwo}}</h5>
-                  <h6 class="card-subtitle mb-2 text-muted">{{item.eventName}}: {{item.fullRoundText}}</h6>
+                  <h6 class="card-subtitle mb-1 text-muted">{{item.eventName}}: {{item.fullRoundText}}</h6>
 
                   <p class="card-text m-0" v-if="item.teamOne == '?' || item.teamTwo == '?'">
                     Waiting On:
                   </p>
                   
                   <ul class="list-group list-group-flush p-0" v-if="item.teamOne == '?' || item.teamTwo == '?'">
-                    <li class="list-group-item pt-0 pb-0" v-if="getPreReqMatch(item.preReqId1).length > 0">{{getPreReqMatch(item.preReqId1)}}</li>
-                    <li class="list-group-item pt-0 pb-0" v-if="getPreReqMatch(item.preReqId2).length > 0">{{getPreReqMatch(item.preReqId2)}}</li>
+                    <li class="list-group-item pt-0 pb-0" v-if="item.teamOne == '?' && getPreReqMatch(item.preReqId1).length > 0">{{getPreReqMatch(item.preReqId1)}}</li>
+                    <li class="list-group-item pt-0 pb-0" v-if="item.teamTwo == '?' && getPreReqMatch(item.preReqId2).length > 0">{{getPreReqMatch(item.preReqId2)}}</li>
                   </ul>
 
                 </div>
@@ -66,7 +66,7 @@
 </body>
 
 <script type="module">
-
+  import QueueManager from '/javascripts/QueueManager.js'
   const { createApp } = Vue
 
   const upcomingApp = createApp({
@@ -95,19 +95,12 @@
     mounted() {
       
       const urlParams = new URLSearchParams(window.location.search)
-      const slug = urlParams.get('slug')
-      const key = urlParams.get('smashgg_key')
       
-      if(key != null){
-        this.apiKey = key      
-      }
-
-      if(slug != null){
-        this.querySets(key,slug)
-      }
-
       const winnerBestOfStart = urlParams.get('winnerBestOfStart') == null ? 5 : this.finalsOrder[urlParams.get('winnerBestOfStart')]
       const loserBestOfStart = urlParams.get('loserBestOfStart') == null ? 5 : this.finalsOrder[urlParams.get('loserBestOfStart')]
+
+      const slug = urlParams.get('slug')
+      const key = urlParams.get('smashgg_key')
 
       if(winnerBestOfStart != null) {
         this.winnerBestOfStart = winnerBestOfStart
@@ -116,41 +109,24 @@
         this.loserBestOfStart = loserBestOfStart
       }
 
+      if(key != null){
+        this.apiKey = key      
+      }
+      if(slug != null){
+        //this.querySets(key,slug)
+        setInterval(function() { upcomingApp.querySets(key,slug) }, 10000)
+      }
+
     },
     methods : {
       async querySets(key,slug) {
 
         const sets = await this.querySetsSmashGG(key,slug)
-        const priorQueue = {}
-        const newQueueIdSet = new Set()
-        const removeIndex = []
+
+        QueueManager.refreshQueue(this.setList,sets)
 
         this.setList.forEach(item => {
-          priorQueue[item.id] = item
-        })
-
-        sets.forEach(item => {
-          const match = priorQueue[item.id] 
-
-          if(match == null) {
-            this.setList.push(item)
-          } else {
-            match.teamOne = item.teamOne
-            match.teamTwo = item.teamTwo
-          }
-
-          newQueueIdSet.add(item.id)
           this.preReqList[item.id] = item
-        })
-
-        for(var i = 0; i < this.setList.length; i++){
-          if(!newQueueIdSet.has(this.setList[i].id)) {
-            removeIndex.push(this.setList[i].id)
-          }
-        }
-
-        removeIndex.forEach(index => {
-          this.setList.splice(index,1)
         })
 
       },
@@ -222,8 +198,9 @@
                         if(event.sets != null){
                           if(event.sets.nodes != null) {
                             event.sets.nodes.forEach(set => {
-                              const s = {id: '', preReqId1: '', preReqId2: '', eventName:'', fullRoundText: '', phaseName: '', teamOne: '?', teamTwo: '?', bestOf: 'Best of 3'}
+                              const s = {id: '', preReqId1: '', preReqId2: '', state: '', eventName:'', fullRoundText: '', phaseName: '', teamOne: '?', teamTwo: '?', bestOf: 'Best of 3'}
                               s.id = set.id 
+                              s.state = set.state == null ? '' : set.state
 
                               s.eventName = event.name == null ? '' : event.name
                               if(s.eventName.length > 30) {
@@ -269,7 +246,9 @@
                                 }
                               }
                             
-                              setQueryData.push(s)
+                              if(s.state != 3){
+                                setQueryData.push(s)
+                              }
                             })
                           }
                         }
