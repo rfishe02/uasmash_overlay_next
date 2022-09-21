@@ -724,14 +724,21 @@ export default {
 
     if(set.slots != null) {
       if(set.slots.length > 0) {
-        if(set.slots[0].entrant != null) {
+
+        if(set.slots[0] != null) {
           setData.preReqId1 = set.slots[0].prereqId
-          setData.teamOne = this.getFormattedEntrantName(set.slots[0].entrant.name)
+          if(set.slots[0].entrant != null) {
+            setData.teamOne = this.getFormattedEntrantName(set.slots[0].entrant.name)
+          }
         }
-        if(set.slots[1].entrant != null) {
+
+        if(set.slots[1] != null) {
           setData.preReqId2 = set.slots[1].prereqId
-          setData.teamTwo  = this.getFormattedEntrantName(set.slots[1].entrant.name)
+          if(set.slots[1].entrant != null) {
+            setData.teamTwo  = this.getFormattedEntrantName(set.slots[1].entrant.name)
+          }
         }
+        
       }
     }
 

@@ -197,36 +197,41 @@
 
           } else {
 
-            //var previousStartedAt = Date.now()
+            var nextSet = null
+
             var previousStartedAt = 0
             data.forEach((set) => {
               if(set.state == 2) {
-
                 if(set.startedAt > previousStartedAt) {
-
-                  const eventRound = set.fullRoundText == null ? '' : set.fullRoundText
-                  const order = this.finalsOrder[eventRound.replace(/Winners |Losers /g,'')]
-                  var bestOfValue = 'Best of 3'
-
-                  if(order != null) {
-                    if(eventRound.indexOf('Winner') >= 0) {
-                      if(order >= this.winnerBestOfStart) {
-                        bestOfValue = 'Best of 5'
-                      }
-                    } else {
-                      if(order >= this.loserBestOfStart) {
-                        bestOfValue = 'Best of 5'
-                      }
-                    }
-                  }
-
-                  this.setOverlayValues(set.teamOne,set.teamTwo,set.phaseName,eventRound,bestOfValue)
-                  this.saveOverlayValuesToSession()
+                  nextSet = set
                 }
-
                 previousStartedAt = set.startedAt
               }
             })
+
+            if(nextSet != null){
+              const eventRound = nextSet.fullRoundText == null ? '' : nextSet.fullRoundText
+              const order = this.finalsOrder[eventRound.replace(/Winners |Losers /g,'')]
+              var bestOfValue = 'Best of 3'
+
+              if(order != null) {
+                if(eventRound.indexOf('Winner') >= 0) {
+                  if(order >= this.winnerBestOfStart) {
+                    bestOfValue = 'Best of 5'
+                  }
+                } else {
+                  if(order >= this.loserBestOfStart) {
+                    bestOfValue = 'Best of 5'
+                  }
+                }
+              }
+
+              this.setOverlayValues(nextSet.teamOne,nextSet.teamTwo,nextSet.phaseName,eventRound,bestOfValue)
+              this.saveOverlayValuesToSession()
+            } else {
+              this.setOverlayValues({},{},'','','')
+              this.saveOverlayValuesToSession()
+            }
 
           }
 

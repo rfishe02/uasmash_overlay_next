@@ -114,7 +114,7 @@
         this.apiKey = key      
       }
       if(slug != null){
-        //this.querySets(key,slug)
+        this.querySets(key,slug)
         setInterval(function() { upcomingApp.querySets(key,slug) }, 10000)
       }
 
@@ -124,10 +124,7 @@
 
         const sets = await StartGGAPI.queryUpcomingMatches(key,slug)
 
-        QueueManager.refreshQueue(this.setList,sets)
-
-        this.setList.forEach(item => {
-          
+        sets.forEach(item => {
           this.preReqList[item.id] = item
 
           const order = this.finalsOrder[item.fullRoundText.replace(/Winners |Losers /g,'')]              
@@ -142,8 +139,9 @@
               }
             }
           }
-
         })
+
+        QueueManager.refreshQueue(this.setList,sets)
 
       },
       getPreReqMatch(id) { 
