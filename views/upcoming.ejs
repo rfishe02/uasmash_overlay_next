@@ -64,27 +64,15 @@
 
       <div v-if="type == 0" class="container-fluid" style="width: 1920px; height: 1080px;">
 
-        <div class="row justify-content-left row-cols-1" style="padding-top: 80px;">
+        <div class="row justify-content-left row-cols-1" style="padding-top: 80px; width: 17em;">
           
           <transition-group name="list">
             <template v-for="(item,index) in setList" :key="item">
               <div class="col mb-2" v-if="item.state == 1">
-                <div class="card shadow" style="width: 17rem; background-color: rgba(255, 255, 255, 1);">
-                  <div class="card-body p-2">
-                    <h5 class="card-title">{{item.teamOne}} vs. {{item.teamTwo}}</h5>
-                    <h6 class="card-subtitle mb-1 text-muted">{{item.eventName}}: {{item.fullRoundText}}</h6>
-  
-                    <p class="card-text m-0" v-if="item.teamOne == '?' || item.teamTwo == '?'">
-                      Waiting On:
-                    </p>
-                    
-                    <ul class="list-group list-group-flush p-0" v-if="item.teamOne == '?' || item.teamTwo == '?'">
-                      <li class="list-group-item pt-0 pb-0" v-if="item.teamOne == '?' && getPreReqMatch(item.preReqId1).length > 0">{{getPreReqMatch(item.preReqId1)}}</li>
-                      <li class="list-group-item pt-0 pb-0" v-if="item.teamTwo == '?' && getPreReqMatch(item.preReqId2).length > 0">{{getPreReqMatch(item.preReqId2)}}</li>
-                    </ul>
-  
-                  </div>
-                </div>
+                
+                <upcoming-match-card :team-one="item.teamOne" :team-two="item.teamTwo" :pre-req-id1="getPreReqMatch(item.preReqId1)" :pre-req-id2="getPreReqMatch(item.preReqId2)" :event-name="item.eventName" :full-round-text="item.fullRoundText">
+                </upcoming-match-card>
+
               </div>
             </template>
           </transition-group>
@@ -104,25 +92,10 @@
           <transition-group name="list">
             <template v-for="(item,index) in setList" :key="item">
               <div class="col mb-3">
-                <div class="card border-secondary shadow" style="background-color: rgba(255, 255, 255, 1);">
-                  <div class="card-body p-3">
-                    <h5 class="card-title">{{item.teamOne}} vs. {{item.teamTwo}}</h5>
-                    <!--<h6 class="card-subtitle mb-1 text-muted"></h6>-->
-  
-                    <p class="card-text m-0" v-if="item.teamOne == '?' || item.teamTwo == '?'">
-                      Waiting On:
-                    </p>
-                    
-                    <ul class="list-group list-group-flush p-0" v-if="item.teamOne == '?' || item.teamTwo == '?'">
-                      <li class="list-group-item pt-0 pb-0" v-if="item.teamOne == '?' && getPreReqMatch(item.preReqId1).length > 0">{{getPreReqMatch(item.preReqId1)}}</li>
-                      <li class="list-group-item pt-0 pb-0" v-if="item.teamTwo == '?' && getPreReqMatch(item.preReqId2).length > 0">{{getPreReqMatch(item.preReqId2)}}</li>
-                    </ul>
-  
-                  </div>
-                  <div class="card-footer">
-                    {{item.eventName}}: {{item.fullRoundText}}
-                  </div>
-                </div>
+                
+                <upcoming-match-card :team-one="item.teamOne" :team-two="item.teamTwo" :pre-req-id1="getPreReqMatch(item.preReqId1)" :pre-req-id2="getPreReqMatch(item.preReqId2)" :event-name="item.eventName" :full-round-text="item.fullRoundText">
+                </upcoming-match-card>
+
               </div>
             </template>
           </transition-group>
@@ -139,6 +112,7 @@
 <script type="module">
   import StartGGAPI from '/javascripts/StartGGAPI.js'
   import QueueManager from '/javascripts/QueueManager.js'
+  import UpcomingMatchCard from '/javascripts/UpcomingMatchCard.js'
   const { createApp } = Vue
 
   const upcomingApp = createApp({
@@ -162,7 +136,7 @@
           'Final':7,
           'Grand Final': 8
         },
-        type: 1,
+        type: 0,
       }
     },
     mounted() {
@@ -215,6 +189,10 @@
               }
             }
           }
+
+          //item.eventName = item.eventName.toUpperCase()
+          //item.phaseName = item.phaseName.toUpperCase()
+          //item.fullRoundText = item.fullRoundText.toUpperCase()
         })
 
         QueueManager.refreshQueue(this.setList,sets)
@@ -229,7 +207,7 @@
       }
     },
     components: {
-
+      UpcomingMatchCard,
     }
   }).mount('#app')
 
