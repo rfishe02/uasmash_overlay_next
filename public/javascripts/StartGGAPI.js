@@ -142,12 +142,7 @@ export default {
                 nodes.forEach((player) => {
   
                   const item = {}
-                  item.name = player.gamerTag
-                    .slice(
-                      player.gamerTag.indexOf("| ") + 1,
-                      player.gamerTag.length
-                    )
-                    .trim()
+                  item.name = this.getFormattedEntrantName(player.gamerTag)
                   item.socials = []
   
                   if (player.user != null) {
@@ -201,19 +196,20 @@ export default {
             nodes {
               id
               state
-              startedAt
-              completedAt
-              round
-              fullRoundText
-              setGamesType
-              totalGames
+              identifier
+              event {
+                name
+              }
               phaseGroup {
                 phase {
                   name
                 }
               }
+              fullRoundText
               slots {
+                prereqId
                 entrant {
+                  id
                   name
                 }
               }
@@ -243,54 +239,9 @@ export default {
             if (data.data.event.sets != null) {
               if (data.data.event.sets.nodes != null) {
                 data.data.event.sets.nodes.forEach((node) => {
-                  const s = {}
-                  s.fullRoundText = node.fullRoundText
-                  s.id = node.id
-                  s.state = node.state
-                  s.totalGames = node.totalGames
-  
-                  s.bracketAndRound = s.fullRoundText
-  
-                  if (node.phaseGroup != null) {
-                    if (node.phaseGroup.phase != null) {
-                      s.phaseName = node.phaseGroup.phase.name
-  
-                      s.bracketAndRound =  s.phaseName + " " + s.bracketAndRound
-                    }
-                  }
-  
-                  s.teamOne = { name: '' };
-                  s.teamTwo = { name: '' };
-  
-                  if (node.slots != null) {
-                    if (node.slots[0] != null) {
-                      if (node.slots[0].entrant != null) {
-                        s.teamOne.name = node.slots[0].entrant.name
-                          .slice(
-                            node.slots[0].entrant.name.indexOf("| ") + 1,
-                            node.slots[0].entrant.name.length
-                          ).trim()
-  
-                        s.versusBanner = s.teamOne.name
-                        s.teamOne.members = []
-                      }
-                    }
-  
-                    if (node.slots[1] != null) {
-                      if (node.slots[1].entrant != null) {
-                        s.teamTwo.name = node.slots[1].entrant.name
-                          .slice(
-                            node.slots[1].entrant.name.indexOf("| ") + 1,
-                            node.slots[1].entrant.name.length
-                          ).trim();
-  
-                        s.versusBanner += " vs " + s.teamTwo.name
-                        s.teamTwo.members = []
-                      }
-                    }
-                  }
+                  const s = this.getSetData(node)
                   setQueryData.push(s)
-                });
+                })
               }
             }
           }
@@ -315,6 +266,7 @@ export default {
         state
         streamQueue {
           sets {
+            id
             completedAt
             createdAt
             event {
@@ -334,6 +286,7 @@ export default {
             }
             setGamesType
             slots {
+              prereqId
               entrant {
                 id
                 name
@@ -383,31 +336,16 @@ export default {
               if(data.data.tournament.streamQueue[0].sets != null){
 
                 data.data.tournament.streamQueue[0].sets.forEach((set) => {
-                  const s = {
-                    eventName: '',
-                    phaseName: '',
-                    fullRoundText: '',
-                    state: '',
-                    startedAt: '',
-                  }
 
-                  s.fullRoundText = set.fullRoundText == null ? '' : set.fullRoundText
-                  s.state = set.state == null ? '' : set.state
+                  const s = this.getSetData(set)
+
                   s.startedAt = set.startedAt == null ? '' : set.startedAt
-
-                  if(set.event != null) {
-                    s.eventName = set.event.name == null ? '' : set.event.name
-                  }
-                  if(set.phaseGroup != null) {
-                    if(set.phaseGroup.phase != null) {
-                      s.phaseName = set.phaseGroup.phase.name == null ? '' : set.phaseGroup.phase.name
-                    }
-                  }
 
                   s.teamOne = this.getTeamData(set,0)
                   s.teamTwo = this.getTeamData(set,1)
 
                   streamQueryData.push(s)
+                  
                 })
 
               }
@@ -433,13 +371,13 @@ export default {
       if (slots != null) {
         if (slots.entrant != null) {
           team.entrantID = slots.entrant.id
-          team.name = slots.entrant.name.slice(slots.entrant.name.indexOf("| ") + 1,slots.entrant.name.length).trim()
+          team.name = this.getFormattedEntrantName(slots.entrant.name)
 
           if (slots.entrant.participants != null) {
             slots.entrant.participants.forEach((player) => {
 
               const item = {}
-              item.name = player.gamerTag.slice(player.gamerTag.indexOf("| ") + 1,player.gamerTag.length).trim()
+              item.name = this.getFormattedEntrantName(player.gamerTag)
               item.socials = []
 
               if (player.user != null) {
@@ -495,18 +433,22 @@ export default {
           }
         ) {
             nodes {
-              id 
-              state 
+              id
+              state
               identifier
-              fullRoundText
+              event {
+                name
+              }
               phaseGroup {
                 phase {
                   name
                 }
               }
+              fullRoundText
               slots {
                 prereqId
                 entrant {
+                  id
                   name
                 }
               }
@@ -546,42 +488,18 @@ export default {
                     if(event.sets != null){
                       if(event.sets.nodes != null) {
                         event.sets.nodes.forEach(set => {
-                          const s = {id: '', preReqId1: '', preReqId2: '', state: '', eventName:'', fullRoundText: '', phaseName: '', teamOne: '?', teamTwo: '?', bestOf: 'Best of 3'}
-                          s.id = set.id 
-                          s.state = set.state == null ? '' : set.state
 
-                          s.eventName = event.name == null ? '' : event.name
+                          const s = this.getSetData(set)
+                          s.bestOf = 'Best of 3'
+
                           if(s.eventName.length > 30) {
                             s.eventName = s.eventName.slice(0,30) + "... "
-                          }
-
-                          s.fullRoundText = set.fullRoundText == null ? '' : set.fullRoundText
-                        
-                          if(set.phaseGroup != null){
-                            if(set.phaseGroup.phase != null){
-                              s.phaseName = set.phaseGroup.phase.name == null ? '' : set.phaseGroup.phase.name
-                            }
-                          }
-                        
-                          if(set.slots != null){
-                            if(set.slots[0] != null){
-                              s.preReqId1 = set.slots[0].prereqId
-                              if(set.slots[0].entrant != null) {
-                                s.teamOne = set.slots[0].entrant.name.slice(set.slots[0].entrant.name.indexOf("| ") + 1,set.slots[0].entrant.name.length).trim()
-                              }
-                            }
-                          
-                            if(set.slots[1] != null){
-                              s.preReqId2 = set.slots[1].prereqId
-                              if(set.slots[1].entrant != null) {
-                                s.teamTwo = set.slots[1].entrant.name.slice(set.slots[1].entrant.name.indexOf("| ") + 1,set.slots[1].entrant.name.length).trim()
-                              }
-                            }
                           }
 
                           if(s.state != 3){
                             setQueryData.push(s)
                           }
+
                         })
                       }
                     }
@@ -620,7 +538,10 @@ export default {
               state
               event {
                 name
-                phases {
+              }
+              phaseGroup {
+                bracketType
+                phase {
                   name
                 }
               }
@@ -650,13 +571,15 @@ export default {
                 id
                 state
                 event {
-                  phases {
+                  name
+                }
+                phaseGroup {
+                  bracketType
+                  phase {
                     name
                   }
                 }
                 fullRoundText
-                displayScore
-                completedAt
                 slots {
                   prereqId
                   entrant {
@@ -664,6 +587,8 @@ export default {
                     name
                   }
                 }
+                displayScore
+                completedAt
               }
             }
             standings(
@@ -709,34 +634,12 @@ export default {
                 if(queue.sets != null) {
                   queue.sets.forEach((set) => {
                     
-                    const queueData = {id:'', state:'', eventName: '', phaseName: '', fullRoundText: '', teamOne: '?', teamTwo: '?'}
-                    queueData.id = set.id
-                    queueData.state = set.state == null ? '' : set.state
-                    queueData.fullRoundText = set.fullRoundText == null ? '' : set.fullRoundText
-
-                    if(set.event != null){
-                      queueData.eventName = set.event.name == null ? '' : set.event.name
-                      if(set.event.phases != null) {
-                        if(set.event.phases.length > 0){
-                          queueData.phaseName = set.event.phases[0].name == null ? '' : set.event.phases[0].name
-                        }
-                      }
-                    }
-
-                    if(set.slots != null) {
-                      if(set.slots.length > 0) {
-                        if(set.slots[0].entrant != null) {
-                          queueData.teamOne = set.slots[0].entrant.name == null ? '' : set.slots[0].entrant.name.slice(set.slots[0].entrant.name.indexOf("| ") + 1,set.slots[0].entrant.name.length).trim()
-                        }
-                        if(set.slots[1].entrant != null) {
-                          queueData.teamTwo  = set.slots[1].entrant.name == null ? '' : set.slots[1].entrant.name.slice(set.slots[1].entrant.name.indexOf("| ") + 1,set.slots[1].entrant.name.length).trim()
-                        }
-                      }
-                    }
+                    const queueData = this.getSetData(set)
 
                     if(queueData.state != 2) {
                       queryData.tournamentStreamQueue.push(queueData)
                     }
+
                   })
                 }
 
@@ -749,47 +652,23 @@ export default {
                 if(e.sets != null) {
                   if(e.sets.nodes != null) {
                     e.sets.nodes.forEach((set) => {
-                      const match = {id:'', state:'', eventName: '', phaseName: '', fullRoundText: '', teamOne: '', teamTwo: '', score: '', completedAt: '', stopTime: ''}
-                      match.id = set.id
-                      match.state = set.state
+                      
+                      const match = this.getSetData(set)
                       match.score = set.displayScore == null ? '' : set.displayScore
-                      match.eventName = e.name == null ? '' : e.name
-                      match.fullRoundText = set.fullRoundText == null ? '' : set.fullRoundText
-
+                      
                       if(set.completedAt != null) {
                         match.completedAt = set.completedAt
                         const d = new Date(set.completedAt * 1000)
                         match.stopTime = Math.round((new Date() - d) / (1000 * 60)) + " minutes ago"
                       }
-                      if(set.event != null){
-                        if(set.event.phases != null){
-                          if(set.event.phases.length > 0) {
-                            match.phaseName = set.event.phases[0].name == null ? '' : set.event.phases[0].name
-                          }
-                        }
-                      }
-
-                      if(set.slots != null) {
-                        if(set.slots[0] != null) {
-                          if(set.slots[0].entrant != null){
-                            match.teamOne = set.slots[0].entrant.name == null ? '' : set.slots[0].entrant.name.slice(set.slots[0].entrant.name.indexOf("| ") + 1,set.slots[0].entrant.name.length).trim()
-                          }
-                        }
-                        if(set.slots[1] != null) {
-                          if(set.slots[1].entrant != null){
-                            match.teamTwo = set.slots[1].entrant.name == null ? '' : set.slots[1].entrant.name.slice(set.slots[1].entrant.name.indexOf("| ") + 1,set.slots[1].entrant.name.length).trim()
-                          }
-                        }
-
-                        if(match.score != 'DQ') {
-                          queryData.tournamentMatches.push(match)
-                        }
+                      
+                      if(match.score != 'DQ') {
+                        queryData.tournamentMatches.push(match)
                       }
 
                     })
                   }
                 }
-
 
                 const eventStandings = {name: '', state: '', standings: []}
                 eventStandings.name = e.name == null ? '' : e.name
@@ -800,7 +679,7 @@ export default {
                     e.standings.nodes.forEach((standing) => {
                       if(standing.entrant != null) {
                         const entrant = { name: '', placement: ''}
-                        entrant.name = standing.entrant.name == null ? '' : standing.entrant.name.slice(standing.entrant.name.indexOf("| ") + 1,standing.entrant.name.length).trim()
+                        entrant.name = this.getFormattedEntrantName(standing.entrant.name)
                         entrant.placement = standing.placement == null ? '' : standing.placement
                         eventStandings.standings.push(entrant)
                       }
@@ -825,5 +704,42 @@ export default {
 
     return queryData
   },
+
+  getSetData(set) {
+    const setData = {id:'', state:'', eventName: '', phaseName: '', fullRoundText: '', teamOne: '?', teamTwo: '?', preReqId1: '', preReqId2: ''}
+    
+    setData.id = set.id
+    setData.state = set.state == null ? '' : set.state
+    setData.fullRoundText = set.fullRoundText == null ? '' : set.fullRoundText
+
+    if(set.event != null){
+      setData.eventName = set.event.name == null ? '' : set.event.name
+    }
+
+    if(set.phaseGroup != null){
+      if(set.phaseGroup.phase != null){
+        setData.phaseName = set.phaseGroup.phase.name == null ? '' : set.phaseGroup.phase.name
+      }
+    }
+
+    if(set.slots != null) {
+      if(set.slots.length > 0) {
+        if(set.slots[0].entrant != null) {
+          setData.preReqId1 = set.slots[0].prereqId
+          setData.teamOne = this.getFormattedEntrantName(set.slots[0].entrant.name)
+        }
+        if(set.slots[1].entrant != null) {
+          setData.preReqId2 = set.slots[1].prereqId
+          setData.teamTwo  = this.getFormattedEntrantName(set.slots[1].entrant.name)
+        }
+      }
+    }
+
+    return setData
+  },
+
+  getFormattedEntrantName(name) {
+    return name == null ? '' : name.slice(name.indexOf("| ") + 1,name.length).trim()
+  }
 
 }
