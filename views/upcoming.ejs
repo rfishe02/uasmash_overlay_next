@@ -17,6 +17,37 @@
       margin: 0px auto;
       overflow: hidden;
     }
+
+    .css-selector {
+      background: linear-gradient(225deg, #0098ff, #ff2f00);
+      background-size: 400% 400%;
+      animation: waitingScreenBackground 31s ease infinite;
+    }
+
+    @keyframes waitingScreenBackground {
+      0%{background-position:0% 51%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 51%}
+    }
+
+    .list-move, /* apply transition to moving elements */
+    .list-enter-active,
+    .list-leave-active {
+      transition: all 0.5s ease;
+    }
+
+    .list-enter-from,
+    .list-leave-to {
+      opacity: 0;
+      transform: translateY(15px);
+    }
+
+    /* ensure leaving items are taken out of layout flow so that moving
+    animations can be calculated correctly. */
+    .list-leave-active {
+      position: absolute;
+    }
+
   </style>
 
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -31,31 +62,71 @@
 <body>
   <div id="app">
 
-      <div class="container-fluid" style="width: 1920px; height: 1080px;">
+      <div v-if="type == 0" class="container-fluid" style="width: 1920px; height: 1080px;">
 
         <div class="row justify-content-left row-cols-1" style="padding-top: 80px;">
-          <template v-for="(item,index) in setList">
-
-            <div class="col mb-2" v-if="item.state == 1">
-              <div class="card shadow" style="width: 17rem; background-color: rgba(255, 255, 255, 1);">
-                <div class="card-body p-2">
-                  <h5 class="card-title">{{item.teamOne}} vs. {{item.teamTwo}}</h5>
-                  <h6 class="card-subtitle mb-1 text-muted">{{item.eventName}}: {{item.fullRoundText}}</h6>
-
-                  <p class="card-text m-0" v-if="item.teamOne == '?' || item.teamTwo == '?'">
-                    Waiting On:
-                  </p>
-                  
-                  <ul class="list-group list-group-flush p-0" v-if="item.teamOne == '?' || item.teamTwo == '?'">
-                    <li class="list-group-item pt-0 pb-0" v-if="item.teamOne == '?' && getPreReqMatch(item.preReqId1).length > 0">{{getPreReqMatch(item.preReqId1)}}</li>
-                    <li class="list-group-item pt-0 pb-0" v-if="item.teamTwo == '?' && getPreReqMatch(item.preReqId2).length > 0">{{getPreReqMatch(item.preReqId2)}}</li>
-                  </ul>
-
+          
+          <transition-group name="list">
+            <template v-for="(item,index) in setList" :key="item">
+              <div class="col mb-2" v-if="item.state == 1">
+                <div class="card shadow" style="width: 17rem; background-color: rgba(255, 255, 255, 1);">
+                  <div class="card-body p-2">
+                    <h5 class="card-title">{{item.teamOne}} vs. {{item.teamTwo}}</h5>
+                    <h6 class="card-subtitle mb-1 text-muted">{{item.eventName}}: {{item.fullRoundText}}</h6>
+  
+                    <p class="card-text m-0" v-if="item.teamOne == '?' || item.teamTwo == '?'">
+                      Waiting On:
+                    </p>
+                    
+                    <ul class="list-group list-group-flush p-0" v-if="item.teamOne == '?' || item.teamTwo == '?'">
+                      <li class="list-group-item pt-0 pb-0" v-if="item.teamOne == '?' && getPreReqMatch(item.preReqId1).length > 0">{{getPreReqMatch(item.preReqId1)}}</li>
+                      <li class="list-group-item pt-0 pb-0" v-if="item.teamTwo == '?' && getPreReqMatch(item.preReqId2).length > 0">{{getPreReqMatch(item.preReqId2)}}</li>
+                    </ul>
+  
+                  </div>
                 </div>
               </div>
-            </div>
+            </template>
+          </transition-group>
+
+        </div>
+
+      </div>
+
+      <div v-if="type == 1" class="container-fluid css-selector" style="width: 1920px; height: 1080px;">
+
+        <div class="row" style="padding-top: 25px; padding-left: 25px; color: white;">
+          <h1>UPCOMING MATCHES</h1>
+        </div>
+
+        <div class="row justify-content-center row-cols-6" style="padding-top: 25px; padding-left: 50px; padding-right: 50px;">
+          
+          <transition-group name="list">
+            <template v-for="(item,index) in setList" :key="item">
+              <div class="col mb-3">
+                <div class="card border-secondary shadow" style="background-color: rgba(255, 255, 255, 1);">
+                  <div class="card-body p-3">
+                    <h5 class="card-title">{{item.teamOne}} vs. {{item.teamTwo}}</h5>
+                    <!--<h6 class="card-subtitle mb-1 text-muted"></h6>-->
   
-          </template>
+                    <p class="card-text m-0" v-if="item.teamOne == '?' || item.teamTwo == '?'">
+                      Waiting On:
+                    </p>
+                    
+                    <ul class="list-group list-group-flush p-0" v-if="item.teamOne == '?' || item.teamTwo == '?'">
+                      <li class="list-group-item pt-0 pb-0" v-if="item.teamOne == '?' && getPreReqMatch(item.preReqId1).length > 0">{{getPreReqMatch(item.preReqId1)}}</li>
+                      <li class="list-group-item pt-0 pb-0" v-if="item.teamTwo == '?' && getPreReqMatch(item.preReqId2).length > 0">{{getPreReqMatch(item.preReqId2)}}</li>
+                    </ul>
+  
+                  </div>
+                  <div class="card-footer">
+                    {{item.eventName}}: {{item.fullRoundText}}
+                  </div>
+                </div>
+              </div>
+            </template>
+          </transition-group>
+
         </div>
 
       </div>
@@ -91,17 +162,22 @@
           'Final':7,
           'Grand Final': 8
         },
+        type: 1,
       }
     },
     mounted() {
       
       const urlParams = new URLSearchParams(window.location.search)
       
+      const slug = urlParams.get('slug')
+      const key = urlParams.get('startgg_key')
+      const type = urlParams.get('type')
       const winnerBestOfStart = urlParams.get('winnerBestOfStart') == null ? 5 : this.finalsOrder[urlParams.get('winnerBestOfStart')]
       const loserBestOfStart = urlParams.get('loserBestOfStart') == null ? 5 : this.finalsOrder[urlParams.get('loserBestOfStart')]
 
-      const slug = urlParams.get('slug')
-      const key = urlParams.get('startgg_key')
+      if(type != null){
+        this.type = type
+      }
 
       if(winnerBestOfStart != null) {
         this.winnerBestOfStart = winnerBestOfStart
