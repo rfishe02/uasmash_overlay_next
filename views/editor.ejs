@@ -36,40 +36,7 @@
 <body>
   <div id="app">
 
-    <nav class="navbar navbar-expand-md navbar-dark bg-secondary">
-      <div class="container-fluid">
-        <a class="navbar-brand pt-1 pl-2" href="#" disabled>
-          <img src="/fsmsmashlogo.png" alt="" height="30" />
-        </a>
-
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNavAltMarkup"
-          aria-controls="navbarNavAltMarkup"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a href="/striker" style="color: white;">Stage Striker</a>
-            </li>
-          </ul>
-
-          <div class="navbar-nav me-auto m-2"></div>
-
-          <!-- TODO: Log out feature. -->
-          <!--<button class="btn btn-light" type="button" @click="logOut">Log Out</button>-->
-
-        </div>
-      </div>
-    </nav>
+    <nav-bar :icon-url="navLogoUrl" :links="navLinks"></nav-bar>
 
     <div class="container" style="padding-bottom: 25px; padding-top: 15px">
 
@@ -281,6 +248,7 @@
 </body>
 
 <script type="module">
+  import NavBar from '/javascripts/NavBar.js'
   import KeyManager from '/javascripts/KeyManager.js'
   import Editor from '/javascripts/Editor.mjs'
 
@@ -323,6 +291,8 @@
       return {
         host: window.location.hostname,
         port: ":3000",
+        navLogoUrl: '/fsmsmashlogo.png',
+        navLinks:[],
         playerEntry: '',
         playerList: [],
         filteredPlayers: [],
@@ -593,7 +563,8 @@
       "p-autocomplete": primevue.autocomplete,
       "p-selectbutton": primevue.selectbutton,
       "p-inputtext": primevue.inputtext,
-      "p-textarea": primevue.textarea
+      "p-textarea": primevue.textarea,
+      NavBar
     },
   }).use(primevue.config.default).mount('#app')
 

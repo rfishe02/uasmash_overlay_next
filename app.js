@@ -11,6 +11,7 @@ var session = require('express-session');
 var SQLiteStore = require('connect-sqlite3')(session);
 
 var indexRouter = require('./routes/index');
+var dashboardRouter = require('./routes/dashboard');
 
 var usersRouter = require('./routes/users');
 var stagesRouter = require('./routes/stages');
@@ -41,7 +42,6 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-
 
 
 app.use(session({
@@ -76,21 +76,20 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/', indexRouter);
-app.use('/stages', stagesRouter);
 
+app.use('/dashboard', dashboardRouter);
 app.use('/editor', editorRouter);
-app.use('/module', overlayRouter);
-
 app.use('/striker', strikerRouter);
-app.use('/module',stageStrikesRouter)
 
+app.use('/module', overlayRouter);
+app.use('/module',stageStrikesRouter)
 app.use('/module', waitingRouter);
 app.use('/module', upcomingRouter);
 
+app.use('/stages', stagesRouter);
+app.use('/stage_lists',stageListRouter)
 app.use('/users', usersRouter);
 app.use('/keys', keysRouter);
-
-app.use('/stage_lists',stageListRouter)
 
 app.set('view engine', 'ejs');
 

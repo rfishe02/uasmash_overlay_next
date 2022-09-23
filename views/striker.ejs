@@ -225,11 +225,11 @@
 </body>
 
 <script type="module">
+  import Striker from '/javascripts/Striker.mjs'
+
   import CardHeader from '/javascripts/CardHeader.js'
   import CardBody from '/javascripts/CardBody.js'
   import StageCardSmall from '/javascripts/StageCardSmall.js'
-
-  import Striker from '/javascripts/Striker.mjs'
 
   import Stage from '/javascripts/Stage.js'
   import KeyManager from '/javascripts/KeyManager.js'
@@ -295,7 +295,6 @@
       }
     },
     mounted() {
-      this.getStageImageURLs()
       this.loadConfigStageList()
 
       this.resetOptionsAndChoices()
@@ -327,29 +326,6 @@
           return "./pexels-gradienta-6985001.jpeg"
         }
       },
-      async getStageImageURLs() {
-        try {
-          const response = await fetch('http://' + this.host + this.port + '/stages', {
-            method: "get",
-            headers: {
-              "Content-Type": "application/json; charset=UTF-8",
-            },
-          })
-
-          if(response.ok) {
-            const results = await response.json()
-            const data = {}
-
-            for (let i = 0; i < results.length; i++) {
-              data[results[i].stage_name] = "/stages/" + results[i].image_url
-            }
-
-            this.stageImageURLs = data
-          }
-        } catch (e) {
-          console.log(e)
-        }
-      },
       async loadConfigStageList() {
         try {
           const response = await fetch('http://' + this.host + this.port + '/stages', {
@@ -361,12 +337,16 @@
 
           if(response.ok) {
             const results = await response.json()
-            const data = []
+            const stageListData = []
+            const stageImgURLData = {}
 
             for (let i = 0; i < results.length; i++) {
-              data.push(results[i].stage_name)
+              stageListData.push(results[i].stage_name)
+              stageImgURLData[results[i].stage_name] = "/stages/" + results[i].image_url
             }
-            this.stageNameList = data
+
+            this.stageNameList = stageListData
+            this.stageImageURLs = stageImgURLData
           }
         } catch (e) {
           console.log(e)
