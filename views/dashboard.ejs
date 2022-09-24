@@ -25,9 +25,7 @@
   <script src="https://unpkg.com/vue@3"></script>
 
   <script src="https://unpkg.com/primevue/core/core.min.js"></script>
-  <script src="https://unpkg.com/primevue@^3/autocomplete/autocomplete.min.js"></script>
-  <script src="https://unpkg.com/primevue@^3/selectbutton/selectbutton.min.js"></script>
-  <script src="https://unpkg.com/primevue@^3/textarea/textarea.min.js"></script>
+  <script src="https://unpkg.com/primevue@^3/radiobutton/radiobutton.min.js"></script>
 
   <script src="/socket.io/socket.io.js"></script>
 
@@ -38,9 +36,70 @@
 
     <nav-bar :icon-url="navLogoUrl" :links="navLinks"></nav-bar>
 
-    <div class="container" style="padding-bottom: 25px; padding-top: 15px">
+    <div class="container" style="padding-bottom: 15px; padding-top: 15px;">
 
-      
+      <div class="row mb-2">
+        <div class="col border rounded" style="padding: 15px; background-color: white;">
+
+          <div class="row mb-3">
+            <h3>Browser Source URLs</h3>
+          </div>
+
+          <template v-for="(url, urlIndex) in overlayURLs">
+            <template v-for="type in url.types">
+              <div class="row mb-3">
+                <div class="col-8">
+                  <label :for="'url'+urlIndex"><h6>{{url.name}}</h6></label>
+                  <div :id="'url'+urlIndex" class="p-inputgroup">
+                    <p-inputtext type="text" :value="getOverlayURL(url.path,{'type':type,'id':url.room,})"> </p-inputtext>
+                    <p-button icon="pi pi-refresh" class="p-button-text" @click="regenerateKey(url.path, url.name)" ></p-button>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </template>
+
+          <div class="row mb-3">
+            <div class="col">
+              <label>Start.gg API Key</label>
+              <div class="p-inputgroup">
+                <p-inputtext v-model="apiKey" @change="saveAPIKey"></p-inputtext>
+                <!--<p-button label="Save Key" @click="saveAPIKey"></p-button>-->
+              </div>
+            </div>
+          </div>
+
+          <div class="row mb-3" v-if="apiKey.length > 0">
+            <div class="col">
+              <label>Winners "Best Of 5" Starting Point</label>
+              <div v-for="option of finalsStartOptions" :key="option" class="field-radiobutton">
+                <p-radiobutton :inputId="'winner' + option" name="winnerStart" :value="option" v-model="selectedWinnerBestOfStart"></p-radiobutton>
+                <label :for="'winner' + option">&nbsp;<i>{{option}}</i></label>
+              </div>
+            </div>
+
+            <div class="col">
+              <label>Losers "Best Of 5" Starting Point</label>
+              <div v-for="option of finalsStartOptions" :key="option" class="field-radiobutton">
+                <p-radiobutton :inputId="'loser' + option" name="loserStart" :value="option" v-model="selectedLoserBestOfStart"></p-radiobutton>
+                <label :for="'loser' + option">&nbsp;<i>{{option}}</i></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mb-3" v-if="apiKey.length > 0">
+            <div class="col">
+              <p-dropdown
+                v-model="tournamentSelection"
+                :options="tournamentList"
+                option-label="name"
+                placeholder="Select a Tournament"
+                @change="getOverlayURLs()"></p-dropdown>
+            </div>
+          </div>
+
+        </div>
+      </div>
 
     </div>
 
@@ -48,8 +107,11 @@
 </body>
 
 <script type="module">
+  import StartGGAPI from '/javascripts/StartGGAPI.js'
   import NavBar from '/javascripts/NavBar.js'
+  import KeyManager from '/javascripts/KeyManager.js'
   const { createApp} = Vue
+  const { FilterMatchMode, FilterOperator } = primevue.api;
 
   const dashboardApp = createApp({
     data() {
@@ -58,24 +120,104 @@
         port: ":3000",
         navLogoUrl: '/fsmsmashlogo.png',
         navLinks:[
-          {url: '/editor', name:'Editor'},
-          {url: '/striker', name:'Stage Striker'},
+          {url: '/editor', name: 'Editor'},
+          {url: '/striker', name: 'Stage Striker'},
+        ],
+        playerOverlayRoom: "",
+        strikerOverlayRoom: "",
+        overlayList: [
+          {types: [0], path: "players", name: "Player Overlay (Manual Entry)"},
+          {types: [0], path: "stage_strikes", name: "Stage Strikes Overlay"},
+          {types: [0], path: "players", name: "Player Overlay (Automatic)"},
+          {types: [0], path: "waiting", name: "Waiting Screen"},
+          {types: [0], path: "upcoming", name: "Upcoming Matches"},
+        ],
+        overlayURLs: [],
+        apiKey: '',
+        tournamentList: [],
+        tournamentSelection: [],
+        selectedWinnerBestOfStart: 'Quarter-Final',
+        selectedLoserBestOfStart: 'Quarter-Final',
+        finalsStartOptions : [
+          'Round 1',
+          'Round 2',
+          'Round 3',
+          'Round 4',
+          'Round 5',
+          'Quarter-Final',
+          'Semi-Final',
+          'Final',
+          'Grand Final',
         ],
       }
     },
     mounted() {
-      
+
+      this.overlayList.forEach(item => {
+        KeyManager.importOverlayKeyOrGenerate('http://'+this.host+this.port,<%= user.id %>,item.path,item.name).then((data) => {
+          this.overlayURLs.push({types: item.types, path:item.path, name:item.name, room:data.key_value})
+        })
+      })
+
+      const key = localStorage.getItem('apiKey')
+
+      if(key != null) {
+        this.apiKey = key
+        this.loadTournamentList()
+      }
+
     },
     methods: {
+      getOverlayURL(overlay_path,params) {
 
+        if(overlay_path != null && params != null) {
+          return this.host + this.port+ "/overlay/" + overlay_path + "?" + new URLSearchParams(params)
+        } else {
+          return ''
+        }
+
+      },
+      async regenerateKey(overlay_path,overlay_name) {
+        KeyManager.regenerateOverlayKey('http://'+this.host+this.port,<%= user.id %>,overlay_path,overlay_name).then((data) => {
+          const url = this.overlayURLs.find(x => x.path == data.overlay_path)
+          if(url != null){
+            url.path = data.overlay_path
+            url.name = data.overlay_name
+            url.room = data.key_value
+          }
+        })
+      },
+      saveAPIKey() {
+        localStorage.setItem('apiKey',this.apiKey)
+        this.loadTournamentList()
+      },
+      async loadTournamentList() {
+        try {
+
+          const results = await StartGGAPI.queryTournaments(this.apiKey)
+          this.tournamentList = results
+
+        } catch (e) {
+          console.log(e)
+        }
+      },
+      getOverlayURLs() {
+
+      },
     },
     computed: {
-
+      
     },
     components: {
-      NavBar
+      "p-button": primevue.button,
+      "p-radiobutton": primevue.radiobutton,
+      "p-inputtext": primevue.inputtext,
+      "p-dropdown": primevue.dropdown,
+      NavBar,
+      KeyManager,
+      StartGGAPI
     },
-  }).mount('#app')
+  }).use(primevue.config.default).mount('#app')
 
 </script>
 

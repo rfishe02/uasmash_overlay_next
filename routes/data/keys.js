@@ -13,7 +13,7 @@ function generateRandomString() {
   return result
 }
 
-router.post('/get_key', isLoggedIn, async function(req, res, next) {
+router.post('/overlay/get_key', isLoggedIn, async function(req, res, next) {
 
   try {
     const user_id = req.body.user_id;
@@ -29,7 +29,7 @@ router.post('/get_key', isLoggedIn, async function(req, res, next) {
 
 });
 
-router.post('/create_key', isLoggedIn, async function(req, res, next) {
+router.post('/overlay/create_key', isLoggedIn, async function(req, res, next) {
 
   try {
     const user_id = req.body.user_id;
@@ -37,9 +37,8 @@ router.post('/create_key', isLoggedIn, async function(req, res, next) {
     const overlay_name = req.body.overlay_name;
     const key_value = generateRandomString();
 
-    const result =
-    await db.pool.query("INSERT INTO user_overlays(user_id,overlay_path,overlay_name,key_value) VALUES(?,?,?,?)",[user_id,overlay_path,overlay_name,key_value]);
-    res.send({overlay_path: overlay_path, key_value: key_value});
+    const result = await db.pool.query("INSERT INTO user_overlays(user_id,overlay_path,overlay_name,key_value) VALUES(?,?,?,?)",[user_id,overlay_path,overlay_name,key_value]);
+    res.send([{user_id: user_id, overlay_path: overlay_path, overlay_name: overlay_name, key_value: key_value}]);
 
   } catch (e) {
     res.status(401).send("Unauthorized");
@@ -48,16 +47,16 @@ router.post('/create_key', isLoggedIn, async function(req, res, next) {
 
 });
 
-router.post('/update_key', isLoggedIn, async function(req, res, next) {
+router.post('/overlay/update_key', isLoggedIn, async function(req, res, next) {
 
   try {
     const user_id = req.body.user_id;
     const overlay_path = req.body.overlay_path;
+    const overlay_name = req.body.overlay_name;
     const key_value = generateRandomString();
 
-    const result = await db.pool.query("UPDATE user_overlays SET key_value=? WHERE user_id = ? AND overlay_path = ?",[key_value,user_id,overlay_path]);
-
-    res.send({overlay_path: overlay_path, key_value: key_value});
+    const result = await db.pool.query("UPDATE user_overlays SET key_value=?, overlay_name=? WHERE user_id = ? AND overlay_path = ?",[key_value,overlay_name,user_id,overlay_path]);
+    res.send([{user_id: user_id, overlay_path: overlay_path, overlay_name: overlay_name, key_value: key_value}]);
 
   } catch (e) {
     res.status(401).send("Unauthorized");

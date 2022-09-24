@@ -94,19 +94,6 @@
         <div class="container-fluid">
 
           <div class="row mb-3">
-            <h5>Browser Source URL</h5>
-          </div>
-
-          <div class="row mb-3">
-            <div class="col-12">
-              <div class="p-inputgroup">
-                <p-inputtext type="text" :value="getOverlayURL"></p-inputtext>
-                <p-button icon="pi pi-refresh" class="p-button-text" @click="regenerateKey()" ></p-button>
-              </div>
-            </div>
-          </div>
-
-          <div class="row mb-3">
             <h5>Choose Stages</h5>
           </div>
 
@@ -278,7 +265,6 @@
         stageNameList: [],
         starterSelection: [],
         counterpickSelection: [],
-        strikerOverlay: "",
         strikerRoom: "",
         display: false,
         options: [],
@@ -300,13 +286,12 @@
       this.resetOptionsAndChoices()
       this.loadStageSelectionsFromDB()
 
-      this.importKeyOrGenerate().then((room) => {
-        if(room.length > 0) {
-          this.strikerRoom = room
-          this.strikerOverlay = "overlay/stage_strikes"
-
+      KeyManager.importOverlayKeyOrGenerate('http://'+this.host+this.port,<%= user.id %>,"stage_strikes","Stage Strikes Overlay").then((data) => {
+        if(data.key_value.length > 0) {
+          this.strikerRoom = data.key_value
+          
           this.socket.connect()
-          this.socket.emit("subscribe",room)
+          this.socket.emit("subscribe",data.key_value)
         }
       })
     },
@@ -502,45 +487,19 @@
           console.log(e)
         }
       },
-      async importKeyOrGenerate() {
-        var room = await KeyManager.importRoomKey('http://'+this.host+this.port+'/data/keys/get_key',<%= user.id %>,"stage_strikes")
-        if(room.length == 0) {
-          room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/data/keys/create_key',<%= user.id %>,"stage_strikes","Stage Striker")
-        }
-
-        return room;
-      },
-      async regenerateKey() {
-        var room = room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/data/keys/update_key',<%= user.id %>,"stage_strikes","Stage Striker")
-
-        if(room.length > 0) {
-          await this.socket.emit("unsubscribe",this.strikerRoom)
-
-          this.strikerRoom = room
-          this.socket.emit("subscribe",this.strikerRoom)
-        }
-      },
     },
     computed: {
-      getOverlayURL() {
-        if(this.strikerRoom != null && this.strikerOverlay != null) {
-          return this.host +this.port+ "/" + this.strikerOverlay + "?id=" + this.strikerRoom
-        } else {
-          return ''
-        }
-      }
+      
     },
     components: {
       "p-dialog": primevue.dialog,
       "p-button": primevue.button,
       "p-multiselect": primevue.multiselect,
       "p-inputtext": primevue.inputtext,
-
       "p-datatable": primevue.datatable,
       "p-column": primevue.column,
       "p-dataview": primevue.dataview,
       "p-dataviewlayoutoptions": primevue.dataviewlayoutoptions,
-
       CardHeader,
       CardBody,
       StageCardSmall

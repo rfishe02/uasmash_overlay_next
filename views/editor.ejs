@@ -210,26 +210,6 @@
             </div>
           </div>
 
-          <div class="row mb-2">
-            <div class="col border rounded" style="padding-top: 12px; background-color: white;">
-
-              <div class="row mb-2" style="padding-left: 20px;">
-                <h5>Browser Source URLs</h5>
-              </div>
-    
-              <div class="row" style="padding-left: 20px;">
-                <div class="col-12 mb-3">
-                  <label for="type0nonpoll"><h6>Player Overlay</h6></label>
-                  <div id="type0nonpoll" class="p-inputgroup">
-                    <p-inputtext type="text" :value="getOverlayURL(0)"> </p-inputtext>
-                    <p-button icon="pi pi-refresh" class="p-button-text" @click="regenerateKey()" ></p-button>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
         </div>
 
       </div>
@@ -277,6 +257,20 @@
   addEventListener('pageshow', (event) => {
     if(event.persisted) {
       socket.connect()
+
+      /*
+
+      KeyManager.importKeyOrGenerate('http://'+editorApp.host+editorApp.port,<%= user.id %>,"players","Player Overlay").then((data) => {
+        if(data.key_value.length > 0) {
+          await socket.emit("unsubscribe",editorApp.playerRoom)
+
+          editorApp.playerRoom = data.key_value
+          socket.emit("subscribe",editorApp.playerRoom)
+        }
+      })
+
+      */
+
     }
   })
 
@@ -301,8 +295,7 @@
         bracketType: "",
         eventRound: "",
         bestOf: "Best of 3",
-        overlayRoom: "",
-        playerOverlay: "",
+        playerRoom: "",
         socket: socket,
         scoreOptions: [
           { name: "-", value: "" },
@@ -352,13 +345,12 @@
     },
     mounted() {
 
-      this.importKeyOrGenerate().then((room) => {
-        if(room.length > 0) {
-          this.overlayRoom = room
-          this.playerOverlay = "overlay/players"
-
+      KeyManager.importOverlayKeyOrGenerate('http://'+this.host+this.port,<%= user.id %>,"players","Player Overlay").then((data) => {
+        if(data.key_value.length > 0) {
+          this.playerRoom = data.key_value
+          
           this.socket.connect()
-          this.socket.emit("subscribe",room)
+          this.socket.emit("subscribe",data.key_value)
         }
       })
 
@@ -450,24 +442,6 @@
           this.filteredRounds = _filteredItems
         }
       },
-      async importKeyOrGenerate() {
-        var room = await KeyManager.importRoomKey('http://'+this.host+this.port+'/data/keys/get_key',<%= user.id %>,"overlay")
-        if(room.length == 0) {
-          room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/data/keys/create_key',<%= user.id %>,"overlay","Overlay")
-        }
-
-        return room;
-      },
-      async regenerateKey() {
-        var room = room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/data/keys/update_key',<%= user.id %>,"overlay","Overlay")
-
-        if(room.length > 0) {
-          await this.socket.emit("unsubscribe",this.overlayRoom)
-
-          this.overlayRoom = room
-          this.socket.emit("subscribe",this.overlayRoom)
-        }
-      },
       async submitOverlayForm() {
         try {
           if (this.teamOne != null && this.p1Score != null && this.teamTwo != null && this.p2Score != null) {
@@ -482,7 +456,7 @@
               this.bestOf,
             );
 
-            this.socket.emit("overlay-update", {content: form, to: this.overlayRoom}, (response) => {
+            this.socket.emit("overlay-update", {content: form, to: this.playerRoom}, (response) => {
               console.log(response)
             })
 
@@ -520,20 +494,12 @@
 
           this.socket.emit("score-update", {
             content: form,
-            to: this.overlayRoom,
+            to: this.playerRoom,
           })
 
         } catch(e) {
           console.log(e)
         }
-
-      },
-      getOverlayURL(type) {
-
-        return this.host +this.port+ "/" + this.playerOverlay + "?" + new URLSearchParams({
-          "type": type,
-          "id": this.overlayRoom,
-        })
 
       },
     },
