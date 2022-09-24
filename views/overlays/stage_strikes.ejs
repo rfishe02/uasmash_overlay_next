@@ -160,7 +160,7 @@
       async getStageImageURLs() {
         try {
 
-          const response = await fetch('http://' + this.host + this.port + '/stages', {
+          const response = await fetch('http://' + this.host + this.port + '/data/stages', {
             method: "get",
             headers: {
               "Content-Type": "application/json; charset=UTF-8",

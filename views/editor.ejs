@@ -219,18 +219,12 @@
     
               <div class="row" style="padding-left: 20px;">
                 <div class="col-12 mb-3">
-                  <label for="module0nonpoll"><h6>Player Overlay</h6></label>
-                  <div id="module0nonpoll" class="p-inputgroup">
-                    <p-inputtext type="text" :value="getModuleURL(0)"> </p-inputtext>
+                  <label for="type0nonpoll"><h6>Player Overlay</h6></label>
+                  <div id="type0nonpoll" class="p-inputgroup">
+                    <p-inputtext type="text" :value="getOverlayURL(0)"> </p-inputtext>
                     <p-button icon="pi pi-refresh" class="p-button-text" @click="regenerateKey()" ></p-button>
                   </div>
                 </div>
-                <!-- <div class="col-12">
-                  <div class="p-inputgroup">
-                    <p-inputtext type="text" :value="getModuleURL(1)"> </p-inputtext>
-                    <p-button icon="pi pi-refresh" class="p-button-text" @click="regenerateKey()" ></p-button>
-                  </div>
-                </div>-->
               </div>
 
             </div>
@@ -308,7 +302,7 @@
         eventRound: "",
         bestOf: "Best of 3",
         overlayRoom: "",
-        overlayModule: "",
+        playerOverlay: "",
         socket: socket,
         scoreOptions: [
           { name: "-", value: "" },
@@ -361,7 +355,7 @@
       this.importKeyOrGenerate().then((room) => {
         if(room.length > 0) {
           this.overlayRoom = room
-          this.overlayModule = "module/overlay"
+          this.playerOverlay = "overlay/players"
 
           this.socket.connect()
           this.socket.emit("subscribe",room)
@@ -457,15 +451,15 @@
         }
       },
       async importKeyOrGenerate() {
-        var room = await KeyManager.importRoomKey('http://'+this.host+this.port+'/keys/get_key',<%= user.id %>,"overlay")
+        var room = await KeyManager.importRoomKey('http://'+this.host+this.port+'/data/keys/get_key',<%= user.id %>,"overlay")
         if(room.length == 0) {
-          room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/keys/create_key',<%= user.id %>,"overlay","Overlay")
+          room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/data/keys/create_key',<%= user.id %>,"overlay","Overlay")
         }
 
         return room;
       },
       async regenerateKey() {
-        var room = room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/keys/update_key',<%= user.id %>,"overlay","Overlay")
+        var room = room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/data/keys/update_key',<%= user.id %>,"overlay","Overlay")
 
         if(room.length > 0) {
           await this.socket.emit("unsubscribe",this.overlayRoom)
@@ -534,9 +528,9 @@
         }
 
       },
-      getModuleURL(type) {
+      getOverlayURL(type) {
 
-        return this.host +this.port+ "/" + this.overlayModule + "?" + new URLSearchParams({
+        return this.host +this.port+ "/" + this.playerOverlay + "?" + new URLSearchParams({
           "type": type,
           "id": this.overlayRoom,
         })

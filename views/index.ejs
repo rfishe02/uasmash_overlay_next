@@ -87,30 +87,30 @@
               :options="tournamentList"
               option-label="name"
               placeholder="Select a Tournament"
-              @change="getOverlayModuleURLs()"
+              @change="getOverlayURLs()"
             ></p-dropdown>
           </div>
 
           <div class="row">
             <div class="col p-0">
-              <template v-for="(item,index) in overlayModuleURLs">
-                <label for="'modulepoll'+index">Player Overlay</label>
-                <div id="'modulepoll'+index" class="p-inputgroup mb-2">
+              <template v-for="(item,index) in overlayURLs">
+                <label for="'playeroverlay'+index">Player Overlay</label>
+                <div id="'playeroverlay'+index" class="p-inputgroup mb-2">
                   <p-inputtext type="text" :value="item"> </p-inputtext>
                 </div>
               </template>
 
-              <template v-if="waitingModuleURL.length > 0">
-                <label for="waitingmodule">Waiting Screen</label>
-                <div id="waitingmodule" class="p-inputgroup mb-2">
-                  <p-inputtext type="text" :value="waitingModuleURL"> </p-inputtext>
+              <template v-if="waitingOverlayURL.length > 0">
+                <label for="waitingoverlay">Waiting Screen</label>
+                <div id="waitingoverlay" class="p-inputgroup mb-2">
+                  <p-inputtext type="text" :value="waitingOverlayURL"> </p-inputtext>
                 </div>
               </template>
 
-              <template v-if="waitingModuleURL.length > 0">
-                <label for="upcomingModule">Upcoming Matches</label>
-                <div id="upcomingModule" class="p-inputgroup mb-2">
-                  <p-inputtext type="text" :value="upcomingModuleURL"> </p-inputtext>
+              <template v-if="waitingOverlayURL.length > 0">
+                <label for="upcomingoverlay">Upcoming Matches</label>
+                <div id="upcomingoverlay" class="p-inputgroup mb-2">
+                  <p-inputtext type="text" :value="upcomingOverlayURL"> </p-inputtext>
                 </div>
               </template>
             </div>
@@ -173,9 +173,9 @@
         password: "",
         tournamentList: [],
         tournamentSelection: [],
-        overlayModule: "module/overlay",
-        waitingModule: "module/waiting",
-        upcomingModule: "module/upcoming",
+        playerOverlay: "overlay/players",
+        waitingOverlay: "overlay/waiting",
+        upcomingOverlay: "overlay/upcoming",
         selectedWinnerBestOfStart: 'Quarter-Final',
         selectedLoserBestOfStart: 'Quarter-Final',
         finalsStartOptions : [
@@ -190,9 +190,9 @@
           'Grand Final',
         ],
         overlayTypes: [0],
-        overlayModuleURLs: [],
-        waitingModuleURL: '',
-        upcomingModuleURL: '',
+        overlayURLs: [],
+        waitingOverlayURL: '',
+        upcomingOverlayURL: '',
         apiKey: '',
       }
     },
@@ -274,12 +274,12 @@
           console.log(e)
         }
       },
-      getOverlayModuleURLs() {
+      getOverlayURLs() {
         const slug = this.tournamentSelection.slug == null ? '' : this.tournamentSelection.slug
 
-        this.overlayModuleURLs = []
+        this.overlayURLs = []
         for(var i = 0; i < this.overlayTypes.length; i++) {
-          const url = this.host + this.port + "/" + this.overlayModule + "?" + new URLSearchParams({
+          const url = this.host + this.port + "/" + this.playerOverlay + "?" + new URLSearchParams({
             "type": this.overlayTypes[i],
             "poll": true,
             "winnerBestOfStart": this.selectedWinnerBestOfStart,
@@ -288,15 +288,15 @@
             "startgg_key": this.apiKey,
           })
 
-          this.overlayModuleURLs.push(url)
+          this.overlayURLs.push(url)
         }
 
-        this.waitingModuleURL = this.host + this.port + "/" + this.waitingModule + "?" + new URLSearchParams({
+        this.waitingOverlayURL = this.host + this.port + "/" + this.waitingOverlay + "?" + new URLSearchParams({
           "slug": slug,
           "startgg_key": this.apiKey,
         })
 
-        this.upcomingModuleURL = this.host + this.port + "/" + this.upcomingModule + "?" + new URLSearchParams({
+        this.upcomingOverlayURL = this.host + this.port + "/" + this.upcomingOverlay + "?" + new URLSearchParams({
           "type": 0,
           "winnerBestOfStart": this.selectedWinnerBestOfStart,
           "loserBestOfStart": this.selectedLoserBestOfStart,

@@ -5,7 +5,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/players', function(req, res, next) {
-  res.render('players', { });
+  res.render('./overlays/players', { });
 });
 
 module.exports = router;
