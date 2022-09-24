@@ -1,7 +1,7 @@
 var express = require('express')
 var router = express.Router()
 
-const db = require('../bin/db')
+const db = require('../../bin/db')
 
 router.get('/', async function(req, res, next) {
   try {

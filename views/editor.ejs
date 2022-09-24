@@ -459,13 +459,13 @@
       async importKeyOrGenerate() {
         var room = await KeyManager.importRoomKey('http://'+this.host+this.port+'/keys/get_key',<%= user.id %>,"overlay")
         if(room.length == 0) {
-          room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/keys/create_key',<%= user.id %>,"overlay")
+          room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/keys/create_key',<%= user.id %>,"overlay","Overlay")
         }
 
         return room;
       },
       async regenerateKey() {
-        var room = room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/keys/update_key',<%= user.id %>,"overlay")
+        var room = room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/keys/update_key',<%= user.id %>,"overlay","Overlay")
 
         if(room.length > 0) {
           await this.socket.emit("unsubscribe",this.overlayRoom)

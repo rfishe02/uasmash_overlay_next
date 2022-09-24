@@ -1,5 +1,5 @@
 
-const db = require('../bin/db')
+const db = require('../../bin/db')
 
 var express = require('express');
 var router = express.Router();

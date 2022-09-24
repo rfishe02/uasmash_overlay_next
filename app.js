@@ -11,21 +11,19 @@ var session = require('express-session');
 var SQLiteStore = require('connect-sqlite3')(session);
 
 var indexRouter = require('./routes/index');
-var dashboardRouter = require('./routes/dashboard');
-
 var usersRouter = require('./routes/users');
-var stagesRouter = require('./routes/stages');
-var keysRouter = require('./routes/keys');
-
+var dashboardRouter = require('./routes/dashboard');
 var editorRouter = require('./routes/editor');
-var overlayRouter = require('./routes/overlay');
-var waitingRouter = require('./routes/waiting');
-var upcomingRouter = require('./routes/upcoming');
-
 var strikerRouter = require('./routes/striker');
-var stageStrikesRouter = require('./routes/stage_strikes');
 
-var stageListRouter = require('./routes/stage_lists');
+var stagesRouter = require('./routes/data/stages');
+var stageListRouter = require('./routes/data/stage_lists');
+var keysRouter = require('./routes/data/keys');
+
+var playersRouter = require('./routes/overlays/players');
+var stageStrikesRouter = require('./routes/overlays/stage_strikes');
+var waitingRouter = require('./routes/overlays/waiting');
+var upcomingRouter = require('./routes/overlays/upcoming');
 
 var app = express();
 
@@ -76,20 +74,19 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/', indexRouter);
-
+app.use('/users', usersRouter);
 app.use('/dashboard', dashboardRouter);
 app.use('/editor', editorRouter);
 app.use('/striker', strikerRouter);
 
-app.use('/module', overlayRouter);
-app.use('/module',stageStrikesRouter)
-app.use('/module', waitingRouter);
-app.use('/module', upcomingRouter);
+app.use('/overlay', playersRouter);
+app.use('/overlay', stageStrikesRouter)
+app.use('/overlay', waitingRouter);
+app.use('/overlay', upcomingRouter);
 
-app.use('/stages', stagesRouter);
-app.use('/stage_lists',stageListRouter)
-app.use('/users', usersRouter);
-app.use('/keys', keysRouter);
+app.use('/data/stages', stagesRouter);
+app.use('/data/stage_lists', stageListRouter)
+app.use('/data/keys', keysRouter);
 
 app.set('view engine', 'ejs');
 

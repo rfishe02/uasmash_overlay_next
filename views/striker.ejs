@@ -503,15 +503,15 @@
         }
       },
       async importKeyOrGenerate() {
-        var room = await KeyManager.importRoomKey('http://'+this.host+this.port+'/keys/get_key',<%= user.id %>,"stage strikes")
+        var room = await KeyManager.importRoomKey('http://'+this.host+this.port+'/keys/get_key',<%= user.id %>,"stage_strikes")
         if(room.length == 0) {
-          room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/keys/create_key',<%= user.id %>,"stage strikes")
+          room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/keys/create_key',<%= user.id %>,"stage_strikes","Stage Striker")
         }
 
         return room;
       },
       async regenerateKey() {
-        var room = room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/keys/update_key',<%= user.id %>,"stage strikes")
+        var room = room = await KeyManager.generateRoomKey('http://'+this.host+this.port+'/keys/update_key',<%= user.id %>,"stage_strikes","Stage Striker")
 
         if(room.length > 0) {
           await this.socket.emit("unsubscribe",this.strikerRoom)

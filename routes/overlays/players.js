@@ -4,8 +4,8 @@ var express = require('express');
 var router = express.Router();
 
 /* GET home page. */
-router.get('/overlay', function(req, res, next) {
-  res.render('overlay', { });
+router.get('/players', function(req, res, next) {
+  res.render('players', { });
 });
 
 module.exports = router;

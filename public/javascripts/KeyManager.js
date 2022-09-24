@@ -1,10 +1,10 @@
 
 export default {
 
-  async importRoomKey(path,user_id,module_name) {
+  async importRoomKey(path,user_id,overlay_path) {
     var key = ""
     try {
-      const data = { "user_id": user_id, "module_name": module_name }
+      const data = { "user_id": user_id, "overlay_path": overlay_path }
 
       const response = await fetch(path, {
         method: "post",
@@ -27,10 +27,10 @@ export default {
     return key
   },
 
-  async generateRoomKey(path,user_id,module_name) {
+  async generateRoomKey(path,user_id,overlay_path,overlay_name) {
     var key = ""
     try {
-      const data = { "user_id": user_id, "module_name": module_name }
+      const data = { "user_id": user_id, "overlay_path": overlay_path, "overlay_name": overlay_name }
 
       const response = await fetch(path, {
         method: "post",
