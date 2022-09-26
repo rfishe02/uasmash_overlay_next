@@ -292,6 +292,7 @@
         }
 
         this.waitingOverlayURL = this.host + this.port + "/" + this.waitingOverlay + "?" + new URLSearchParams({
+          "type": 0,
           "slug": slug,
           "startgg_key": this.apiKey,
         })

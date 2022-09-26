@@ -166,7 +166,6 @@
       if(this.room != null) {
 
         OverlayDataManager.importOverlaySettings('http://'+this.host+this.port,this.room).then((data) => {
-          console.log(data.settings)
 
           if(data.settings != null) {
 
@@ -180,8 +179,8 @@
               if(this.poll && this.apiKey != null && this.slug != null){
 
                 setInterval(function(){
-                  playerOverlayApp.pollStartGGAPI(playerOverlayApp.apiKey,playerOverlayApp.slug)
-                }, 5000);
+                  playerOverlayApp.pollStartGGAPI()
+                }, 5000)
 
               } else {
                 this.connectSocketToRoom(this.room)
@@ -209,7 +208,7 @@
           try {
 
             setInterval(function(){
-              playerOverlayApp.pollStartGGAPI(playerOverlayApp.apiKey,playerOverlayApp.slug)
+              playerOverlayApp.pollStartGGAPI()
             }, 5000);
 
           } catch (e) {
@@ -238,9 +237,9 @@
           this.socket.emit("subscribe",room)
         }
       },
-      async pollStartGGAPI(key,slug) {
+      async pollStartGGAPI() {
         try {
-          const data = await StartGGAPI.queryStreamQueue(key,slug)
+          const data = await StartGGAPI.queryStreamQueue(this.apiKey,this.slug)
 
           if(data.length == 0) {
 
@@ -332,7 +331,6 @@
     },
     components: {
       GameplayOverlay,
-      OverlayDataManager,
     }
   }).mount('#app')
 

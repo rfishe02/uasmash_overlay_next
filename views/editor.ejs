@@ -345,6 +345,8 @@
     },
     mounted() {
 
+      // TODO: Consider making this import only.
+
       OverlayDataManager.importOverlayDataOrGenerate('http://'+this.host+this.port,<%= user.id %>,"players","Player Overlay").then((data) => {
         if(data.key_value.length > 0) {
           this.playerRoom = data.key_value

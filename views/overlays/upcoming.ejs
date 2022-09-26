@@ -112,6 +112,7 @@
 <script type="module">
   import StartGGAPI from '/javascripts/StartGGAPI.js'
   import QueueManager from '/javascripts/QueueManager.js'
+  import OverlayDataManager from '/javascripts/OverlayDataManager.js'
   import UpcomingMatchCard from '/javascripts/UpcomingMatchCard.js'
   const { createApp } = Vue
 
@@ -123,6 +124,7 @@
         apiKey: '',
         setList: [],
         preReqList: {},
+        type: 0,
         winnerBestOfStart: 5,
         loserBestOfStart: 5,
         finalsOrder : {
@@ -136,43 +138,84 @@
           'Final':7,
           'Grand Final': 8
         },
-        type: 0,
+        slug: null,
+        room: null,
       }
     },
     mounted() {
       
       const urlParams = new URLSearchParams(window.location.search)
-      
-      const slug = urlParams.get('slug')
-      const key = urlParams.get('startgg_key')
       const type = urlParams.get('type')
-      const winnerBestOfStart = urlParams.get('winnerBestOfStart') == null ? 5 : this.finalsOrder[urlParams.get('winnerBestOfStart')]
-      const loserBestOfStart = urlParams.get('loserBestOfStart') == null ? 5 : this.finalsOrder[urlParams.get('loserBestOfStart')]
+      const key = urlParams.get('key')
+      const startgg_key = urlParams.get('startgg_key')
 
-      if(type != null){
+      if(type != null) {
         this.type = type
       }
+      if(key != null) {
+        this.room = key
+      }
+      if(startgg_key != null) {
+        this.apiKey = startgg_key
+      }
 
-      if(winnerBestOfStart != null) {
-        this.winnerBestOfStart = winnerBestOfStart
-      }
-      if(loserBestOfStart != null) {
-        this.loserBestOfStart = loserBestOfStart
-      }
+      if(this.room != null) {
 
-      if(key != null){
-        this.apiKey = key      
-      }
-      if(slug != null){
-        this.querySets(key,slug)
-        setInterval(function() { upcomingApp.querySets(key,slug) }, 10000)
+        OverlayDataManager.importOverlaySettings('http://'+this.host+this.port,this.room).then((data) => {
+
+          if(data.settings != null) {
+
+            this.winnerBestOfStart = data.settings.winnerBestOfStart
+            this.loserBestOfStart = data.settings.loserBestOfStart
+            this.slug = data.settings.slug
+
+            try {
+
+              if(this.apiKey != null && this.slug != null){
+
+                this.querySets()
+                setInterval(function() { 
+                  upcomingApp.querySets() 
+                }, 10000)
+
+              } else {
+                alert("Required URL parameters missing.")
+              } 
+
+            } catch(e) {
+              alert(e)
+            }
+
+          } else {
+            alert("Unable to load configuration settings or required URL parameters missing.")
+          }
+
+        })
+
+      } else {
+
+        this.winnerBestOfStart = urlParams.get('winnerBestOfStart') == null ? 5 : this.finalsOrder[urlParams.get('winnerBestOfStart')]
+        this.loserBestOfStart = urlParams.get('loserBestOfStart') == null ? 5 : this.finalsOrder[urlParams.get('loserBestOfStart')]
+        this.slug = urlParams.get('slug')
+
+        if(this.apiKey != null && this.slug != null){
+
+          this.querySets()
+          setInterval(function() { 
+            upcomingApp.querySets() 
+          }, 10000)
+          
+        } else {
+          alert("Required URL parameters missing.")
+        }
+
       }
 
     },
     methods : {
-      async querySets(key,slug) {
+      async querySets() {
 
-        const sets = await StartGGAPI.queryUpcomingMatches(key,slug)
+        const sets = await StartGGAPI.queryUpcomingMatches(this.apiKey,this.slug)
 
         sets.forEach(item => {
           this.preReqList[item.id] = item

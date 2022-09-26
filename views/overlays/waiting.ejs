@@ -251,24 +251,79 @@
         currentTime: new Date(),
         showTwitchEmbed: false,
         apiKey: '',
+        type: 0,
+        slug: null,
+        room: null,
       }
     },
     mounted() {
+
       const urlParams = new URLSearchParams(window.location.search)
-      const slug = urlParams.get('slug')
-      const key = urlParams.get('startgg_key')
+      const type = urlParams.get('type')
+      const key = urlParams.get('key')
+      const startgg_key = urlParams.get('startgg_key')
 
-      if(slug != null && key != null) {
-        this.slug = slug
-        this.apiKey = key
+      if(type != null) {
+        this.type = type
+      }
+      if(key != null) {
+        this.room = key
+      }
+      if(startgg_key != null) {
+        this.apiKey = startgg_key
+      }
 
-        this.fetchTournamentDataAndSave().then(() => {
-          waitingApp.reloadStandingsData()
+      if(this.room != null){
+
+        OverlayDataManager.importOverlaySettings('http://'+this.host+this.port,this.room).then((data) => {
+
+          if(data.settings != null) {
+
+            this.slug = data.settings.slug
+
+            try {
+
+              if(this.apiKey != null && this.slug != null){
+
+                this.fetchTournamentDataAndSave().then(() => {
+                  waitingApp.reloadStandingsData()
+                })
+
+                setInterval(function() { waitingApp.fetchTournamentDataAndSave() }, 10000)
+
+              } else {
+                alert("Required URL parameters missing.")
+              } 
+
+            } catch(e) {
+              alert(e)
+            }
+
+          } else {
+            alert("Unable to load configuration settings or required URL parameters missing.")
+          }
+
         })
 
-        setInterval(function() { waitingApp.fetchTournamentDataAndSave() }, 10000)
+      } else {
+
+        this.slug = urlParams.get('slug')
+
+        if(this.slug != null && this.apiKey != null) {
+
+          this.fetchTournamentDataAndSave().then(() => {
+            waitingApp.reloadStandingsData()
+          })
+
+          setInterval(function() { waitingApp.fetchTournamentDataAndSave() }, 10000)
+
+        } else {
+          alert("Required URL parameters missing.")
+        }
+
 
       }
+
 
       setTimeout(function() {
         waitingApp.showTwitchEmbed = true
