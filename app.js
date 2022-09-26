@@ -18,7 +18,7 @@ var strikerRouter = require('./routes/striker');
 
 var stagesRouter = require('./routes/data/stages');
 var stageListRouter = require('./routes/data/stage_lists');
-var keysRouter = require('./routes/data/keys');
+var overlayRouter = require('./routes/data/overlays');
 
 var playersRouter = require('./routes/overlays/players');
 var stageStrikesRouter = require('./routes/overlays/stage_strikes');
@@ -86,7 +86,7 @@ app.use('/overlay', upcomingRouter);
 
 app.use('/data/stages', stagesRouter);
 app.use('/data/stage_lists', stageListRouter)
-app.use('/data/keys', keysRouter);
+app.use('/data/overlay', overlayRouter);
 
 app.set('view engine', 'ejs');
 

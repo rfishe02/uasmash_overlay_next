@@ -219,7 +219,7 @@
   import StageCardSmall from '/javascripts/StageCardSmall.js'
 
   import Stage from '/javascripts/Stage.js'
-  import KeyManager from '/javascripts/KeyManager.js'
+  import OverlayDataManager from '/javascripts/OverlayDataManager.js'
 
   const { createApp } = Vue
 
@@ -286,7 +286,7 @@
       this.resetOptionsAndChoices()
       this.loadStageSelectionsFromDB()
 
-      KeyManager.importOverlayKeyOrGenerate('http://'+this.host+this.port,<%= user.id %>,"stage_strikes","Stage Strikes Overlay").then((data) => {
+      OverlayDataManager.importOverlayDataOrGenerate('http://'+this.host+this.port,<%= user.id %>,"stage_strikes","Stage Strikes Overlay").then((data) => {
         if(data.key_value.length > 0) {
           this.strikerRoom = data.key_value
           

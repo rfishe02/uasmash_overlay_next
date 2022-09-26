@@ -142,7 +142,7 @@
       this.getStageImageURLs();
 
       const urlParams = new URLSearchParams(window.location.search);
-      const room = urlParams.get('id')
+      const room = urlParams.get('key')
 
       if(room != null) {
         this.socket.connect()

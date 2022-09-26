@@ -223,7 +223,7 @@
 
 <script type="module">
   import NavBar from '/javascripts/NavBar.js'
-  import KeyManager from '/javascripts/KeyManager.js'
+  import OverlayDataManager from '/javascripts/OverlayDataManager.js'
   import Editor from '/javascripts/Editor.mjs'
 
   const { createApp} = Vue
@@ -260,7 +260,7 @@
 
       /*
 
-      KeyManager.importKeyOrGenerate('http://'+editorApp.host+editorApp.port,<%= user.id %>,"players","Player Overlay").then((data) => {
+      OverlayDataManager.importKeyOrGenerate('http://'+editorApp.host+editorApp.port,<%= user.id %>,"players","Player Overlay").then((data) => {
         if(data.key_value.length > 0) {
           await socket.emit("unsubscribe",editorApp.playerRoom)
 
@@ -345,7 +345,7 @@
     },
     mounted() {
 
-      KeyManager.importOverlayKeyOrGenerate('http://'+this.host+this.port,<%= user.id %>,"players","Player Overlay").then((data) => {
+      OverlayDataManager.importOverlayDataOrGenerate('http://'+this.host+this.port,<%= user.id %>,"players","Player Overlay").then((data) => {
         if(data.key_value.length > 0) {
           this.playerRoom = data.key_value
           

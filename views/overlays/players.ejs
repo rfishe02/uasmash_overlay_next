@@ -70,6 +70,7 @@
 <script type="module">
   import GameplayOverlay from '/javascripts/GameplayOverlay.js'
   import StartGGAPI from '/javascripts/StartGGAPI.js'
+  import OverlayDataManager from '/javascripts/OverlayDataManager.js'
   const { createApp} = Vue
 
   const socket = io("http://" + window.location.hostname + ":3000", {
@@ -124,6 +125,7 @@
         bestOf:"",
         socket: socket,
         type: 0,
+        poll: false,
         winnerBestOfStart: 5,
         loserBestOfStart: 5,
         finalsOrder : {
@@ -137,55 +139,105 @@
           'Final':7,
           'Grand Final': 8
         },
-        apiKey: ''
+        apiKey: null,
+        slug: null,
+        room: null,
       }
     },
     mounted() {
-      const urlParams = new URLSearchParams(window.location.search)
-      const room = urlParams.get('id')
-      const type = urlParams.get('type')
 
-      if(room != null) {
-        this.socket.connect()
-        this.socket.emit("subscribe",room)
-      }
+      this.loadDataFromSessionStorage()
+
+      const urlParams = new URLSearchParams(window.location.search)
+      const type = urlParams.get('type')
+      const key = urlParams.get('key')
+      const startgg_key = urlParams.get('startgg_key')
+
       if(type != null) {
         this.type = type
       }
-
-      const teamOne = sessionStorage.getItem("teamOne") == null ? {} : JSON.parse(sessionStorage.getItem("teamOne"))
-      const teamTwo = sessionStorage.getItem("teamTwo") == null ? {} : JSON.parse(sessionStorage.getItem("teamTwo"))
-
-      this.setOverlayValues(teamOne,teamTwo,sessionStorage.getItem("bracketType"),sessionStorage.getItem("eventRound"),sessionStorage.getItem("bestOf"))
-
-      const slug = urlParams.get('slug')
-      const poll = urlParams.get('poll')
-
-      const winnerBestOfStart = urlParams.get('winnerBestOfStart') == null ? 5 : this.finalsOrder[urlParams.get('winnerBestOfStart')]
-      const loserBestOfStart = urlParams.get('loserBestOfStart') == null ? 5 : this.finalsOrder[urlParams.get('loserBestOfStart')]
-
-      if(winnerBestOfStart != null) {
-        this.winnerBestOfStart = winnerBestOfStart
+      if(key != null) {
+        this.room = key
       }
-      if(loserBestOfStart != null) {
-        this.loserBestOfStart = loserBestOfStart
+      if(startgg_key != null) {
+        this.apiKey = startgg_key
       }
 
-      const key = urlParams.get('startgg_key')
+      if(this.room != null) {
 
-      if(slug != null && poll != null && key != null) {
-        this.apiKey = key
+        OverlayDataManager.importOverlaySettings('http://'+this.host+this.port,this.room).then((data) => {
+          console.log(data.settings)
 
-        if(poll == 'true') {
-          setInterval(function(){
+          if(data.settings != null) {
 
-            playerOverlayApp.pollStartGGAPI(key,slug)
-          }, 5000);
+            this.poll = data.settings.poll
+            this.winnerBestOfStart = data.settings.winnerBestOfStart
+            this.loserBestOfStart = data.settings.loserBestOfStart
+            this.slug = data.settings.slug
+
+            try {
+
+              if(this.poll && this.apiKey != null && this.slug != null){
+
+                setInterval(function(){
+                  playerOverlayApp.pollStartGGAPI(playerOverlayApp.apiKey,playerOverlayApp.slug)
+                }, 5000);
+
+              } else {
+                this.connectSocketToRoom(this.room)
+              } 
+
+            } catch(e) {
+              alert(e)
+            }
+
+          } else {
+            alert("Unable to load configuration settings or required URL parameters missing.")
+          }
+
+        })
+
+      } else {
+        
+        this.poll = urlParams.get('poll') == null ? false : urlParams.get('poll');
+        this.winnerBestOfStart = urlParams.get('winnerBestOfStart') == null ? 5 : this.finalsOrder[urlParams.get('winnerBestOfStart')]
+        this.loserBestOfStart = urlParams.get('loserBestOfStart') == null ? 5 : this.finalsOrder[urlParams.get('loserBestOfStart')]
+        this.slug = urlParams.get('slug')
+
+        if(this.poll && this.apiKey != null && this.slug != null){
+
+          try {
+
+            setInterval(function(){
+              playerOverlayApp.pollStartGGAPI(playerOverlayApp.apiKey,playerOverlayApp.slug)
+            }, 5000);
+
+          } catch (e) {
+            alert(e)
+          }
+
+        } else {
+          alert("Required URL parameters missing.")
         }
+
       }
 
     },
     methods : {
+      loadDataFromSessionStorage() {
+
+        const teamOne = sessionStorage.getItem("teamOne") == null ? {} : JSON.parse(sessionStorage.getItem("teamOne"))
+        const teamTwo = sessionStorage.getItem("teamTwo") == null ? {} : JSON.parse(sessionStorage.getItem("teamTwo"))
+
+        this.setOverlayValues(teamOne,teamTwo,sessionStorage.getItem("bracketType"),sessionStorage.getItem("eventRound"),sessionStorage.getItem("bestOf"))
+
+      },
+      connectSocketToRoom(room) {
+        if(room != null) {
+          this.socket.connect()
+          this.socket.emit("subscribe",room)
+        }
+      },
       async pollStartGGAPI(key,slug) {
         try {
           const data = await StartGGAPI.queryStreamQueue(key,slug)
@@ -280,6 +332,7 @@
     },
     components: {
       GameplayOverlay,
+      OverlayDataManager,
     }
   }).mount('#app')
 
