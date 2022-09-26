@@ -154,7 +154,7 @@
   const dashboardApp = createApp({
     data() {
       return {
-        host: window.location.hostname,
+        host: 'http://' + window.location.hostname,
         port: ":3000",
         navLogoUrl: '/fsmsmashlogo.png',
         navLinks:[
@@ -192,7 +192,7 @@
     mounted() {
 
       this.overlayList.forEach(item => {
-        OverlayDataManager.importOverlayDataOrGenerate('http://'+this.host+this.port,<%= user.id %>,item.path,item.name).then((data) => {
+        OverlayDataManager.importOverlayDataOrGenerate(this.host+this.port,<%= user.id %>,item.path,item.name).then((data) => {
           console.log(data)
           const urlItem = {types: item.types, path:item.path, name:item.name, room:data.key_value}
           this.overlayURLs.push(urlItem)
@@ -218,7 +218,7 @@
 
       },
       async regenerateKey(overlay_path,overlay_name) {
-        OverlayDataManager.regenerateOverlayKey('http://'+this.host+this.port,<%= user.id %>,overlay_path,overlay_name).then((data) => {
+        OverlayDataManager.regenerateOverlayKey(this.host+this.port,<%= user.id %>,overlay_path,overlay_name).then((data) => {
           const url = this.overlayURLs.find(x => x.path == data.overlay_path)
           if(url != null){
             url.path = data.overlay_path
@@ -249,8 +249,9 @@
           loserBestOfStart: this.selectedLoserBestOfStart,
           slug: this.tournamentSelection.slug,
         }
+        settings.slug = "tournament/api-test-tournament-3"
 
-        OverlayDataManager.saveOverlaySettings('http://'+this.host+this.port,<%= user.id %>,settings)
+        OverlayDataManager.saveOverlaySettings(this.host+this.port,<%= user.id %>,settings)
 
       },
     },

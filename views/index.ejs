@@ -167,7 +167,7 @@
   createApp({
     data() {
       return {
-        host: window.location.hostname,
+        host: 'http://' + window.location.hostname,
         port: ":3000",
         username: "",
         password: "",
@@ -212,7 +212,7 @@
           if(this.username.length > 0  && this.password.length > 0) {
 
             const data = {"username": this.username,"password": this.password};
-            const path = 'http://' + this.host + this.port
+            const path = this.host + this.port
 
             try {
               const response = await fetch(path + '/users/login', {
@@ -240,7 +240,7 @@
           if(this.username.length > 0  && this.password.length > 0) {
 
             const data = {"username": this.username,"password": this.password};
-            const path = 'http://' + this.host + this.port
+            const path = this.host + this.port
 
             try {
               const response = await fetch(path + '/users/signup', {
@@ -252,7 +252,7 @@
               });
 
               if(response.status == 200) {
-                window.location.href = 'http://' + this.host + this.port + '/'
+                window.location.href = this.host + this.port + '/'
               }
 
             } catch (e) {

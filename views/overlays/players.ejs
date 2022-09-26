@@ -82,7 +82,7 @@
     try {
 
       playerOverlayApp.setOverlayValues(content["teamOne"],content["teamTwo"],content["bracketType"],content["eventRound"],content["bestOf"])
-      playerOverlayApp.saveOverlayValuesToSession()
+      playerOverlayApp.saveDataToSessionStorage()
 
     } catch(e) {
       console.log(e)
@@ -112,7 +112,7 @@
   const playerOverlayApp = createApp({
     data() {
       return {
-        host: window.location.hostname,
+        host: 'http://' + window.location.hostname,
         port: ":3000",
         p1: {},
         p2: {},
@@ -165,7 +165,7 @@
 
       if(this.room != null) {
 
-        OverlayDataManager.importOverlaySettings('http://'+this.host+this.port,this.room).then((data) => {
+        OverlayDataManager.importOverlaySettings(this.host+this.port,this.room).then((data) => {
 
           if(data.settings != null) {
 
@@ -178,6 +178,7 @@
 
               if(this.poll && this.apiKey != null && this.slug != null){
 
+                playerOverlayApp.pollStartGGAPI()
                 setInterval(function(){
                   playerOverlayApp.pollStartGGAPI()
                 }, 5000)
@@ -207,6 +208,7 @@
 
           try {
 
+            playerOverlayApp.pollStartGGAPI()
             setInterval(function(){
               playerOverlayApp.pollStartGGAPI()
             }, 5000);
@@ -223,14 +225,6 @@
 
     },
     methods : {
-      loadDataFromSessionStorage() {
-
-        const teamOne = sessionStorage.getItem("teamOne") == null ? {} : JSON.parse(sessionStorage.getItem("teamOne"))
-        const teamTwo = sessionStorage.getItem("teamTwo") == null ? {} : JSON.parse(sessionStorage.getItem("teamTwo"))
-
-        this.setOverlayValues(teamOne,teamTwo,sessionStorage.getItem("bracketType"),sessionStorage.getItem("eventRound"),sessionStorage.getItem("bestOf"))
-
-      },
       connectSocketToRoom(room) {
         if(room != null) {
           this.socket.connect()
@@ -244,7 +238,7 @@
           if(data.length == 0) {
 
             this.setOverlayValues({},{},'','','')
-            this.saveOverlayValuesToSession()
+            this.saveDataToSessionStorage()
 
           } else {
 
@@ -278,10 +272,10 @@
               }
 
               this.setOverlayValues(nextSet.teamOne,nextSet.teamTwo,nextSet.phaseName,eventRound,bestOfValue)
-              this.saveOverlayValuesToSession()
+              this.saveDataToSessionStorage()
             } else {
               this.setOverlayValues({},{},'','','')
-              this.saveOverlayValuesToSession()
+              this.saveDataToSessionStorage()
             }
 
           }
@@ -320,14 +314,22 @@
         this.eventRound = eventRound == null ? "" : eventRound.toUpperCase()
         this.bestOf = bestOf == null ? "" : bestOf.toUpperCase()
       },
-      saveOverlayValuesToSession() {
+      saveDataToSessionStorage() {
         sessionStorage.setItem("teamOne",JSON.stringify(this.p1))
         sessionStorage.setItem("teamTwo",JSON.stringify(this.p2))
 
         sessionStorage.setItem("bracketType",this.bracketType)
         sessionStorage.setItem("eventRound",this.eventRound)
         sessionStorage.setItem("bestOf",this.bestOf)
-      }
+      },
+      loadDataFromSessionStorage() {
+
+        const teamOne = sessionStorage.getItem("teamOne") == null ? {} : JSON.parse(sessionStorage.getItem("teamOne"))
+        const teamTwo = sessionStorage.getItem("teamTwo") == null ? {} : JSON.parse(sessionStorage.getItem("teamTwo"))
+
+        this.setOverlayValues(teamOne,teamTwo,sessionStorage.getItem("bracketType"),sessionStorage.getItem("eventRound"),sessionStorage.getItem("bestOf"))
+
+      },
     },
     components: {
       GameplayOverlay,

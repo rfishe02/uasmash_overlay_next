@@ -129,7 +129,7 @@
   const stageStrikesApp = createApp({
     data() {
       return {
-        host: window.location.hostname,
+        host: 'http://' + window.location.hostname,
         port: ":3000",
         socket: socket,
         showstrike: false,
@@ -160,7 +160,7 @@
       async getStageImageURLs() {
         try {
 
-          const response = await fetch('http://' + this.host + this.port + '/data/stages', {
+          const response = await fetch(this.host + this.port + '/data/stages', {
             method: "get",
             headers: {
               "Content-Type": "application/json; charset=UTF-8",

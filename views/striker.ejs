@@ -259,7 +259,7 @@
   const editorApp = createApp({
     data() {
       return {
-        host: window.location.hostname,
+        host: 'http://' + window.location.hostname,
         port: ":3000",
         stageImageURLs: {},
         stageNameList: [],
@@ -288,7 +288,7 @@
 
       // TODO: Consider making this import only.
 
-      OverlayDataManager.importOverlayDataOrGenerate('http://'+this.host+this.port,<%= user.id %>,"stage_strikes","Stage Strikes Overlay").then((data) => {
+      OverlayDataManager.importOverlayDataOrGenerate(this.host+this.port,<%= user.id %>,"stage_strikes","Stage Strikes Overlay").then((data) => {
         if(data.key_value.length > 0) {
           this.strikerRoom = data.key_value
           
@@ -315,7 +315,7 @@
       },
       async loadConfigStageList() {
         try {
-          const response = await fetch('http://' + this.host + this.port + '/data/stages', {
+          const response = await fetch(this.host + this.port + '/data/stages', {
             method: "get",
             headers: {
               "Content-Type": "application/json; charset=UTF-8",
@@ -435,7 +435,7 @@
       async saveStageSelectionsToDB(stage_list) {
         try {
 
-          const response = await fetch('http://'+this.host+this.port+'/data/stage_lists/save_list', {
+          const response = await fetch(this.host+this.port+'/data/stage_lists/save_list', {
             method: "post",
             headers: {
               "Content-Type": "application/json; charset=UTF-8",
@@ -454,7 +454,7 @@
       async loadStageSelectionsFromDB() {
         try {
 
-          const response = await fetch('http://'+this.host+this.port+'/data/stage_lists/load_list', {
+          const response = await fetch(this.host+this.port+'/data/stage_lists/load_list', {
             method: "post",
             headers: {
               "Content-Type": "application/json; charset=UTF-8",

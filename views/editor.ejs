@@ -260,7 +260,7 @@
 
       /*
 
-      OverlayDataManager.importKeyOrGenerate('http://'+editorApp.host+editorApp.port,<%= user.id %>,"players","Player Overlay").then((data) => {
+      OverlayDataManager.importKeyOrGenerate(editorApp.host+editorApp.port,<%= user.id %>,"players","Player Overlay").then((data) => {
         if(data.key_value.length > 0) {
           await socket.emit("unsubscribe",editorApp.playerRoom)
 
@@ -277,7 +277,7 @@
   const editorApp = createApp({
     data() {
       return {
-        host: window.location.hostname,
+        host: 'http://' + window.location.hostname,
         port: ":3000",
         navLogoUrl: '/fsmsmashlogo.png',
         navLinks:[],
@@ -347,7 +347,7 @@
 
       // TODO: Consider making this import only.
 
-      OverlayDataManager.importOverlayDataOrGenerate('http://'+this.host+this.port,<%= user.id %>,"players","Player Overlay").then((data) => {
+      OverlayDataManager.importOverlayDataOrGenerate(this.host+this.port,<%= user.id %>,"players","Player Overlay").then((data) => {
         if(data.key_value.length > 0) {
           this.playerRoom = data.key_value
           

@@ -119,7 +119,7 @@
   const upcomingApp = createApp({
     data() {
       return {
-        host: window.location.hostname,
+        host: 'http://' + window.location.hostname,
         port: ":3000",
         apiKey: '',
         setList: [],
@@ -161,7 +161,7 @@
 
       if(this.room != null) {
 
-        OverlayDataManager.importOverlaySettings('http://'+this.host+this.port,this.room).then((data) => {
+        OverlayDataManager.importOverlaySettings(this.host+this.port,this.room).then((data) => {
 
           if(data.settings != null) {
 
@@ -204,7 +204,7 @@
           setInterval(function() { 
             upcomingApp.querySets() 
           }, 10000)
-          
+
         } else {
           alert("Required URL parameters missing.")
         }

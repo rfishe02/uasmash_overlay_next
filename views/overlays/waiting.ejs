@@ -221,7 +221,8 @@
 <script type="module">
   import StartGGAPI from '/javascripts/StartGGAPI.js'
   import QueueManager from '/javascripts/QueueManager.js'
-  const { createApp} = Vue
+  import OverlayDataManager from '/javascripts/OverlayDataManager.js'
+  const { createApp } = Vue
 
   // Create a Twitch.Player object. This will render within the placeholder div
   new Twitch.Player("twitch-embed", {
@@ -236,7 +237,7 @@
   const waitingApp = createApp({
     data() {
       return {
-        host: window.location.hostname,
+        host: 'http://' + window.location.hostname,
         port: ":3000",
         slug: '',
         tournamentName: '',
@@ -275,7 +276,7 @@
 
       if(this.room != null){
 
-        OverlayDataManager.importOverlaySettings('http://'+this.host+this.port,this.room).then((data) => {
+        OverlayDataManager.importOverlaySettings(this.host+this.port,this.room).then((data) => {
 
           if(data.settings != null) {
 
@@ -289,7 +290,9 @@
                   waitingApp.reloadStandingsData()
                 })
 
-                setInterval(function() { waitingApp.fetchTournamentDataAndSave() }, 10000)
+                setInterval(function() { 
+                  waitingApp.fetchTournamentDataAndSave() 
+                }, 10000)
 
               } else {
                 alert("Required URL parameters missing.")
@@ -315,12 +318,13 @@
             waitingApp.reloadStandingsData()
           })
 
-          setInterval(function() { waitingApp.fetchTournamentDataAndSave() }, 10000)
+          setInterval(function() { 
+            waitingApp.fetchTournamentDataAndSave() 
+          }, 10000)
 
         } else {
           alert("Required URL parameters missing.")
         }
-
 
       }
 
