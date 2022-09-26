@@ -44,9 +44,9 @@ export default {
 
   async generateOverlayData(path,user_id,overlay_path,overlay_name) {
     var data = {user_id: '', overlay_path: '', overlay_name: '', key_value: ''}
-  
+    
     try {
-      const form = { "user_id": user_id, "overlay_path": overlay_path, "overlay_name": overlay_name, settings: null }
+      const form = { "user_id": user_id, "overlay_path": overlay_path, "overlay_name": overlay_name, settings: { poll: false, winnerBestOfStart: "Quarter-Final", loserBestOfStart: "Quarter-Final", slug: null, } }
 
       const response = await fetch(path, {
         method: "post",

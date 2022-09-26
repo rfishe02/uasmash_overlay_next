@@ -38,6 +38,7 @@
       <div class="container-fluid" style="width: 1920px; height: 1080px;">
 
         <gameplay-overlay v-if="type == 0"
+        :logo-url="navLogoUrl"
         :p1name="p1Name"
         :p2name="p2Name"
         :p1score="p1Score"
@@ -114,6 +115,7 @@
       return {
         host: 'http://' + window.location.hostname,
         port: ":3000",
+        navLogoUrl: '',
         p1: {},
         p2: {},
         p1Name: "",
@@ -173,6 +175,7 @@
             this.winnerBestOfStart = data.settings.winnerBestOfStart
             this.loserBestOfStart = data.settings.loserBestOfStart
             this.slug = data.settings.slug
+            this.navLogoUrl = data.settings.navLogoUrl
 
             try {
 

@@ -4,8 +4,9 @@ require('./bin/auth');
 var express = require('express');
 const cors = require('cors');
 var path = require('path');
-var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
 var passport = require('passport');
 var session = require('express-session');
 var SQLiteStore = require('connect-sqlite3')(session);
@@ -19,6 +20,7 @@ var strikerRouter = require('./routes/striker');
 var stagesRouter = require('./routes/data/stages');
 var stageListRouter = require('./routes/data/stage_lists');
 var overlayRouter = require('./routes/data/overlays');
+var imagesRouter = require('./routes/data/images');
 
 var playersRouter = require('./routes/overlays/players');
 var stageStrikesRouter = require('./routes/overlays/stage_strikes');
@@ -36,9 +38,9 @@ app.use(
 )
 
 app.use(logger('dev'));
-app.use(express.json());
+app.use(bodyParser.json({ type: 'application/*+json' }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 
@@ -87,6 +89,7 @@ app.use('/overlay', upcomingRouter);
 app.use('/data/stages', stagesRouter);
 app.use('/data/stage_lists', stageListRouter)
 app.use('/data/overlay', overlayRouter);
+app.use('/data/images', imagesRouter);
 
 app.set('view engine', 'ejs');
 

@@ -3,9 +3,7 @@ import SocialMediaFooter from '/javascripts/SocialMediaFooter.js'
 import SocialMediaHeader from '/javascripts/SocialMediaHeader.js'
 
 export default {
-  props: ['p1name','p2name','p1score','p2score','eventround','bestof','brackettype',
-    'p1members','p2members'
-  ],
+  props: ['p1name','p2name','p1score','p2score','eventround','bestof','brackettype','p1members','p2members','logoUrl'],
   components: {
     SocialMediaFooter,
     SocialMediaHeader
@@ -13,7 +11,7 @@ export default {
   template: `
   <div class="row justify-content-center">
     <div class="col-2">
-      <img src="/fsmsmashlogo.png" style="margin-left: -5px; height: 75px; top: 2%; position: absolute;"/>
+      <img v-if="logoUrl.length > 0" :src="logoUrl" style="width: 300px; top: 2%; position: absolute;"/>
     </div>
   </div>
 
