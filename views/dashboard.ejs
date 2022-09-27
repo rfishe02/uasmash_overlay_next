@@ -15,7 +15,19 @@
   <link href="https://unpkg.com/primevue/resources/primevue.min.css" rel="stylesheet">
   <link href="https://unpkg.com/primeicons/primeicons.css" rel="stylesheet">
 
-  <link rel="stylesheet" href="/stylesheets/editor.css">
+  <style>
+    body {
+      background-color: rgb(245, 245, 245);
+      padding: 0px;
+    }
+
+    body form {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+  </style>
 
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -53,23 +65,41 @@
             <h3>Configuration Settings</h3>
           </div>
 
-          <p-fileupload 
-            name="files[]" 
-            :url="this.host + this.port + '/data/images/upload'" 
-            @upload="onUpload" 
-            :multiple="true" 
-            accept="image/*" 
-            :max-file-size="1000000"
-            :with-credentials="true"
-            >
-            <template #empty>
-              <p>Drag and drop files to here to upload.</p>
-            </template>
-          </p-fileupload>
+          <div class="row">
+            <div class="col-12">
+              <h5>Logo</h5>
+            </div>
+            <div class="col-12">
+              <p>Limit size to 300 x 200 for best results.</p>
+            </div>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col">
+
+              <p-fileupload 
+                mode="basic" 
+                :multiple="false"
+                :with-credentials="true"
+                name="files[]"
+                :url="this.host + this.port + '/data/images/upload'"
+                accept="image/png" 
+                :max-file-size="1000000" 
+                @upload="onUpload" 
+                :auto="true" 
+                choose-label="Browse">
+              </p-fileupload>
+
+            </div>
+
+            <div class="col">
+              <img v-if="logoUrl.length > 0" :src="'/data/uploads/' + logoUrl" style="width: 300px; background-color: black;"/>
+            </div>
+          </div>
 
           <div class="row">
             <div class="col">
-              <h6>Start.gg API Key</h6>
+              <h5>Start.gg API Key</h5>
             </div>
           </div>
 
@@ -87,7 +117,7 @@
 
           <div class="row">
             <div class="col">
-              <h6>"Best Of 5" Starting Point</h6>
+              <h5>"Best Of 5" Starting Point</h5>
             </div>
           </div>
 
@@ -109,7 +139,7 @@
 
           <div class="row">
             <div class="col">
-              <h6>Tournament</h6>
+              <h5>Tournament</h5>
             </div>
           </div>
 
@@ -126,7 +156,7 @@
           <div class="row">
             <div class="col">
               <p-button
-              label="Submit"
+              label="Save"
               class="p-button-outlined"
               style="width: 125px"
               @click="submitSettings"></p-button>
@@ -191,6 +221,7 @@
           {types: [0], path: "upcoming", name: "Upcoming Matches"},
         ],
         overlayURLs: [],
+        logoUrl: '',
         apiKey: '',
         tournamentList: [],
         tournamentSelection: {slug: '',},
@@ -213,8 +244,18 @@
     setup() {
 
       const toast = useToast();
-			const onUpload = () => {
+			const onUpload = (event) => {
 				toast.add({severity: 'info', summary: 'Success', detail: 'File Uploaded', life: 3000});
+
+        const response = event.xhr.responseText
+        if(response != null) {
+          const data = JSON.parse(response)
+
+          if(data.length > 0) {
+            dashboardApp.logoUrl = data[0].filename == null ? '' : data[0].filename
+          }          
+        }
+
 			}
 
 			return { onUpload };
@@ -239,9 +280,39 @@
 
     },
     methods: {
+      fileUploadFinished(event) {
+
+      },
       myUploader(event) {
-        console.log(event.files)
-        console.log(this.logoFiles)
+        //event.files == files to upload
+
+        let xhr = new XMLHttpRequest();
+        let formData = new FormData();
+
+        formData.append('user_id',<%= user.id %>)
+
+        for (let file of event.files) {
+          formData.append('files[]', file, file.name);
+        }
+
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState === 4) {
+              
+              if (xhr.status >= 200 && xhr.status < 300) {
+                alert(xhr.responseText)
+              } else {
+                
+              }
+
+              this.clear();
+            }
+        };
+          
+        xhr.open('POST', this.host + this.port + '/data/images/upload', true);
+
+        xhr.withCredentials = true;
+        xhr.send(formData);
+
       },
       getOverlayURL(overlay_path,params) {
 
@@ -283,9 +354,9 @@
           winnerBestOfStart: this.selectedWinnerBestOfStart,
           loserBestOfStart: this.selectedLoserBestOfStart,
           slug: this.tournamentSelection.slug,
-          navLogoUrl: this.navLogoUrl,
+          logoUrl: this.logoUrl,
         }
-        settings.slug = "tournament/api-test-tournament-3"
+        //settings.slug = "tournament/api-test-tournament-3"
 
         OverlayDataManager.saveOverlaySettings(this.host+this.port,<%= user.id %>,settings)
 

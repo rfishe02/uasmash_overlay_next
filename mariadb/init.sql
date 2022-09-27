@@ -65,3 +65,12 @@ INSERT INTO uasmash.stages (stage_id,stage_name,image_url) VALUES (DEFAULT,"Wuhu
 INSERT INTO uasmash.stages (stage_id,stage_name,image_url) VALUES (DEFAULT,"Yggdrasil's Altar","SSBU-Yggdrasil'sAltar.jpeg");
 INSERT INTO uasmash.stages (stage_id,stage_name,image_url) VALUES (DEFAULT,"Yoshi's Island","SSBU-Yoshi's_Island_(SSBB).png");
 INSERT INTO uasmash.stages (stage_id,stage_name,image_url) VALUES (DEFAULT,"Yoshi's Story","SSBU-Yoshi's_Story.png");
+
+CREATE TABLE uasmash.user_images (
+	user_id INT NOT NULL,
+	image_name VARCHAR(400),
+	PRIMARY KEY(user_id,image_name),
+	FOREIGN KEY (user_id) REFERENCES uasmash.users (user_id)
+)
+CHARACTER SET 'utf8mb4'
+COLLATE 'utf8mb4_unicode_ci';

@@ -46,7 +46,7 @@
       <div class="container-fluid" style="margin-top: 75px;">
         <a class="navbar-brand pt-1 pl-2" href="#" disabled>
           <img
-            src="/fsmsmashlogo.png"
+            :src="navLogoUrl"
             alt=""
             height="30"
           />
@@ -261,6 +261,7 @@
       return {
         host: 'http://' + window.location.hostname,
         port: ":3000",
+        navLogoUrl: '/fsmsmashlogo.png',
         stageImageURLs: {},
         stageNameList: [],
         starterSelection: [],
