@@ -122,7 +122,7 @@
               <h1 class="m-0 pt-1">{{tournamentName}}</h1>
             </div>
             <div class="col" style="text-align: right">
-              <img src="/fsmsmashlogo.png" style="height: 50px;"/>
+              <img :src="'/data/uploads/' + logoUrl" style="height: 50px;"/>
             </div>
           </div>
 
@@ -255,6 +255,7 @@
         type: 0,
         slug: null,
         room: null,
+        logoUrl: '',
       }
     },
     mounted() {
@@ -281,6 +282,7 @@
           if(data.settings != null) {
 
             this.slug = data.settings.slug
+            this.logoUrl = data.settings.logoUrl
 
             try {
 

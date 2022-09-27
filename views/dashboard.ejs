@@ -278,40 +278,34 @@
         this.loadTournamentList()
       }
 
+      this.getLogo()
+
     },
     methods: {
-      fileUploadFinished(event) {
+      async getLogo () {
 
-      },
-      myUploader(event) {
-        //event.files == files to upload
+        try {
+          const url = this.host + this.port + '/data/images/gather?' + new URLSearchParams({ "user_id": <%= user.id %> })
 
-        let xhr = new XMLHttpRequest();
-        let formData = new FormData();
+          const response = await fetch(url, {
+            method: "get",
+            headers: {
+              "Content-Type": "application/json; charset=UTF-8",
+            },
+          })
 
-        formData.append('user_id',<%= user.id %>)
-
-        for (let file of event.files) {
-          formData.append('files[]', file, file.name);
-        }
-
-        xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4) {
-              
-              if (xhr.status >= 200 && xhr.status < 300) {
-                alert(xhr.responseText)
-              } else {
-                
+          if(response.ok) {
+            const results = await response.json()
+            if(results.length > 0) {
+              if(results[0].image_name != null){
+                this.logoUrl = results[0].image_name
               }
-
-              this.clear();
             }
-        };
-          
-        xhr.open('POST', this.host + this.port + '/data/images/upload', true);
+          }
 
-        xhr.withCredentials = true;
-        xhr.send(formData);
+        } catch(e) {
+          console.log(e)
+        }
 
       },
       getOverlayURL(overlay_path,params) {
