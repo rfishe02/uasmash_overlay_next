@@ -38,7 +38,7 @@
       <div class="container-fluid" style="width: 1920px; height: 1080px;">
 
         <gameplay-overlay v-if="type == 0"
-        :logo-url="'/data/uploads/' + logoUrl"
+        :logo-choice="logoChoice"
         :p1name="p1Name"
         :p2name="p2Name"
         :p1score="p1Score"
@@ -143,7 +143,7 @@
         apiKey: null,
         slug: null,
         room: null,
-        logoUrl: '',
+        logoChoice: '',
       }
     },
     mounted() {
@@ -175,7 +175,13 @@
             this.winnerBestOfStart = data.settings.winnerBestOfStart
             this.loserBestOfStart = data.settings.loserBestOfStart
             this.slug = data.settings.slug
-            this.logoUrl = data.settings.logoUrl
+            this.logoChoice = data.settings.logoChoice
+
+            if(data.settings.logoChoice.length > 0){
+              this.logoChoice = '/data/uploads/' + data.settings.logoChoice
+            } else {
+              this.logoChoice = ""
+            }
 
             try {
 

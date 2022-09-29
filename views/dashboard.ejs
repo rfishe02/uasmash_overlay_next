@@ -27,6 +27,11 @@
       padding-left: 20px;
       padding-right: 20px;
     }
+
+    .p-dropdown-panel {
+      overflow: hidden;
+      max-height: 250px;
+    }
   </style>
 
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -75,7 +80,7 @@
           </div>
 
           <div class="row mb-4">
-            <div class="col">
+            <div class="col-12 mb-2">
 
               <p-fileupload 
                 mode="basic" 
@@ -92,8 +97,14 @@
 
             </div>
 
-            <div class="col">
-              <img v-if="logoUrl.length > 0" :src="'/data/uploads/' + logoUrl" style="width: 300px; background-color: black;"/>
+            <div class="col-12 mb-2">
+              <p-radiobutton :inputId="logoChoice0" name="logoChoice" :value="" v-model="logoChoice"></p-radiobutton>
+              <label :for="logoChoice0">&nbsp; None</label>
+            </div>
+
+            <div class="col-12 mb-2" v-for="(url, index) of logoUrl" :key="url">
+              <p-radiobutton :inputId="'logoChoice' + (index + 1)" name="logoChoice" :value="url" v-model="logoChoice"></p-radiobutton>
+              <label :for="'logoChoice' + (index + 1)">&nbsp; <img v-if="url.length > 0" :src="'/data/uploads/' + url" style="width: 150px; background-color: black;"/></label>
             </div>
           </div>
 
@@ -144,12 +155,17 @@
           </div>
 
           <div class="row mb-4" v-if="apiKey.length > 0">
-            <div class="col">
+            <div class="col-12 mb-2">
               <p-dropdown
                 v-model="tournamentSelection"
                 :options="tournamentList"
                 option-label="name"
-                placeholder="Select a Tournament"></p-dropdown>
+                placeholder="Select a Tournament"
+                @change="selectTournamentSlug"
+                style="width:100%;"></p-dropdown>
+            </div>
+            <div class="col-12">
+              <p-inputtext v-model="slug" style="width:100%;"></p-inputtext>
             </div>
           </div>
 
@@ -221,10 +237,12 @@
           {types: [0], path: "upcoming", name: "Upcoming Matches"},
         ],
         overlayURLs: [],
-        logoUrl: '',
+        logoUrl: [],
+        logoChoice: "",
         apiKey: '',
         tournamentList: [],
-        tournamentSelection: {slug: '',},
+        tournamentSelection: null,
+        slug: '',
         selectedWinnerBestOfStart: 'Quarter-Final',
         selectedLoserBestOfStart: 'Quarter-Final',
         finalsStartOptions : [
@@ -252,7 +270,12 @@
           const data = JSON.parse(response)
 
           if(data.length > 0) {
-            dashboardApp.logoUrl = data[0].filename == null ? '' : data[0].filename
+            const file = data[0].filename == null ? '' : data[0].filename
+
+            const item = dashboardApp.logoUrl.find(x => x == file)
+            if(item == null) {
+              dashboardApp.logoUrl.push(file)
+            }
           }          
         }
 
@@ -278,11 +301,11 @@
         this.loadTournamentList()
       }
 
-      this.getLogo()
+      this.getLogoFromDB()
 
     },
     methods: {
-      async getLogo () {
+      async getLogoFromDB () {
 
         try {
           const url = this.host + this.port + '/data/images/gather?' + new URLSearchParams({ "user_id": <%= user.id %> })
@@ -298,7 +321,7 @@
             const results = await response.json()
             if(results.length > 0) {
               if(results[0].image_name != null){
-                this.logoUrl = results[0].image_name
+                this.logoUrl.push(results[0].image_name)
               }
             }
           }
@@ -316,6 +339,11 @@
           return ''
         }
 
+      },
+      selectTournamentSlug() {
+        if(this.tournamentSelection != null) {
+          this.slug = this.tournamentSelection.slug
+        }
       },
       async regenerateKey(overlay_path,overlay_name) {
         OverlayDataManager.regenerateOverlayKey(this.host+this.port,<%= user.id %>,overlay_path,overlay_name).then((data) => {
@@ -347,10 +375,9 @@
           poll:this.polling,
           winnerBestOfStart: this.selectedWinnerBestOfStart,
           loserBestOfStart: this.selectedLoserBestOfStart,
-          slug: this.tournamentSelection.slug,
-          logoUrl: this.logoUrl,
+          slug: this.slug,
+          logoChoice: this.logoChoice,
         }
-        //settings.slug = "tournament/api-test-tournament-3"
 
         OverlayDataManager.saveOverlaySettings(this.host+this.port,<%= user.id %>,settings)
 

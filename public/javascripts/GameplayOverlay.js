@@ -3,7 +3,7 @@ import SocialMediaFooter from '/javascripts/SocialMediaFooter.js'
 import SocialMediaHeader from '/javascripts/SocialMediaHeader.js'
 
 export default {
-  props: ['p1name','p2name','p1score','p2score','eventround','bestof','brackettype','p1members','p2members','logoUrl'],
+  props: ['p1name','p2name','p1score','p2score','eventround','bestof','brackettype','p1members','p2members','logoChoice'],
   components: {
     SocialMediaFooter,
     SocialMediaHeader
@@ -11,7 +11,7 @@ export default {
   template: `
   <div class="row justify-content-center">
     <div class="col-2">
-      <img v-if="logoUrl.length > 0" :src="logoUrl" style="width: 300px; top: 2%; position: absolute;"/>
+      <img v-if="logoChoice.length > 0" :src="logoChoice" style="width: 300px; top: 2%; position: absolute;"/>
     </div>
   </div>
 

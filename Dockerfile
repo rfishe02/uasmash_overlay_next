@@ -16,6 +16,11 @@ WORKDIR /server
 
 COPY ["package.json", "package-lock.json*", "./"]
 
+
+RUN mkdir -p /server/public/data/uploads
+RUN chmod 755 /server/public/data/uploads
+
+
 RUN npm install --production
 
 COPY . .
