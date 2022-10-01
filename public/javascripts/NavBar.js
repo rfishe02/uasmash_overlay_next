@@ -24,7 +24,7 @@ export default {
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
 
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item" v-for="link in links">
+          <li class="nav-item mx-1" v-for="link in links">
             <a :href="link.url" style="color: white;">{{link.name}}</a>
           </li>
         </ul>

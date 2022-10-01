@@ -104,7 +104,7 @@
 
             <div class="col-12 mb-2" v-for="(url, index) of logoUrl" :key="url">
               <p-radiobutton :inputId="'logoChoice' + (index + 1)" name="logoChoice" :value="url" v-model="logoChoice"></p-radiobutton>
-              <label :for="'logoChoice' + (index + 1)">&nbsp; <img v-if="url.length > 0" :src="'/data/uploads/' + url" style="width: 150px; background-color: black;"/></label>
+              <label :for="'logoChoice' + (index + 1)">&nbsp; <img v-if="url.length > 0" :src="'/data/uploads/' + url" style="height: 30px; background-color: black;"/></label>
             </div>
           </div>
 
@@ -128,23 +128,43 @@
 
           <div class="row">
             <div class="col">
-              <h5>"Best Of 5" Starting Point</h5>
+              <h5>Rules</h5>
             </div>
           </div>
 
           <div class="row mb-4" v-if="apiKey.length > 0">
-            <div class="col">
-              <div v-for="option of finalsStartOptions" :key="option" class="field-radiobutton">
-                <p-radiobutton :inputId="'winner' + option" name="winnerStart" :value="option" v-model="selectedWinnerBestOfStart"></p-radiobutton>
-                <label :for="'winner' + option">&nbsp;<i>Winners {{option}}</i></label>
-              </div>
+
+            <div class="col-12 mb-2">
+              Best of &nbsp;<p-inputtext v-model="earlyMatches" style="width: 35px;"></p-inputtext> at start
             </div>
 
-            <div class="col">
-              <div v-for="option of finalsStartOptions" :key="option" class="field-radiobutton">
-                <p-radiobutton :inputId="'loser' + option" name="loserStart" :value="option" v-model="selectedLoserBestOfStart"></p-radiobutton>
-                <label :for="'loser' + option">&nbsp;<i>Losers {{option}}</i></label>
-              </div>
+            <div class="col-4">
+              Best of &nbsp;<p-inputtext v-model="laterMatches" style="width: 35px;"></p-inputtext> at 
+            </div>
+            <div class="col-8 mb-2">    
+              <p-dropdown v-model="selectedWinnerBestOfStart" :options="finalsStartOptions" :filter="false" placeholder="Winners Starting Point" :show-clear="false" style="width:100%;">
+                <template #value="slotProps">
+                  Winners {{slotProps.value}}
+                </template>
+                <template #option="slotProps">
+                  Winners {{slotProps.option}}
+                </template>
+              </p-dropdown>
+            </div>
+
+            <div class="col-4">
+              
+            </div>
+
+            <div class="col-8">
+              <p-dropdown v-model="selectedLoserBestOfStart" :options="finalsStartOptions" :filter="false" placeholder="Losers Starting Point" :show-clear="false" style="width:100%;">
+                <template #value="slotProps">
+                  Losers {{slotProps.value}}
+                </template>
+                <template #option="slotProps">
+                  Losers {{slotProps.option}}
+                </template>
+              </p-dropdown>
             </div>
           </div>
 
@@ -243,6 +263,8 @@
         tournamentList: [],
         tournamentSelection: null,
         slug: '',
+        earlyMatches: 3,
+        laterMatches: 5,
         selectedWinnerBestOfStart: 'Quarter-Final',
         selectedLoserBestOfStart: 'Quarter-Final',
         finalsStartOptions : [
@@ -251,6 +273,9 @@
           'Round 3',
           'Round 4',
           'Round 5',
+          'Round 6',
+          'Round 7',
+          'Round 8',
           'Quarter-Final',
           'Semi-Final',
           'Final',
@@ -373,6 +398,8 @@
         
         const settings = {
           poll:this.polling,
+          earlyMatches: this.earlyMatches,
+          laterMatches: this.laterMatches,
           winnerBestOfStart: this.selectedWinnerBestOfStart,
           loserBestOfStart: this.selectedLoserBestOfStart,
           slug: this.slug,

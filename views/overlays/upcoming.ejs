@@ -125,19 +125,6 @@
         setList: [],
         preReqList: {},
         type: 0,
-        winnerBestOfStart: 5,
-        loserBestOfStart: 5,
-        finalsOrder : {
-          'Round 1':0,
-          'Round 2':1,
-          'Round 3':2,
-          'Round 4':3,
-          'Round 5':4,
-          'Quarter-Final':5,
-          'Semi-Final':6,
-          'Final':7,
-          'Grand Final': 8
-        },
         slug: null,
         room: null,
       }
@@ -165,8 +152,6 @@
 
           if(data.settings != null) {
 
-            this.winnerBestOfStart = data.settings.winnerBestOfStart
-            this.loserBestOfStart = data.settings.loserBestOfStart
             this.slug = data.settings.slug
 
             try {
@@ -194,8 +179,6 @@
 
       } else {
 
-        this.winnerBestOfStart = urlParams.get('winnerBestOfStart') == null ? 5 : this.finalsOrder[urlParams.get('winnerBestOfStart')]
-        this.loserBestOfStart = urlParams.get('loserBestOfStart') == null ? 5 : this.finalsOrder[urlParams.get('loserBestOfStart')]
         this.slug = urlParams.get('slug')
 
         if(this.apiKey != null && this.slug != null){
@@ -217,26 +200,23 @@
 
         const sets = await StartGGAPI.queryUpcomingMatches(this.apiKey,this.slug)
 
+        /*
         sets.forEach(item => {
           this.preReqList[item.id] = item
 
           const order = this.finalsOrder[item.fullRoundText.replace(/Winners |Losers /g,'')]              
           if(order != null) {
             if(item.fullRoundText.indexOf('Winner') >= 0) {
-              if(order >= this.winnerBestOfStart) {
-                item.bestOf = 'Best of 5'
-              }
+
             } else {
-              if(order >= this.loserBestOfStart) {
-                item.bestOf = 'Best of 5'
-              }
+
             }
           }
 
           //item.eventName = item.eventName.toUpperCase()
           //item.phaseName = item.phaseName.toUpperCase()
           //item.fullRoundText = item.fullRoundText.toUpperCase()
-        })
+        })*/
 
         QueueManager.refreshQueue(this.setList,sets)
 

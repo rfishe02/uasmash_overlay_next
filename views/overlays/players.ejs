@@ -127,6 +127,8 @@
         socket: socket,
         type: 0,
         poll: false,
+        earlyMatches: "",
+        laterMatches: "",
         winnerBestOfStart: 5,
         loserBestOfStart: 5,
         finalsOrder : {
@@ -135,10 +137,13 @@
           'Round 3':2,
           'Round 4':3,
           'Round 5':4,
-          'Quarter-Final':5,
-          'Semi-Final':6,
-          'Final':7,
-          'Grand Final': 8
+          'Round 6':5,
+          'Round 7':6,
+          'Round 8':7,
+          'Quarter-Final':8,
+          'Semi-Final':9,
+          'Final':10,
+          'Grand Final':11
         },
         apiKey: null,
         slug: null,
@@ -172,8 +177,12 @@
           if(data.settings != null) {
 
             this.poll = data.settings.poll
-            this.winnerBestOfStart = data.settings.winnerBestOfStart
-            this.loserBestOfStart = data.settings.loserBestOfStart
+
+            this.earlyMatches = "Best of " + data.settings.earlyMatches
+            this.laterMatches = "Best of " + data.settings.laterMatches
+
+            this.winnerBestOfStart = this.finalsOrder[data.settings.winnerBestOfStart] == null ? 8 : this.finalsOrder[data.settings.winnerBestOfStart]
+            this.loserBestOfStart = this.finalsOrder[data.settings.loserBestOfStart] == null ? 8 : this.finalsOrder[data.settings.loserBestOfStart]
             this.slug = data.settings.slug
             this.logoChoice = data.settings.logoChoice
 
@@ -209,8 +218,8 @@
       } else {
         
         this.poll = urlParams.get('poll') == null ? false : urlParams.get('poll');
-        this.winnerBestOfStart = urlParams.get('winnerBestOfStart') == null ? 5 : this.finalsOrder[urlParams.get('winnerBestOfStart')]
-        this.loserBestOfStart = urlParams.get('loserBestOfStart') == null ? 5 : this.finalsOrder[urlParams.get('loserBestOfStart')]
+        this.winnerBestOfStart = urlParams.get('winnerBestOfStart') == null ? 8 : this.finalsOrder[urlParams.get('winnerBestOfStart')]
+        this.loserBestOfStart = urlParams.get('loserBestOfStart') == null ? 8 : this.finalsOrder[urlParams.get('loserBestOfStart')]
         this.slug = urlParams.get('slug')
 
         if(this.poll && this.apiKey != null && this.slug != null){
@@ -266,16 +275,16 @@
             if(nextSet != null){
               const eventRound = nextSet.fullRoundText == null ? '' : nextSet.fullRoundText
               const order = this.finalsOrder[eventRound.replace(/Winners |Losers /g,'')]
-              var bestOfValue = 'Best of 3'
+              var bestOfValue = this.earlyMatches
 
               if(order != null) {
                 if(eventRound.indexOf('Winner') >= 0) {
                   if(order >= this.winnerBestOfStart) {
-                    bestOfValue = 'Best of 5'
+                    bestOfValue = this.laterMatches
                   }
                 } else {
                   if(order >= this.loserBestOfStart) {
-                    bestOfValue = 'Best of 5'
+                    bestOfValue = this.laterMatches
                   }
                 }
               }
