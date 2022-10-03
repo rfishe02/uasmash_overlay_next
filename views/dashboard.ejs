@@ -98,8 +98,8 @@
             </div>
 
             <div class="col-12 mb-2">
-              <p-radiobutton :inputId="logoChoice0" name="logoChoice" :value="" v-model="logoChoice"></p-radiobutton>
-              <label :for="logoChoice0">&nbsp; None</label>
+              <p-radiobutton inputId="logoChoice0" name="logoChoice" value="" v-model="logoChoice"></p-radiobutton>
+              <label for="logoChoice0">&nbsp; None</label>
             </div>
 
             <div class="col-12 mb-2" v-for="(url, index) of logoUrl" :key="url">
@@ -135,11 +135,11 @@
           <div class="row mb-4" v-if="apiKey.length > 0">
 
             <div class="col-12 mb-2">
-              Best of &nbsp;<p-inputtext v-model="earlyMatches" style="width: 35px;"></p-inputtext> at start
+              Best of &nbsp;<p-inputtext type="number" v-model="earlyMatches" style="width: 35px;"></p-inputtext> at start
             </div>
 
             <div class="col-4">
-              Best of &nbsp;<p-inputtext v-model="laterMatches" style="width: 35px;"></p-inputtext> at 
+              Best of &nbsp;<p-inputtext type="number" v-model="laterMatches" style="width: 35px;"></p-inputtext> at 
             </div>
             <div class="col-8 mb-2">    
               <p-dropdown v-model="selectedWinnerBestOfStart" :options="finalsStartOptions" :filter="false" placeholder="Winners Starting Point" :show-clear="false" style="width:100%;">
