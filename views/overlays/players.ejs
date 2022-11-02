@@ -50,16 +50,33 @@
         :p2members="p2.members"
         > </gameplay-overlay>
 
-        <!--
-        <div class="row justify-content-center fixed-bottom" v-if="type == 1">
-          <div class="col-4 white-border mb-3">
-            {{p1Name}}
+        <div class="row mt-3 justify-content-center" v-if="type == 1">
+          
+          <div class="col-1 shadow" style="background-color: rgba(0, 0, 0, 0.8); color: white; font-size: 24pt; border-radius: 50px 0 0 50px; font-weight: bold;">
+            <div class="row p-3" style="text-align: right;">
+              <p class="m-0">{{p1Name}}</p>
+            </div>
           </div>
+          <div class="col-1 shadow" style="background-color: rgba(0, 0, 0, 0.8); color: white; font-size: 24pt; border-radius: 0 50px 50px 0; font-weight: bold;">
+            <div class="row p-3 m-0">
+              <p class="m-0">{{p1Score}}</p>
+            </div>
+          </div>
+
           <div class="col-1"></div>
-          <div class="col-4 white-border mb-3">
-            {{p2Name}}
+
+          <div class="col-1 shadow" style="background-color: rgba(0, 0, 0, 0.8); color: white; font-size: 24pt; border-radius: 50px 0 0 50px; font-weight: bold;">
+            <div class="row p-3 m-0" style="text-align: right;">
+              <p class="m-0">{{p2Name}}</p>
+            </div>
           </div>
-        </div>-->
+          <div class="col-1 shadow" style="background-color: rgba(0, 0, 0, 0.8); color: white; font-size: 24pt; border-radius: 0 50px 50px 0; font-weight: bold;">
+            <div class="row p-3 m-0">
+              <p class="m-0">{{p2Score}}</p>
+            </div>
+          </div>
+
+        </div>
 
       </div>
 
