@@ -27,6 +27,7 @@ export default {
 
       if(response.ok) {
         const results = await response.json()
+        console.log(results)
         if(results.length > 0) {
           data.user_id = results[0].user_id 
           data.overlay_path = results[0].overlay_path 
@@ -43,10 +44,10 @@ export default {
   },
 
   async generateOverlayData(path,user_id,overlay_path,overlay_name) {
-    var data = {user_id: '', overlay_path: '', overlay_name: '', key_value: ''}
+    var data = {user_id: '', overlay_path: '', overlay_name: '', key_value: '', settings: null }
     
     try {
-      const form = { "user_id": user_id, "overlay_path": overlay_path, "overlay_name": overlay_name, settings: { poll: false, winnerBestOfStart: "Quarter-Final", loserBestOfStart: "Quarter-Final", slug: null, } }
+      const form = { "user_id": user_id, "overlay_path": overlay_path, "overlay_name": overlay_name, "settings": { poll: false, winnerBestOfStart: "Quarter-Final", loserBestOfStart: "Quarter-Final", slug: null, logoChoice: "" } }
 
       const response = await fetch(path, {
         method: "post",

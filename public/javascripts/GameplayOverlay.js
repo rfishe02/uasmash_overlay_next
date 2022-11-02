@@ -119,14 +119,15 @@ export default {
     </div>
   </transition>
 
+  <!--
   <div class="row justify-content-between fixed-bottom">
     <div class="col shadow camera-boxes" style="margin-left: 25px;">
-      <!--<social-media-footer :members="p1members"> </social-media-footer>-->
+      <social-media-footer :members="p1members"> </social-media-footer>
     </div>
 
     <div class="col shadow camera-boxes" style="margin-right: 25px;">
-      <!--<social-media-footer :members="p2members"> </social-media-footer>-->
+      <social-media-footer :members="p2members"> </social-media-footer>
     </div>
-  </div>
+  </div>-->
   `
 }

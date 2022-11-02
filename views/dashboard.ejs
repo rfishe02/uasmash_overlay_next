@@ -313,7 +313,6 @@
 
       this.overlayList.forEach(item => {
         OverlayDataManager.importOverlayDataOrGenerate(this.host+this.port,<%= user.id %>,item.path,item.name).then((data) => {
-          console.log(data)
           const urlItem = {types: item.types, path:item.path, name:item.name, room:data.key_value}
           this.overlayURLs.push(urlItem)
         })

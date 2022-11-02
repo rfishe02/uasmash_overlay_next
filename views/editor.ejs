@@ -294,7 +294,7 @@
         p2ScoreIncrement: {name: '-', value: ''},
         bracketType: "",
         eventRound: "",
-        bestOf: "Best of 3",
+        bestOf: "",
         playerRoom: "",
         socket: socket,
         scoreOptions: [
@@ -338,6 +338,7 @@
           "Grand Final Reset",
         ],
         matchList: [
+          "",
           "Best of 3",
           "Best of 5",
         ],
@@ -481,7 +482,7 @@
 
         this.bracketType = ""
         this.eventRound = ""
-        this.bestOf = "Best of 3"
+        this.bestOf = ""
       },
       clearScoreForm() {
         this.p1ScoreIncrement = { name: "-", value: "" }
