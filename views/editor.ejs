@@ -183,10 +183,16 @@
     
                 <div class = "row mb-3">
                   <div class="col">
-                    <p-selectbutton v-model="p1ScoreIncrement" :unselectable="false" option-label="name" :options="scoreOptions" aria-labelledby=""></p-selectbutton>
+                    
+                    <!--<p-selectbutton v-model="p1ScoreIncrement" :unselectable="false" option-label="name" :options="scoreOptions" aria-labelledby=""></p-selectbutton>-->
+                    <p-inputtext type="number" v-model="p1ScoreIncrement" style="width: 50px;"></p-inputtext>
+
                   </div>
                   <div class="col">
-                    <p-selectbutton v-model="p2ScoreIncrement" :unselectable="false" option-label="name" :options="scoreOptions" aria-labelledby=""></p-selectbutton>
+
+                    <!--<p-selectbutton v-model="p2ScoreIncrement" :unselectable="false" option-label="name" :options="scoreOptions" aria-labelledby=""></p-selectbutton>-->
+                    <p-inputtext type="number" v-model="p2ScoreIncrement" style="width: 50px;"></p-inputtext>
+
                   </div>
                 </div>
     
@@ -290,8 +296,8 @@
         teamTwo: '',
         p1Score: {name: '-', value: ''},
         p2Score: {name: '-', value: ''},
-        p1ScoreIncrement: {name: '-', value: ''},
-        p2ScoreIncrement: {name: '-', value: ''},
+        p1ScoreIncrement: 0,
+        p2ScoreIncrement: 0,
         bracketType: "",
         eventRound: "",
         bestOf: "",
@@ -465,6 +471,9 @@
 
             // TODO: Find a way to persist data without introducing bugs. A get recent button? This should happen with user knowledge.
 
+            this.p1ScoreIncrement = this.p1Score.value
+            this.p2ScoreIncrement = this.p2Score.value
+
             this.clearOverlayForm()
 
           } else {
@@ -485,15 +494,15 @@
         this.bestOf = ""
       },
       clearScoreForm() {
-        this.p1ScoreIncrement = { name: "-", value: "" }
-        this.p2ScoreIncrement = { name: "-", value: "" }
+        this.p1ScoreIncrement = 0
+        this.p2ScoreIncrement = 0
       },
       submitScoreForm() {
 
         try {
           const form = { p1Score: '', p2Score: '' }
-          form.p1Score = this.p1ScoreIncrement.value
-          form.p2Score = this.p2ScoreIncrement.value
+          form.p1Score = this.p1ScoreIncrement
+          form.p2Score = this.p2ScoreIncrement
 
           this.socket.emit("score-update", {
             content: form,
