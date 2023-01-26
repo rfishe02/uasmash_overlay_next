@@ -32,7 +32,7 @@ Contains the overlays, which can be used as a browser source in Open Broadcastin
 
 # Prerequisites
 
-This project uses Node Package Manger (NPM) to manage and install dependencies, and a local instance of Docker to host the application. It requires port 3000 for Express and Socket.io communication. 
+This project uses Node Package Manager (NPM) to manage and install dependencies, and a local instance of Docker to host the application. It requires port 3000 for Express and Socket.io communication. 
 
 # Installation
 
