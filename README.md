@@ -24,19 +24,19 @@ Contains scripts that define routing behavior within the server.
 
 ## /test
 
-Contains unit tests for various objects that manipulate data, to ensure that they acheive proper output, which can be run with the command ```npm test```.
+Contains unit tests for various objects that manipulate data, to ensure that they achieve proper output, which can be run with the command ```npm test```.
 
 ## /views
 
 Contains the overlays, which can be used as a browser source in Open Broadcasting Software (OBS), and other web pages.
 
-# Prequisites
+# Prerequisites
 
 This project uses Node Package Manger (NPM) to manage and install dependencies, and a local instance of Docker to host the application. It requires port 3000 for Express and Socket.io communication. 
 
 # Installation
 
-This project uses Dockerfiles to setup the application and database in Docker, and it uses [Docker compose CLI](https://docs.docker.com/compose/reference/) comands for installation.
+This project uses Dockerfiles to setup the application and database in Docker, and it uses [Docker compose CLI](https://docs.docker.com/compose/reference/) commands for installation.
 
 Build the application, database, and create the containers in Docker.
 ```
