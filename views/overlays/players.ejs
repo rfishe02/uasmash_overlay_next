@@ -89,7 +89,7 @@
   import GameplayOverlay from '/javascripts/GameplayOverlay.js'
   import StartGGAPI from '/javascripts/StartGGAPI.js'
   import OverlayDataManager from '/javascripts/OverlayDataManager.js'
-  const { createApp} = Vue
+  const { createApp } = Vue
 
   const socket = io("http://" + window.location.hostname + ":3000", {
     reconnectionDelayMax: 10000,
@@ -213,7 +213,7 @@
 
               if(this.poll && this.apiKey != null && this.slug != null){
 
-                playerOverlayApp.pollStartGGAPI()
+                this.pollStartGGAPI()
                 setInterval(function(){
                   playerOverlayApp.pollStartGGAPI()
                 }, 5000)
@@ -243,7 +243,7 @@
 
           try {
 
-            playerOverlayApp.pollStartGGAPI()
+            this.pollStartGGAPI()
             setInterval(function(){
               playerOverlayApp.pollStartGGAPI()
             }, 5000);
