@@ -9,24 +9,25 @@ services:
     restart: always
     ports:
       - 3306:3306
-    env_file:
-      - ./.env
     volumes:
       - ./mariadb/var/lib/mysql:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-      MYSQL_USER: "${MYSQL_USER}"
-      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
-      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+    env_file:
+      - ./.env
 
   webapp:
     depends_on:
       - mariadb
     build:
       context: ./
-    ports:
-      - '3000:3000'
     container_name: docker-uasmash-webapp
     restart: always
-    environment:
-      NODE_ENV: "production"
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./bin:/server/bin
+      - ./modules:/server/modules
+      - ./public:/server/public
+      - ./routes:/server/routes
+      - ./views:/server/views
+    env_file:
+      - ./.env

@@ -1,7 +1,7 @@
 require('dotenv').config()
 
 var host = process.env.MYSQL_HOST
-if(process.env.NODE_ENV != "production") {
+if(process.env.DB_ENV == "local") {
   host = '127.0.0.1'
 }
 
