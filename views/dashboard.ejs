@@ -168,6 +168,23 @@
             </div>
           </div>
 
+          <div class="row mb-4">
+            <div class="col">
+              <label>Show Scores</label>
+
+              <div class="field-radiobutton">
+                <p-radiobutton inputId="showScore1" name="showScore" value="Show" v-model="selectedShowScore"></p-radiobutton>
+                <label for="showScore1">&nbsp;<i>Show</i></label>
+              </div>
+
+              <div class="field-radiobutton">
+                <p-radiobutton inputId="showScore2" name="showScore" value="Hide" v-model="selectedShowScore"></p-radiobutton>
+                <label for="showScore2">&nbsp;<i>Hide</i></label>
+              </div>
+
+            </div>
+          </div>
+
           <div class="row">
             <div class="col">
               <h5>Tournament</h5>
@@ -267,6 +284,7 @@
         laterMatches: 5,
         selectedWinnerBestOfStart: 'Quarter-Final',
         selectedLoserBestOfStart: 'Quarter-Final',
+        selectedShowScore: "Hide",
         finalsStartOptions : [
           'Round 1',
           'Round 2',
@@ -401,6 +419,7 @@
           laterMatches: this.laterMatches,
           winnerBestOfStart: this.selectedWinnerBestOfStart,
           loserBestOfStart: this.selectedLoserBestOfStart,
+          showScores: this.selectedShowScore,
           slug: this.slug,
           logoChoice: this.logoChoice,
         }

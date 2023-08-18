@@ -3,7 +3,7 @@ import SocialMediaFooter from '/javascripts/SocialMediaFooter.js'
 import SocialMediaHeader from '/javascripts/SocialMediaHeader.js'
 
 export default {
-  props: ['p1name','p2name','p1score','p2score','eventround','bestof','brackettype','p1members','p2members','logoChoice'],
+  props: ['p1name','p2name','showscore','p1score','p2score','eventround','bestof','brackettype','p1members','p2members','logoChoice'],
   components: {
     SocialMediaFooter,
     SocialMediaHeader
@@ -28,7 +28,7 @@ export default {
                 <div class="player-name" >{{p1name}}</div>
               </div>
               <div class="col-1">
-                <div class="player-score">{{p1score}}</div>
+                <div class="player-score" v-if="showscore === 'Show'">{{p1score}}</div>
               </div>
 
             </div>
@@ -45,7 +45,7 @@ export default {
           <div class="col-12">
             <div class="row">
               <div class="col-1" >
-                <div class="player-score">{{p2score}}</div>
+                <div class="player-score" v-if="showscore === 'Show'">{{p2score}}</div>
               </div>
               <div class="col-11" style="text-align: right;">
                 <div class="player-name" >{{p2name}}</div>

@@ -41,6 +41,7 @@
         :logo-choice="logoChoice"
         :p1name="p1Name"
         :p2name="p2Name"
+        :showscore="showScores"
         :p1score="p1Score"
         :p2score="p2Score"
         :eventround="eventRound"
@@ -166,6 +167,7 @@
         slug: null,
         room: null,
         logoChoice: '',
+        showScores: "Hide",
       }
     },
     mounted() {
@@ -200,6 +202,7 @@
 
             this.winnerBestOfStart = this.finalsOrder[data.settings.winnerBestOfStart] == null ? 8 : this.finalsOrder[data.settings.winnerBestOfStart]
             this.loserBestOfStart = this.finalsOrder[data.settings.loserBestOfStart] == null ? 8 : this.finalsOrder[data.settings.loserBestOfStart]
+            this.showScores = data.settings.showScores
             this.slug = data.settings.slug
             this.logoChoice = data.settings.logoChoice
 
@@ -237,6 +240,7 @@
         this.poll = urlParams.get('poll') == null ? false : urlParams.get('poll');
         this.winnerBestOfStart = urlParams.get('winnerBestOfStart') == null ? 8 : this.finalsOrder[urlParams.get('winnerBestOfStart')]
         this.loserBestOfStart = urlParams.get('loserBestOfStart') == null ? 8 : this.finalsOrder[urlParams.get('loserBestOfStart')]
+        this.showScores = urlParams.get('showScores') == null ? "Hide" : urlParams.get('showScores')
         this.slug = urlParams.get('slug')
 
         if(this.poll && this.apiKey != null && this.slug != null){
