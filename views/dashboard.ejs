@@ -28,6 +28,10 @@
       padding-right: 20px;
     }
 
+    .p-dropdown {
+      width: 100%;
+    }
+
     .p-dropdown-panel {
       overflow: hidden;
       max-height: 250px;
@@ -117,7 +121,7 @@
           <div class="row mb-4">
             <div class="col">
               <div class="p-inputgroup">
-                <p-inputtext v-model="apiKey" @change="saveAPIKey"></p-inputtext>
+                <p-inputtext v-model="apiKey" @input="saveAPIKey"></p-inputtext>
               </div>
               <div class="field-checkbox">
                 <p-checkbox inputId="binary" v-model="polling" :binary="true"></p-checkbox>
@@ -126,7 +130,7 @@
             </div>
           </div>
 
-          <div class="row">
+          <div class="row" v-if="apiKey.length > 0">
             <div class="col">
               <h5>Rules</h5>
             </div>
@@ -134,14 +138,14 @@
 
           <div class="row mb-4" v-if="apiKey.length > 0">
 
-            <div class="col-12 mb-2">
+            <div class="col-12 mb-3">
               Best of &nbsp;<p-inputtext type="number" v-model="earlyMatches" style="width: 50px;"></p-inputtext> at start
             </div>
 
-            <div class="col-4">
+            <div class="col-5 mb-1">
               Best of &nbsp;<p-inputtext type="number" v-model="laterMatches" style="width: 50px;"></p-inputtext> at 
             </div>
-            <div class="col-8 mb-2">    
+            <div class="col-7">    
               <p-dropdown v-model="selectedWinnerBestOfStart" :options="finalsStartOptions" :filter="false" placeholder="Winners Starting Point" :show-clear="false" style="width:100%;">
                 <template #value="slotProps">
                   Winners {{slotProps.value}}
@@ -152,11 +156,11 @@
               </p-dropdown>
             </div>
 
-            <div class="col-4">
+            <div class="col-5">
               
             </div>
 
-            <div class="col-8">
+            <div class="col-7">
               <p-dropdown v-model="selectedLoserBestOfStart" :options="finalsStartOptions" :filter="false" placeholder="Losers Starting Point" :show-clear="false" style="width:100%;">
                 <template #value="slotProps">
                   Losers {{slotProps.value}}
@@ -168,7 +172,7 @@
             </div>
           </div>
 
-          <div class="row mb-4">
+          <div class="row mb-4" v-if="apiKey.length > 0">
             <div class="col">
               <label>Show Scores</label>
 
@@ -185,13 +189,25 @@
             </div>
           </div>
 
-          <div class="row">
+          <div class="row" v-if="apiKey.length > 0">
             <div class="col">
               <h5>Tournament</h5>
             </div>
           </div>
 
-          <div class="row mb-4" v-if="apiKey.length > 0">
+          <div class="row mb-3" v-if="apiKey.length > 0">
+            <div class="col">
+              <p-dropdown
+              v-model="stateSelection"
+              :options="stateList"
+              option-label="state"
+              placeholder="Select a State"
+              @change="loadTournamentList()"
+              ></p-dropdown>
+            </div>
+          </div>
+
+          <div class="row mb-4" v-if="stateSelection != null">
             <div class="col-12 mb-2">
               <p-dropdown
                 v-model="tournamentSelection"
@@ -277,6 +293,58 @@
         logoUrl: [],
         logoChoice: "",
         apiKey: '',
+        stateList: [
+          { state: "Alabama", abbr: "AL" },
+          { state: "Alaska", abbr: "AK" },
+          { state: "Arizona", abbr: "AZ" },
+          { state: "Arkansas", abbr: "AR" },
+          { state: "California", abbr: "CA" },
+          { state: "Colorado", abbr: "CO" },
+          { state: "Connecticut", abbr: "CT" },
+          { state: "Delaware", abbr: "DE" },
+          { state: "Florida", abbr: "FL" },
+          { state: "Georgia", abbr: "GA" },
+          { state: "Hawaii", abbr: "HI" },
+          { state: "Idaho", abbr: "ID" },
+          { state: "Illinois", abbr: "IL" },
+          { state: "Indiana", abbr: "IN" },
+          { state: "Iowa", abbr: "IA" },
+          { state: "Kansas", abbr: "KS" },
+          { state: "Kentucky", abbr: "KY" },
+          { state: "Louisiana", abbr: "LA" },
+          { state: "Maine", abbr: "ME" },
+          { state: "Maryland", abbr: "MD" },
+          { state: "Massachusetts", abbr: "MA" },
+          { state: "Michigan", abbr: "MI" },
+          { state: "Minnesota", abbr: "MN" },
+          { state: "Mississippi", abbr: "MS" },
+          { state: "Missouri", abbr: "MO" },
+          { state: "Montana", abbr: "MT" },
+          { state: "Nebraska", abbr: "NE" },
+          { state: "Nevada", abbr: "NV" },
+          { state: "New Hampshire", abbr: "NH" },
+          { state: "New Jersey", abbr: "NJ" },
+          { state: "New Mexico", abbr: "NM" },
+          { state: "New York", abbr: "NY" },
+          { state: "North Carolina", abbr: "NC" },
+          { state: "North Dakota", abbr: "ND" },
+          { state: "Ohio", abbr: "OH" },
+          { state: "Oklahoma", abbr: "OK" },
+          { state: "Oregon", abbr: "OR" },
+          { state: "Pennsylvania", abbr: "PA" },
+          { state: "Rhode Island", abbr: "RI" },
+          { state: "South Carolina", abbr: "SC" },
+          { state: "South Dakota", abbr: "SD" },
+          { state: "Tennessee", abbr: "TN" },
+          { state: "Texas", abbr: "TX" },
+          { state: "Utah", abbr: "UT" },
+          { state: "Vermont", abbr: "VT" },
+          { state: "Virginia", abbr: "VA" },
+          { state: "Washington", abbr: "WA" },
+          { state: "West Virginia", abbr: "WV" },
+          { state: "Wisconsin", abbr: "WI" },
+          { state: "Wyoming", abbr: "WY" }],
+        stateSelection: null,
         tournamentList: [],
         tournamentSelection: null,
         slug: '',
@@ -340,7 +408,7 @@
 
       if(key != null) {
         this.apiKey = key
-        this.loadTournamentList()
+        //this.loadTournamentList()
       }
 
       this.getLogoFromDB()
@@ -399,19 +467,21 @@
       },
       saveAPIKey() {
         localStorage.setItem('apiKey',this.apiKey)
-        this.loadTournamentList()
+        //this.loadTournamentList()
       },
       async loadTournamentList() {
         try {
-
-          const results = await StartGGAPI.queryTournaments(this.apiKey)
-          this.tournamentList = results
-
+          if(this.stateSelection != null) {
+            const key = this.apiKey
+            const stateAbbr = this.stateSelection.abbr
+            const results = await StartGGAPI.queryTournaments(key,stateAbbr)
+            this.tournamentList = results
+          }
         } catch (e) {
           console.log(e)
         }
       },
-      submitSettings() {
+      async submitSettings() {
         
         const settings = {
           poll:this.polling,
@@ -424,7 +494,18 @@
           logoChoice: this.logoChoice,
         }
 
-        OverlayDataManager.saveOverlaySettings(this.host+this.port,<%= user.id %>,settings)
+        if(this.slug.length > 0) {
+          const result = await OverlayDataManager.saveOverlaySettings(this.host+this.port,<%= user.id %>,settings)
+          
+          if(result) {
+            alert('Settings successfully saved.')
+          } else {
+            alert('Error occured while saving settings.')
+          }
+
+        } else {
+          alert('Please choose a tournament.')
+        }
 
       },
     },

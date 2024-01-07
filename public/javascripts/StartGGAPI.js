@@ -1,11 +1,10 @@
 
 export default {
 
-  async queryTournaments(key) {
+  async queryTournaments(key,state) {
     const tournamentQueryData = []
   
     try {
-      const addrState = 'AR'
       const query = `
       query LocalTournaments($addrState:String) {
         tournaments(
@@ -46,7 +45,7 @@ export default {
         body: JSON.stringify({
           query,
           variables: {
-            addrState: addrState
+            addrState: state
           },
         }),
       })

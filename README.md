@@ -70,4 +70,5 @@ docker compose down
 1. Paste your Start.gg API key into the field on the Dashboard.
 2. Select your tournament and options.
 3. Copy the generated URL into the Browser Source URL field.
-4. In Start.gg, add a match to the stream queue then start the match.
+4. Create a stream queue in Start.gg.
+5. In Start.gg, add a match to the stream queue, then start the match.

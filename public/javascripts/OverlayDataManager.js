@@ -27,7 +27,6 @@ export default {
 
       if(response.ok) {
         const results = await response.json()
-        console.log(results)
         if(results.length > 0) {
           data.user_id = results[0].user_id 
           data.overlay_path = results[0].overlay_path 
@@ -95,8 +94,9 @@ export default {
       })
 
       if(response.ok) {
-        const results = await response.json()
-        // TODO: Return something useful?
+        return true;
+      } else {
+        return false;
       }
 
     } catch(e) {

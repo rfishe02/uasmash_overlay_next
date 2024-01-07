@@ -23,6 +23,10 @@
       width: 100%;
     }
 
+    .p-dropdown {
+      width: 100%;
+    }
+
     .p-dropdown-panel {
       overflow: hidden;
     }
@@ -50,15 +54,16 @@
         <div class="col-6" style="padding-left: 50px; padding-right: 50px;">
 
           <div class="row mb-3" style="text-align: center">
-            <h4>Simple Browser Source URL Generator</h4>
+            <h4>Demo Browser Source URL Generator</h4>
+            <p>Paste your Start.gg API key to begin.</p>
           </div>
 
           <div class="row mb-3">
             <div class="col">
               <label>Start.gg API Key</label>
               <div class="p-inputgroup">
-                <p-inputtext v-model="apiKey" @change="saveAPIKey"></p-inputtext>
-                <!--<p-button label="Save Key" @click="saveAPIKey"></p-button>-->
+                <p-inputtext v-model="apiKey" @input="saveAPIKey"></p-inputtext>
+                <!--<p-button label="Save Key" @click="saveAPIKey">Save Key</p-button>-->
               </div>
             </div>
           </div>
@@ -94,22 +99,35 @@
                 <p-radiobutton inputId="showScore2" name="showScore" value="Hide" v-model="selectedShowScore"></p-radiobutton>
                 <label for="showScore2">&nbsp;<i>Hide</i></label>
               </div>
-
             </div>
           </div>
 
           <div class="row mb-3" v-if="apiKey.length > 0">
-            <p-dropdown
+            <div class="col">
+              <p-dropdown
+              v-model="stateSelection"
+              :options="stateList"
+              option-label="state"
+              placeholder="Select a State"
+              @change="loadTournamentList()"
+              ></p-dropdown>
+            </div>
+          </div>
+
+          <div class="row mb-3" v-if="stateSelection != null">
+            <div class="col">
+              <p-dropdown
               v-model="tournamentSelection"
               :options="tournamentList"
               option-label="name"
               placeholder="Select a Tournament"
               @change="getOverlayURLs()"
-            ></p-dropdown>
+              ></p-dropdown>
+            </div>
           </div>
 
           <div class="row">
-            <div class="col p-0">
+            <div class="col">
               <template v-for="(item,index) in overlayURLs">
                 <label for="'playeroverlay'+index">Player Overlay</label>
                 <div id="'playeroverlay'+index" class="p-inputgroup mb-2">
@@ -188,8 +206,60 @@
         port: ":3000",
         username: "",
         password: "",
+        stateList: [
+          { state: "Alabama", abbr: "AL" },
+          { state: "Alaska", abbr: "AK" },
+          { state: "Arizona", abbr: "AZ" },
+          { state: "Arkansas", abbr: "AR" },
+          { state: "California", abbr: "CA" },
+          { state: "Colorado", abbr: "CO" },
+          { state: "Connecticut", abbr: "CT" },
+          { state: "Delaware", abbr: "DE" },
+          { state: "Florida", abbr: "FL" },
+          { state: "Georgia", abbr: "GA" },
+          { state: "Hawaii", abbr: "HI" },
+          { state: "Idaho", abbr: "ID" },
+          { state: "Illinois", abbr: "IL" },
+          { state: "Indiana", abbr: "IN" },
+          { state: "Iowa", abbr: "IA" },
+          { state: "Kansas", abbr: "KS" },
+          { state: "Kentucky", abbr: "KY" },
+          { state: "Louisiana", abbr: "LA" },
+          { state: "Maine", abbr: "ME" },
+          { state: "Maryland", abbr: "MD" },
+          { state: "Massachusetts", abbr: "MA" },
+          { state: "Michigan", abbr: "MI" },
+          { state: "Minnesota", abbr: "MN" },
+          { state: "Mississippi", abbr: "MS" },
+          { state: "Missouri", abbr: "MO" },
+          { state: "Montana", abbr: "MT" },
+          { state: "Nebraska", abbr: "NE" },
+          { state: "Nevada", abbr: "NV" },
+          { state: "New Hampshire", abbr: "NH" },
+          { state: "New Jersey", abbr: "NJ" },
+          { state: "New Mexico", abbr: "NM" },
+          { state: "New York", abbr: "NY" },
+          { state: "North Carolina", abbr: "NC" },
+          { state: "North Dakota", abbr: "ND" },
+          { state: "Ohio", abbr: "OH" },
+          { state: "Oklahoma", abbr: "OK" },
+          { state: "Oregon", abbr: "OR" },
+          { state: "Pennsylvania", abbr: "PA" },
+          { state: "Rhode Island", abbr: "RI" },
+          { state: "South Carolina", abbr: "SC" },
+          { state: "South Dakota", abbr: "SD" },
+          { state: "Tennessee", abbr: "TN" },
+          { state: "Texas", abbr: "TX" },
+          { state: "Utah", abbr: "UT" },
+          { state: "Vermont", abbr: "VT" },
+          { state: "Virginia", abbr: "VA" },
+          { state: "Washington", abbr: "WA" },
+          { state: "West Virginia", abbr: "WV" },
+          { state: "Wisconsin", abbr: "WI" },
+          { state: "Wyoming", abbr: "WY" }],
+        stateSelection: null,
         tournamentList: [],
-        tournamentSelection: [],
+        tournamentSelection: null,
         playerOverlay: "overlay/players",
         waitingOverlay: "overlay/waiting",
         upcomingOverlay: "overlay/upcoming",
@@ -220,7 +290,6 @@
 
       if(key != null) {
         this.apiKey = key
-        this.loadTournamentList()
       }
 
     },
@@ -284,10 +353,14 @@
       },
       async loadTournamentList() {
         try {
+          if(this.stateSelection != null) {
 
-          const results = await StartGGAPI.queryTournaments(this.apiKey)
-          this.tournamentList = results
+            const key = this.apiKey
+            const stateAbbr = this.stateSelection.abbr
+            const results = await StartGGAPI.queryTournaments(key,stateAbbr)
+            this.tournamentList = results
 
+          }
         } catch (e) {
           console.log(e)
         }
@@ -325,7 +398,6 @@
       },
       saveAPIKey() {
         localStorage.setItem('apiKey',this.apiKey)
-        this.loadTournamentList()
       }
     },
     components: {
