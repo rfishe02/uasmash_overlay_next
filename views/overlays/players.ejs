@@ -92,7 +92,7 @@
   import OverlayDataManager from '/javascripts/OverlayDataManager.js'
   const { createApp } = Vue
 
-  const socket = io("http://" + window.location.hostname + ":3000", {
+  const socket = io(window.location.origin, {
     reconnectionDelayMax: 10000,
     autoConnect: false,
   })
@@ -131,8 +131,6 @@
   const playerOverlayApp = createApp({
     data() {
       return {
-        host: 'http://' + window.location.hostname,
-        port: ":3000",
         p1: {},
         p2: {},
         p1Name: "",
@@ -191,7 +189,7 @@
 
       if(this.room != null) {
 
-        OverlayDataManager.importOverlaySettings(this.host+this.port,this.room).then((data) => {
+        OverlayDataManager.importOverlaySettings(window.location.origin,this.room).then((data) => {
 
           if(data.settings != null) {
 
@@ -207,7 +205,25 @@
             this.logoChoice = data.settings.logoChoice
 
             if(data.settings.logoChoice.length > 0){
-              this.logoChoice = '/data/uploads/' + data.settings.logoChoice
+
+              const imageResponse = fetch(data.settings.logoChoice, {
+                method: "get",
+                headers: {
+                  "Content-Type": "image/png",
+                },
+              }).then((response) => {
+                if (!response.ok) {
+                  throw new Error('Network response was not ok');
+                }
+                return response.blob()
+              }).then((blob) => {
+                const imageURL = URL.createObjectURL(blob)
+                this.logoChoice = imageURL
+              })
+              .catch((error) => {
+                console.error('Fetch error:', error)
+              })
+
             } else {
               this.logoChoice = ""
             }

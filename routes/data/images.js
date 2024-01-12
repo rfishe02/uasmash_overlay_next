@@ -1,24 +1,33 @@
-const db = require('../../bin/db')
+const db = require('../../bin/db');
 
-var express = require('express')
-var router = express.Router()
-
-const multer  = require('multer')
+var express = require('express');
+var router = express.Router();
+var fs = require('fs');
+var path = require('path');
+const multer  = require('multer');
 
 const multerStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, './public/data/uploads/');
+
+    const userID = req.user.id + "";
+    const userUploadDir = path.join('/server','uploads',userID);
+
+    if (!fs.existsSync(userUploadDir)) {
+      fs.mkdirSync(userUploadDir, { recursive: true });
+    }
+
+    cb(null, userUploadDir);
   },
   filename: (req, file, cb) => {
-    const ext = file.mimetype.split("/")[1];
-    cb(null, `user-${req.user.id}-logo.${ext}`);
+    //cb(null, Date.now() + '-' + file.originalname);
+    cb(null, file.originalname);
   },
 });
 
 const multerFilter = (req, file, cb) => {
   const fileType = file.mimetype.split("/")[1]
 
-  if (fileType === "png") {
+  if (fileType == "png" || fileType == "PNG") {
     cb(null, true);
   } else {
     cb(new Error("Not a supported file."), false);
@@ -34,7 +43,6 @@ const upload = multer({
 router.post('/upload', isLoggedIn, upload.array('files[]'), async function(req, res, next) {
   try {
 
-    //const user_id = req.body.user_id;
     const user_id = req.user.id;
     const image_name = req.files[0].filename;
 
@@ -52,16 +60,32 @@ router.post('/upload', isLoggedIn, upload.array('files[]'), async function(req, 
   }
 });
 
-router.get('/gather', isLoggedIn, async function(req, res, next) {
+router.get('/all', isLoggedIn, async function(req, res, next) {
   try {
 
     const user_id = req.query.user_id;
-    const result = await db.pool.query("SELECT * FROM user_images WHERE user_id = ?",[user_id]);
+    if(req.user.id == user_id) {
+      const result = await db.pool.query("SELECT * FROM user_images WHERE user_id = ?",[user_id]);
 
-    res.setHeader("Content-Type", "application/json; charset=UTF-8");
-    res.json(result);
+      res.setHeader("Content-Type", "application/json; charset=UTF-8");
+      res.json(result);
+    } else {
+      next('Permission denied.');
+    }
 
   } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/get', async function(req, res, next) {
+  try {
+    const user_id = req.query.user_id + "";
+    const filename = req.query.filename + "";
+
+    const filePath = path.join('/server','uploads',user_id,filename);
+    res.sendFile(filePath);
+  } catch(err) {
     next(err);
   }
 });

@@ -91,7 +91,7 @@
                 :multiple="false"
                 :with-credentials="true"
                 name="files[]"
-                :url="this.host + this.port + '/data/images/upload'"
+                :url="originURL + '/data/images/upload'"
                 accept="image/png" 
                 :max-file-size="1000000" 
                 @upload="onUpload" 
@@ -107,8 +107,8 @@
             </div>
 
             <div class="col-12 mb-2" v-for="(url, index) of logoUrl" :key="url">
-              <p-radiobutton :inputId="'logoChoice' + (index + 1)" name="logoChoice" :value="url" v-model="logoChoice"></p-radiobutton>
-              <label :for="'logoChoice' + (index + 1)">&nbsp; <img v-if="url.length > 0" :src="'/data/uploads/' + url" style="height: 30px; background-color: black;"/></label>
+              <p-radiobutton :inputId="'logoChoice' + (index + 1)" name="logoChoice" :value="url.value" v-model="logoChoice"></p-radiobutton>
+              <label :for="'logoChoice' + (index + 1)">&nbsp; <img v-if="url.src.length > 0" :src="url.src" style="height: 30px; background-color: black;"/></label>
             </div>
           </div>
 
@@ -274,8 +274,7 @@
   const dashboardApp = createApp({
     data() {
       return {
-        host: 'http://' + window.location.hostname,
-        port: ":3000",
+        originURL: window.location.origin,
         navLogoUrl: '/fsmsmashlogo.png',
         navLinks:[
           {url: '/editor', name: 'Manual Editor'},
@@ -383,13 +382,12 @@
           if(data.length > 0) {
             const file = data[0].filename == null ? '' : data[0].filename
 
-            const item = dashboardApp.logoUrl.find(x => x == file)
+            const item = dashboardApp.logoUrl.find(x => x.value.indexOf(file) > 0)
             if(item == null) {
-              dashboardApp.logoUrl.push(file)
+              dashboardApp.logoUrl.push({src: file, value: '/data/images/get?user_id=<%= user.id %>' + "&filename=" + file})
             }
           }          
         }
-
 			}
 
 			return { onUpload };
@@ -398,7 +396,7 @@
     mounted() {
 
       this.overlayList.forEach(item => {
-        OverlayDataManager.importOverlayDataOrGenerate(this.host+this.port,<%= user.id %>,item.path,item.name).then((data) => {
+        OverlayDataManager.importOverlayDataOrGenerate(window.location.origin,<%= user.id %>,item.path,item.name).then((data) => {
           const urlItem = {types: item.types, path:item.path, name:item.name, room:data.key_value}
           this.overlayURLs.push(urlItem)
         })
@@ -418,7 +416,7 @@
       async getLogoFromDB () {
 
         try {
-          const url = this.host + this.port + '/data/images/gather?' + new URLSearchParams({ "user_id": <%= user.id %> })
+          const url = window.location.origin + '/data/images/all?' + new URLSearchParams({ "user_id": <%= user.id %> })
 
           const response = await fetch(url, {
             method: "get",
@@ -429,9 +427,19 @@
 
           if(response.ok) {
             const results = await response.json()
-            if(results.length > 0) {
-              if(results[0].image_name != null){
-                this.logoUrl.push(results[0].image_name)
+
+            for(var i = 0; i < results.length; i++) {
+              const imageFetchURL = '/data/images/get?user_id=<%= user.id %>' + "&filename=" + results[i].image_name
+              const imageResponse = await fetch(imageFetchURL, {
+                method: "get",
+                headers: {
+                  "Content-Type": "image/png",
+                },
+              })
+              if (imageResponse.ok) {
+                const blob = await imageResponse.blob()
+                const imageURL = URL.createObjectURL(blob)
+                this.logoUrl.push({src: imageURL, value: imageFetchURL})
               }
             }
           }
@@ -444,7 +452,7 @@
       getOverlayURL(overlay_path,params) {
 
         if(overlay_path != null && params != null) {
-          return this.host + this.port+ "/overlay/" + overlay_path + "?" + new URLSearchParams(params)
+          return window.location.origin + "/overlay/" + overlay_path + "?" + new URLSearchParams(params)
         } else {
           return ''
         }
@@ -456,7 +464,7 @@
         }
       },
       async regenerateKey(overlay_path,overlay_name) {
-        OverlayDataManager.regenerateOverlayKey(this.host+this.port,<%= user.id %>,overlay_path,overlay_name).then((data) => {
+        OverlayDataManager.regenerateOverlayKey(window.location.origin,<%= user.id %>,overlay_path,overlay_name).then((data) => {
           const url = this.overlayURLs.find(x => x.path == data.overlay_path)
           if(url != null){
             url.path = data.overlay_path
@@ -495,7 +503,7 @@
         }
 
         if(this.slug.length > 0) {
-          const result = await OverlayDataManager.saveOverlaySettings(this.host+this.port,<%= user.id %>,settings)
+          const result = await OverlayDataManager.saveOverlaySettings(window.location.origin,<%= user.id %>,settings)
           
           if(result) {
             alert('Settings successfully saved.')
