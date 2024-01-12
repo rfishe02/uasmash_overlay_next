@@ -202,8 +202,6 @@
   createApp({
     data() {
       return {
-        host: 'http://' + window.location.hostname,
-        port: ":3000",
         username: "",
         password: "",
         stateList: [
@@ -299,7 +297,7 @@
           if(this.username.length > 0  && this.password.length > 0) {
 
             const data = {"username": this.username,"password": this.password};
-            const path = this.host + this.port
+            const path = window.location.origin
 
             try {
               const response = await fetch(path + '/users/login', {
@@ -312,9 +310,12 @@
 
               if(response.status == 200) {
                 window.location.href = path + '/dashboard'
+              } else {
+                alert('Username or password is incorrect.')
               }
             } catch (e) {
-              console.log(e)
+              alert('Login attempt failed.')
+              //console.log(e)
             }
 
           } else {
@@ -327,7 +328,7 @@
           if(this.username.length > 0  && this.password.length > 0) {
 
             const data = {"username": this.username,"password": this.password};
-            const path = this.host + this.port
+            const path = window.location.origin
 
             try {
               const response = await fetch(path + '/users/signup', {
@@ -339,11 +340,14 @@
               });
 
               if(response.status == 200) {
-                window.location.href = this.host + this.port + '/'
+                alert('Signup successful!')
+              } else {
+                alert('Signup unsuccessful.')
               }
 
             } catch (e) {
-              console.log(e)
+              alert('Signup attempt failed.')
+              //console.log(e)
             }
 
           } else {
@@ -370,7 +374,7 @@
 
         this.overlayURLs = []
         for(var i = 0; i < this.overlayTypes.length; i++) {
-          const url = this.host + this.port + "/" + this.playerOverlay + "?" + new URLSearchParams({
+          const url = window.location.origin + "/" + this.playerOverlay + "?" + new URLSearchParams({
             "type": this.overlayTypes[i],
             "poll": true,
             "winnerBestOfStart": this.selectedWinnerBestOfStart,
@@ -383,13 +387,13 @@
           this.overlayURLs.push(url)
         }
 
-        this.waitingOverlayURL = this.host + this.port + "/" + this.waitingOverlay + "?" + new URLSearchParams({
+        this.waitingOverlayURL = window.location.origin + "/" + this.waitingOverlay + "?" + new URLSearchParams({
           "type": 0,
           "slug": slug,
           "startgg_key": this.apiKey,
         })
 
-        this.upcomingOverlayURL = this.host + this.port + "/" + this.upcomingOverlay + "?" + new URLSearchParams({
+        this.upcomingOverlayURL = window.location.origin + "/" + this.upcomingOverlay + "?" + new URLSearchParams({
           "type": 0,
           "slug": slug,
           "startgg_key": this.apiKey,
