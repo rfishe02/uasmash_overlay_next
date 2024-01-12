@@ -9,8 +9,6 @@ services:
     restart: always
     ports:
       - 3306:3306
-    volumes:
-      - ./mariadb/var/lib/mysql:/var/lib/mysql
     env_file:
       - ./.env
 
@@ -29,5 +27,6 @@ services:
       - ./public:/server/public
       - ./routes:/server/routes
       - ./views:/server/views
+      - ./uploads:/server/uploads
     env_file:
       - ./.env

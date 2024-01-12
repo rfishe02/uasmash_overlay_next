@@ -12,9 +12,8 @@ WORKDIR /server
 
 COPY ["package.json", "package-lock.json*", "./"]
 
-RUN mkdir -p /server/public/data/uploads
-RUN chmod 755 /server/public/data/uploads
-
+RUN mkdir -p /server/uploads
+RUN chmod 755 /server/uploads
 
 RUN if [ "${NODE_ENV}" = "production" ]; then \
       npm install --production; \

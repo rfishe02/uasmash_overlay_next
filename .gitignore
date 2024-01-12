@@ -3,6 +3,5 @@ node_modules
 .env
 *.local
 *.db
-mariadb/var/
-public/data/uploads/
+/uploads
 .DS_Store
