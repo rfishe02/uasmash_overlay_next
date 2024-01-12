@@ -88,7 +88,7 @@
   const { createApp} = Vue
   import StageCardLarge from '/javascripts/StageCardLarge.js'
 
-  const socket = io("http://" + window.location.hostname + ":3000", {
+  const socket = io(window.location.origin, {
     reconnectionDelayMax: 10000,
     autoConnect: false,
   })
@@ -129,8 +129,6 @@
   const stageStrikesApp = createApp({
     data() {
       return {
-        host: 'http://' + window.location.hostname,
-        port: ":3000",
         socket: socket,
         showstrike: false,
         strikeList: [],
@@ -159,8 +157,8 @@
       },
       async getStageImageURLs() {
         try {
-
-          const response = await fetch(this.host + this.port + '/data/stages', {
+          const url = window.location.origin + '/data/stages'
+          const response = await fetch(url, {
             method: "get",
             headers: {
               "Content-Type": "application/json; charset=UTF-8",

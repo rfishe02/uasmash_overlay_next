@@ -119,8 +119,6 @@
   const upcomingApp = createApp({
     data() {
       return {
-        host: 'http://' + window.location.hostname,
-        port: ":3000",
         apiKey: '',
         setList: [],
         preReqList: {},
@@ -148,7 +146,7 @@
 
       if(this.room != null) {
 
-        OverlayDataManager.importOverlaySettings(this.host+this.port,this.room).then((data) => {
+        OverlayDataManager.importOverlaySettings(window.location.origin,this.room).then((data) => {
 
           if(data.settings != null) {
 

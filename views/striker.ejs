@@ -223,7 +223,7 @@
 
   const { createApp } = Vue
 
-  const socket = io("http://" + window.location.hostname + ":3000", {
+  const socket = io(window.location.origin, {
     reconnectionDelayMax: 10000,
     autoConnect: false,
   })
@@ -259,8 +259,6 @@
   const editorApp = createApp({
     data() {
       return {
-        host: 'http://' + window.location.hostname,
-        port: ":3000",
         navLogoUrl: '/fsmsmashlogo.png',
         stageImageURLs: {},
         stageNameList: [],
@@ -289,7 +287,7 @@
 
       // TODO: Consider making this import only.
 
-      OverlayDataManager.importOverlayDataOrGenerate(this.host+this.port,<%= user.id %>,"stage_strikes","Stage Strikes Overlay").then((data) => {
+      OverlayDataManager.importOverlayDataOrGenerate(window.location.origin,<%= user.id %>,"stage_strikes","Stage Strikes Overlay").then((data) => {
         if(data.key_value.length > 0) {
           this.strikerRoom = data.key_value
           
@@ -316,7 +314,8 @@
       },
       async loadConfigStageList() {
         try {
-          const response = await fetch(this.host + this.port + '/data/stages', {
+          const url = window.location.origin + '/data/stages'
+          const response = await fetch(url, {
             method: "get",
             headers: {
               "Content-Type": "application/json; charset=UTF-8",
@@ -435,8 +434,8 @@
       },
       async saveStageSelectionsToDB(stage_list) {
         try {
-
-          const response = await fetch(this.host+this.port+'/data/stage_lists/save_list', {
+          const url = window.location.origin + '/data/stage_lists/save_list'
+          const response = await fetch(url, {
             method: "post",
             headers: {
               "Content-Type": "application/json; charset=UTF-8",
@@ -454,8 +453,8 @@
       },
       async loadStageSelectionsFromDB() {
         try {
-
-          const response = await fetch(this.host+this.port+'/data/stage_lists/load_list', {
+          const url = window.location.origin + '/data/stage_lists/load_list'
+          const response = await fetch(url, {
             method: "post",
             headers: {
               "Content-Type": "application/json; charset=UTF-8",

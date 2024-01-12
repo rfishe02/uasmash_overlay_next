@@ -235,7 +235,7 @@
   const { createApp} = Vue
   const { FilterMatchMode, FilterOperator } = primevue.api;
 
-  const socket = io("http://" + window.location.hostname + ":3000", {
+  const socket = io(window.location.origin, {
     reconnectionDelayMax: 10000,
     autoConnect: false,
   })
@@ -283,8 +283,6 @@
   const editorApp = createApp({
     data() {
       return {
-        host: 'http://' + window.location.hostname,
-        port: ":3000",
         navLogoUrl: '/fsmsmashlogo.png',
         navLinks:[],
         playerEntry: '',
@@ -354,7 +352,7 @@
 
       // TODO: Consider making this import only.
 
-      OverlayDataManager.importOverlayDataOrGenerate(this.host+this.port,<%= user.id %>,"players","Player Overlay").then((data) => {
+      OverlayDataManager.importOverlayDataOrGenerate(window.location.origin,<%= user.id %>,"players","Player Overlay").then((data) => {
         if(data.key_value.length > 0) {
           this.playerRoom = data.key_value
           

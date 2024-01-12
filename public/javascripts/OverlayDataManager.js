@@ -5,9 +5,10 @@ export default {
 
   async importOverlayDataOrGenerate(path,user_id,overlay_path,overlay_name) {
     var data = await this.importOverlayData(path,user_id,overlay_path)
+    const url = path + this.overlayBaseURL + 'make_data'
 
     if(data.key_value.length == 0) {
-      data = await this.generateOverlayData(path+this.overlayBaseURL+'make_data',user_id,overlay_path,overlay_name)
+      data = await this.generateOverlayData(url,user_id,overlay_path,overlay_name)
     }
 
     return data;
@@ -74,7 +75,8 @@ export default {
   },
 
   async regenerateOverlayKey(path,user_id,overlay_path,overlay_name) {
-    var data = await this.generateOverlayData(path+this.overlayBaseURL+'update_key',user_id,overlay_path,overlay_name)
+    const url = path + this.overlayBaseURL + 'update_key'
+    var data = await this.generateOverlayData(url,user_id,overlay_path,overlay_name)
     return data
   },
 
