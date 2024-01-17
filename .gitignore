@@ -5,3 +5,4 @@ node_modules
 *.db
 /uploads
 .DS_Store
+/mariadb/var
