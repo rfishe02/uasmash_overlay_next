@@ -13,47 +13,31 @@ router.post(
 
     res
     .status(200)
-    .json({
-      message: 'Signup successful'
-    });
+    .json({redirectUrl: '/'});
 
   }
 );
 
 router.post(
   '/login',
-  async (req, res, next) => {
-    passport.authenticate(
-      'login',
-      async (err, user, info) => {
-        try {
+  passport.authenticate('login', { failureRedirect: '/login', failureMessage: true }), 
+  async function (req, res, next){
 
-          if (err || !user) {
-            res.status(401).json({ message:info.message })
-            return next(new Error(info.message));
-          }
+    res
+    .status(200)
+    .json({ redirectUrl: '/dashboard' });
 
-          req.login(
-            user,
-            async (error) => {
-              if (error) return next(error);
-
-              return res
-              .status(200)
-              .json({
-                message: "Login successful"
-              });
-            }
-          );
-
-        } catch (error) {
-          return next(error);
-        }
-      }
-    )(req, res, next);
   }
 );
 
-//TODO: Logout feature.
+router.post(
+  '/logout',
+  function(req, res, next) {
+    req.logout(function(err) {
+      if (err) { return next(err); }
+      res.status(200).json({ redirectUrl: '/' });
+    });
+  }
+);
 
 module.exports = router;

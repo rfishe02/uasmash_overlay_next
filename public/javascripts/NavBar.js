@@ -1,7 +1,32 @@
 export default {
   props: {
     iconUrl:'',
-    links: []
+    links: [],
+  },
+  methods: {
+    logOut : function () {
+      fetch("/users/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams()
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("POST attempt to /logout was not OK");
+          }
+          return response.json();
+        })
+        .then((data) => {
+         
+          window.location.href = data.redirectUrl;
+          
+        })
+        .catch((error) => {
+          console.error("Users POST error:", error);
+        });
+    }
   },
   template: `
   <nav class="navbar navbar-expand-md navbar-dark bg-secondary">
@@ -31,8 +56,7 @@ export default {
 
         <div class="navbar-nav me-auto m-2"></div>
 
-        <!-- TODO: Log out feature. -->
-        <!--<button class="btn btn-light" type="button" @click="logOut">Log Out</button>-->
+        <button class="btn btn-light" type="button" @click="logOut">Log Out</button>
 
       </div>
     </div>
