@@ -18,20 +18,6 @@
   <!--
   <link rel="stylesheet" href="/stylesheets/style.css">-->
 
-  <style>
-    .p-inputtext {
-      width: 100%;
-    }
-
-    .p-dropdown {
-      width: 100%;
-    }
-
-    .p-dropdown-panel {
-      overflow: hidden;
-    }
-  </style>
-
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
@@ -60,10 +46,10 @@
 
           <div class="row mb-3">
             <div class="col">
-              <label>Start.gg API Key</label>
-              <div class="p-inputgroup">
-                <p-inputtext v-model="apiKey" @input="saveAPIKey"></p-inputtext>
-                <!--<p-button label="Save Key" @click="saveAPIKey">Save Key</p-button>-->
+              <label for="api-key-input">Start.gg API Key</label>
+              <div class="input-group mb-3">
+                <input type="text" class="form-control" id="api-key-input" v-model="apiKey" @input="saveAPIKey">
+                <button class="btn btn-outline-secondary" type="button" @click="saveAPIKey">Save Key</button> <!-- TODO: Make this less reliant on pasting the key to generate URLS. -->
               </div>
             </div>
           </div>
@@ -72,16 +58,20 @@
             <div class="col">
               <label>Winners "Best Of 5" Starting Point</label>
               <div v-for="option of finalsStartOptions" :key="option" class="field-radiobutton">
-                <p-radiobutton :inputId="'winner' + option" name="winnerStart" :value="option" v-model="selectedWinnerBestOfStart"></p-radiobutton>
-                <label :for="'winner' + option">&nbsp;<i>{{option}}</i></label>
+                <div class="form-check">
+                  <input class="form-check-input" :id="'winner' + option" type="radio" name="winnerStart" :value="option" v-model="selectedWinnerBestOfStart">
+                  <label class="form-check-label" :for="'winner' + option">&nbsp;<i>{{option}}</i></label>
+                </div>
               </div>
             </div>
 
             <div class="col">
               <label>Losers "Best Of 5" Starting Point</label>
               <div v-for="option of finalsStartOptions" :key="option" class="field-radiobutton">
-                <p-radiobutton :inputId="'loser' + option" name="loserStart" :value="option" v-model="selectedLoserBestOfStart"></p-radiobutton>
-                <label :for="'loser' + option">&nbsp;<i>{{option}}</i></label>
+                <div class="form-check">
+                  <input class="form-check-input" :id="'loser' + option" type="radio" name="loserStart" :value="option" v-model="selectedLoserBestOfStart">
+                  <label class="form-check-label" :for="'loser' + option">&nbsp;<i>{{option}}</i></label>
+                </div>
               </div>
             </div>
           </div>
@@ -89,63 +79,60 @@
           <div class="row mb-3" v-if="apiKey.length > 0">
             <div class="col">
               <label>Show Scores</label>
-
-              <div class="field-radiobutton">
-                <p-radiobutton inputId="showScore1" name="showScore" value="Show" v-model="selectedShowScore"></p-radiobutton>
-                <label for="showScore1">&nbsp;<i>Show</i></label>
+              <div class="form-check">
+                <input class="form-check-input" id="showScore1" type="radio" name="showScore" value="Show" v-model="selectedShowScore">
+                <label class="form-check-label" for="showScore1">&nbsp;<i>Show</i></label>
               </div>
 
-              <div class="field-radiobutton">
-                <p-radiobutton inputId="showScore2" name="showScore" value="Hide" v-model="selectedShowScore"></p-radiobutton>
-                <label for="showScore2">&nbsp;<i>Hide</i></label>
+              <div class="form-check">
+                <input class="form-check-input" id="showScore2" type="radio" name="showScore" value="Hide" v-model="selectedShowScore">
+                <label class="form-check-label" for="showScore2">&nbsp;<i>Hide</i></label>
               </div>
             </div>
           </div>
 
           <div class="row mb-3" v-if="apiKey.length > 0">
             <div class="col">
-              <p-dropdown
-              v-model="stateSelection"
-              :options="stateList"
-              option-label="state"
-              placeholder="Select a State"
-              @change="loadTournamentList()"
-              ></p-dropdown>
+              <select class="form-select" aria-label="State selection" v-model="stateSelection" @change="loadTournamentList()">     
+                <option value="" selected>Select a State</option>
+                <template v-for="(item,index) in stateList">
+                  <option :value="item.abbr">{{item.state}}</option>
+                </template>
+              </select>
             </div>
           </div>
 
           <div class="row mb-3" v-if="stateSelection != null">
             <div class="col">
-              <p-dropdown
-              v-model="tournamentSelection"
-              :options="tournamentList"
-              option-label="name"
-              placeholder="Select a Tournament"
-              @change="getOverlayURLs()"
-              ></p-dropdown>
+              <select class="form-select" aria-label="Tournament selection" v-model="tournamentSelection" @change="getOverlayURLs()">     
+                <option value="" selected>Select a Tournament</option>
+                <template v-for="(item,index) in tournamentList">
+                  <option :value="item">{{item.name}}</option>
+                </template>
+              </select>
             </div>
           </div>
 
           <div class="row">
             <div class="col">
               <template v-for="(item,index) in overlayURLs">
-                <label for="'playeroverlay'+index">Player Overlay</label>
-                <div id="'playeroverlay'+index" class="p-inputgroup mb-2">
-                  <p-inputtext type="text" :value="item"> </p-inputtext>
+                <div class="mb-2">
+                  <label for="'playeroverlay'+index">Player Overlay</label>
+                  <input type="text" class="form-control" id="'playeroverlay'+index" :value="item">
                 </div>
               </template>
 
               <template v-if="waitingOverlayURL.length > 0">
-                <label for="waitingoverlay">Waiting Screen</label>
-                <div id="waitingoverlay" class="p-inputgroup mb-2">
-                  <p-inputtext type="text" :value="waitingOverlayURL"> </p-inputtext>
+                <div class="mb-2">
+                  <label for="waitingoverlay">Waiting Screen</label>
+                  <input type="text" class="form-control" id="waitingoverlay" :value="waitingOverlayURL">
                 </div>
               </template>
 
               <template v-if="waitingOverlayURL.length > 0">
-                <label for="upcomingoverlay">Upcoming Matches</label>
-                <div id="upcomingoverlay" class="p-inputgroup mb-2">
-                  <p-inputtext type="text" :value="upcomingOverlayURL"> </p-inputtext>
+                <div class="mb-2">
+                  <label for="upcomingoverlay">Upcoming Matches</label>
+                  <input type="text" class="form-control" id="upcomingoverlay" :value="upcomingOverlayURL">
                 </div>
               </template>
             </div>
@@ -255,7 +242,7 @@
           { state: "West Virginia", abbr: "WV" },
           { state: "Wisconsin", abbr: "WI" },
           { state: "Wyoming", abbr: "WY" }],
-        stateSelection: null,
+        stateSelection: "",
         tournamentList: [],
         tournamentSelection: null,
         playerOverlay: "overlay/players",
@@ -358,10 +345,10 @@
       },
       async loadTournamentList() {
         try {
-          if(this.stateSelection != null) {
+          if(this.stateSelection.length > 0) {
 
             const key = this.apiKey
-            const stateAbbr = this.stateSelection.abbr
+            const stateAbbr = this.stateSelection
             const results = await StartGGAPI.queryTournaments(key,stateAbbr)
             this.tournamentList = results
 
@@ -406,10 +393,7 @@
       }
     },
     components: {
-      "p-inputtext": primevue.inputtext,
-      "p-radiobutton": primevue.radiobutton,
-      "p-dropdown": primevue.dropdown,
-      "p-button": primevue.button,
+
     }
   }).use(primevue.config.default).mount('#app')
 
