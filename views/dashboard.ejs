@@ -11,8 +11,6 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
 
-  <link href="https://unpkg.com/primevue@^3/resources/themes/saga-blue/theme.css" rel="stylesheet">
-  <link href="https://unpkg.com/primevue/resources/primevue.min.css" rel="stylesheet">
   <link href="https://unpkg.com/primeicons/primeicons.css" rel="stylesheet">
 
   <style>
@@ -27,15 +25,6 @@
       padding-left: 20px;
       padding-right: 20px;
     }
-
-    .p-dropdown {
-      width: 100%;
-    }
-
-    .p-dropdown-panel {
-      overflow: hidden;
-      max-height: 250px;
-    }
   </style>
 
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -44,14 +33,6 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js" integrity="sha384-ODmDIVzN+pFdexxHEHFBQH3/9/vQ9uori45z4JjnFsRydbmQbmL5t1tQ0culUzyK" crossorigin="anonymous"></script>
 
   <script src="https://unpkg.com/vue@3"></script>
-
-  <script src="https://unpkg.com/primevue/core/core.min.js"></script>
-  <script src="https://unpkg.com/primevue@^3/radiobutton/radiobutton.min.js"></script>
-  <script src="https://unpkg.com/primevue@^3/checkbox/checkbox.min.js"></script>
-
-  <script src="https://unpkg.com/primevue@^3/fileupload/fileupload.min.js"></script>
-	<script src="https://unpkg.com/primevue@^3/toast/toast.min.js"></script>
-	<script src="https://unpkg.com/primevue@^3/toastservice/toastservice.min.js"></script>
 
   <script src="/socket.io/socket.io.js"></script>
 
@@ -62,7 +43,7 @@
 
     <nav-bar :icon-url="navLogoUrl" :links="navLinks"></nav-bar>
 
-    <p-toast></p-toast>
+    <!--<p-toast></p-toast>-->
 
     <div class="container" style="padding-bottom: 15px; padding-top: 15px;">
 
@@ -84,9 +65,9 @@
           </div>
 
           <div class="row mb-4">
-            <div class="col-12 mb-2">
+            <div class="col-12 mb-4">
 
-              <p-fileupload 
+              <!--<p-fileupload 
                 mode="basic" 
                 :multiple="false"
                 :with-credentials="true"
@@ -97,35 +78,43 @@
                 @upload="onUpload" 
                 :auto="true" 
                 choose-label="Browse">
-              </p-fileupload>
+              </p-fileupload>-->
+
+              <input type="file" id="fileSelect" accept="image/png" @change="fileUpload" style="display:none" />
+              <button id="fileSelectButton" class="btn btn-primary" type="button" @click="fileSelect">Upload Logo</button>
 
             </div>
 
             <div class="col-12 mb-2">
-              <p-radiobutton inputId="logoChoice0" name="logoChoice" value="" v-model="logoChoice"></p-radiobutton>
-              <label for="logoChoice0">&nbsp; None</label>
+              <div class="form-check">
+                <input class="form-check-input" id="logoChoice0" type="radio" name="logoChoice" value="" v-model="logoChoice">
+                <label class="form-check-label" for="logoChoice0">&nbsp; None</label>
+              </div>
             </div>
 
             <div class="col-12 mb-2" v-for="(url, index) of logoUrl" :key="url">
-              <p-radiobutton :inputId="'logoChoice' + (index + 1)" name="logoChoice" :value="url.value" v-model="logoChoice"></p-radiobutton>
-              <label :for="'logoChoice' + (index + 1)">&nbsp; <img v-if="url.src.length > 0" :src="url.src" style="height: 30px; background-color: black;"/></label>
+              <div class="form-check">
+                <input class="form-check-input" :id="'logoChoice' + (index + 1)" type="radio" name="logoChoice" :value="url.value" v-model="logoChoice">
+                <label class="form-check-label" :for="'logoChoice' + (index + 1)">&nbsp; <img v-if="url.src.length > 0" :src="url.src" style="height: 30px; background-color: gray;"/></label>
+              </div>
             </div>
           </div>
 
           <div class="row">
             <div class="col">
-              <h5>Start.gg API Key</h5>
+              <label for="api-key-input"><h5>Start.gg API Key</h5></label>
             </div>
           </div>
 
           <div class="row mb-4">
             <div class="col">
-              <div class="p-inputgroup">
-                <p-inputtext v-model="apiKey" @input="saveAPIKey"></p-inputtext>
+              <div class="input-group mb-2">
+                <input type="text" class="form-control" id="api-key-input" v-model="apiKey" @input="saveAPIKey">
+                <button class="btn btn-outline-secondary" type="button" @click="saveAPIKey">Save Key</button> <!-- TODO: Make this less reliant on pasting the key to generate URLS. -->
               </div>
-              <div class="field-checkbox">
-                <p-checkbox inputId="binary" v-model="polling" :binary="true"></p-checkbox>
-                <label for="binary">&nbsp; Automatic API polling</label>
+              <div class="form-check mb-2">
+                <input class="form-check-input" id="binary" type="checkbox" name="binary" value="true" v-model="polling">
+                <label class="form-check-label" for="binary">&nbsp; Automatic API polling</label>
               </div>
             </div>
           </div>
@@ -139,36 +128,31 @@
           <div class="row mb-4" v-if="apiKey.length > 0">
 
             <div class="col-12 mb-3">
-              Best of &nbsp;<p-inputtext type="number" v-model="earlyMatches" style="width: 50px;"></p-inputtext> at start
+              <div class="input-group">Best of &nbsp;<input type="number" class="form-control" v-model="earlyMatches" style="max-width: 50px;"></div>
             </div>
 
-            <div class="col-5 mb-1">
-              Best of &nbsp;<p-inputtext type="number" v-model="laterMatches" style="width: 50px;"></p-inputtext> at 
+            <div class="col-5 mb-3">
+              <div class="input-group">Best of &nbsp;<input type="number" class="form-control" v-model="laterMatches" style="max-width: 50px;">&nbsp; at</div>
             </div>
             <div class="col-7">    
-              <p-dropdown v-model="selectedWinnerBestOfStart" :options="finalsStartOptions" :filter="false" placeholder="Winners Starting Point" :show-clear="false" style="width:100%;">
-                <template #value="slotProps">
-                  Winners {{slotProps.value}}
+              <select class="form-select" aria-label="Winners Best Of selection" v-model="selectedWinnerBestOfStart">     
+                <!--<option value="" selected>Winners Starting Point</option>-->
+                <template v-for="(item,index) in finalsStartOptions">
+                  <option :value="item">Winners {{item}}</option>
                 </template>
-                <template #option="slotProps">
-                  Winners {{slotProps.option}}
-                </template>
-              </p-dropdown>
+              </select>
             </div>
 
             <div class="col-5">
-              
             </div>
 
             <div class="col-7">
-              <p-dropdown v-model="selectedLoserBestOfStart" :options="finalsStartOptions" :filter="false" placeholder="Losers Starting Point" :show-clear="false" style="width:100%;">
-                <template #value="slotProps">
-                  Losers {{slotProps.value}}
+              <select class="form-select" aria-label="Losers Starting Point" v-model="selectedLoserBestOfStart">     
+                <!--<option value="" selected>Winners Starting Point</option>-->
+                <template v-for="(item,index) in finalsStartOptions">
+                  <option :value="item">Losers {{item}}</option>
                 </template>
-                <template #option="slotProps">
-                  Losers {{slotProps.option}}
-                </template>
-              </p-dropdown>
+              </select>
             </div>
           </div>
 
@@ -176,14 +160,14 @@
             <div class="col">
               <label>Show Scores</label>
 
-              <div class="field-radiobutton">
-                <p-radiobutton inputId="showScore1" name="showScore" value="Show" v-model="selectedShowScore"></p-radiobutton>
-                <label for="showScore1">&nbsp;<i>Show</i></label>
+              <div class="form-check">
+                <input class="form-check-input" id="showScore1" type="radio" name="showScore" value="Show" v-model="selectedShowScore">
+                <label class="form-check-label" for="showScore1">&nbsp;<i>Show</i></label>
               </div>
 
-              <div class="field-radiobutton">
-                <p-radiobutton inputId="showScore2" name="showScore" value="Hide" v-model="selectedShowScore"></p-radiobutton>
-                <label for="showScore2">&nbsp;<i>Hide</i></label>
+              <div class="form-check">
+                <input class="form-check-input" id="showScore2" type="radio" name="showScore" value="Hide" v-model="selectedShowScore">
+                <label class="form-check-label" for="showScore2">&nbsp;<i>Hide</i></label>
               </div>
 
             </div>
@@ -197,38 +181,36 @@
 
           <div class="row mb-3" v-if="apiKey.length > 0">
             <div class="col">
-              <p-dropdown
-              v-model="stateSelection"
-              :options="stateList"
-              option-label="state"
-              placeholder="Select a State"
-              @change="loadTournamentList()"
-              ></p-dropdown>
+              <select class="form-select" aria-label="State selection" v-model="stateSelection" @change="loadTournamentList()">     
+                <option value="" selected>Select a State</option>
+                <template v-for="(item,index) in stateList">
+                  <option :value="item.abbr">{{item.state}}</option>
+                </template>
+              </select>
             </div>
           </div>
 
           <div class="row mb-4" v-if="stateSelection != null">
             <div class="col-12 mb-2">
-              <p-dropdown
-                v-model="tournamentSelection"
-                :options="tournamentList"
-                option-label="name"
-                placeholder="Select a Tournament"
-                @change="selectTournamentSlug"
-                style="width:100%;"></p-dropdown>
+                <select class="form-select" aria-label="Tournament selection" v-model="tournamentSelection" @change="selectTournamentSlug()">     
+                  <option value="" selected>Select a Tournament</option>
+                  <template v-for="(item,index) in tournamentList">
+                    <option :value="item">{{item.name}}</option>
+                  </template>
+                </select>
             </div>
             <div class="col-12">
-              <p-inputtext v-model="slug" style="width:100%;"></p-inputtext>
+              <input type="text" class="form-control" v-model="slug">
             </div>
           </div>
 
           <div class="row">
             <div class="col">
-              <p-button
-              label="Save"
-              class="p-button-outlined"
-              style="width: 125px"
-              @click="submitSettings"></p-button>
+              <button 
+              class="btn btn-primary" 
+              type="button" 
+              
+              @click="submitSettings">Save</button>
             </div>
           </div>
 
@@ -245,9 +227,9 @@
               <div class="row mb-3">
                 <div class="col-12">
                   <label :for="'url'+urlIndex"><h6>{{url.name}}</h6></label>
-                  <div :id="'url'+urlIndex" class="p-inputgroup">
-                    <p-inputtext type="text" :value="getOverlayURL(url.path,{'type':type,'key':url.room,'startgg_key':apiKey})"> </p-inputtext>
-                    <p-button icon="pi pi-refresh" class="p-button-text" @click="regenerateKey(url.path, url.name)" ></p-button>
+                  <div class="input-group mb-3">
+                    <input type="text" class="form-control" :id="'url'+urlIndex" :value="getOverlayURL(url.path,{'type':type,'key':url.room,'startgg_key':apiKey})">
+                    <button class="btn btn-outline-secondary" type="button" @click="regenerateKey(url.path, url.name)">Refresh</button>
                   </div>
                 </div>
               </div>
@@ -268,13 +250,11 @@
   import NavBar from '/javascripts/NavBar.js'
   import OverlayDataManager from '/javascripts/OverlayDataManager.js'
   const { createApp } = Vue
-  const { FilterMatchMode, FilterOperator } = primevue.api;
-  const { useToast } = primevue.usetoast;
 
   const dashboardApp = createApp({
     data() {
       return {
-        originURL: window.location.origin,
+        userID: '',
         navLogoUrl: '/fsmsmashlogo.png',
         navLinks:[
           {url: '/editor', name: 'Manual Editor'},
@@ -371,7 +351,7 @@
     },
     setup() {
 
-      const toast = useToast();
+      /*const toast = useToast();
 			const onUpload = (event) => {
 				toast.add({severity: 'info', summary: 'Success', detail: 'File Uploaded', life: 3000});
 
@@ -390,13 +370,15 @@
         }
 			}
 
-			return { onUpload };
+			return { onUpload };*/
 
     },
     mounted() {
 
+      this.userID = <%= user.id %>;
+
       this.overlayList.forEach(item => {
-        OverlayDataManager.importOverlayDataOrGenerate(window.location.origin,<%= user.id %>,item.path,item.name).then((data) => {
+        OverlayDataManager.importOverlayDataOrGenerate(window.location.origin,this.userID,item.path,item.name).then((data) => {
           const urlItem = {types: item.types, path:item.path, name:item.name, room:data.key_value}
           this.overlayURLs.push(urlItem)
         })
@@ -409,40 +391,89 @@
         //this.loadTournamentList()
       }
 
-      this.getLogoFromDB()
+      this.getAllLogosFromDB()
 
     },
     methods: {
-      async getLogoFromDB () {
+      fileSelect() {
+
+        const fileSelect = document.getElementById("fileSelect");
+        fileSelect.click();
+
+      },
+      async fileUpload() {
+        const fileInput = document.getElementById("fileSelect");
+        const selectedFile = fileInput.files[0];
+
+        if(selectedFile) {
+          const formData = new FormData();
+          formData.append("files[]", selectedFile);
+
+          fetch(window.location.origin + '/data/images/upload', {
+            method: "POST",
+            body: formData
+          })
+          .then(response => response.json())
+          .then(data => {
+
+              if(data.length > 0) {
+                const filename = data[0].filename == null ? '' : data[0].filename
+                const item = dashboardApp.logoUrl.find(x => x.value.indexOf(filename) > 0)
+                if(item == null) {
+                  dashboardApp.getLogoFromDB(filename);
+                }
+              }
+
+          })
+          .catch(error => {
+              console.error("Error uploading file:", error);
+          });
+        } else {
+          //alert('Please select a file to upload.');
+        }
+      },
+      getLogoFromDB(filename) {
+        const imageFetchURL = '/data/images/get?user_id=' +dashboardApp.userID+ "&filename=" + filename
+        
+        fetch(imageFetchURL, {
+          method: "get",
+          headers: {
+            "Content-Type": "image/png",
+          },
+        })
+        .then(response => response.blob())
+        .then(data => {
+
+          const imageURL = URL.createObjectURL(data);
+          dashboardApp.logoUrl.push({src: imageURL, value: imageFetchURL});
+
+        })
+        .catch(error => {
+          console.error("Error fetching logo", error);
+        });
+      },
+      getAllLogosFromDB () {
 
         try {
-          const url = window.location.origin + '/data/images/all?' + new URLSearchParams({ "user_id": <%= user.id %> })
+          const url = window.location.origin + '/data/images/all?' + new URLSearchParams({ "user_id": this.userID })
 
-          const response = await fetch(url, {
+          fetch(url, {
             method: "get",
             headers: {
               "Content-Type": "application/json; charset=UTF-8",
             },
           })
+          .then(response => response.json())
+          .then(data => {
 
-          if(response.ok) {
-            const results = await response.json()
-
-            for(var i = 0; i < results.length; i++) {
-              const imageFetchURL = '/data/images/get?user_id=<%= user.id %>' + "&filename=" + results[i].image_name
-              const imageResponse = await fetch(imageFetchURL, {
-                method: "get",
-                headers: {
-                  "Content-Type": "image/png",
-                },
-              })
-              if (imageResponse.ok) {
-                const blob = await imageResponse.blob()
-                const imageURL = URL.createObjectURL(blob)
-                this.logoUrl.push({src: imageURL, value: imageFetchURL})
-              }
+            for(var i = 0; i < data.length; i++) {
+              dashboardApp.getLogoFromDB(data[i].image_name);
             }
-          }
+
+          })
+          .catch(error => {
+              console.error("Error fetching all logos", error);
+          });
 
         } catch(e) {
           console.log(e)
@@ -464,7 +495,7 @@
         }
       },
       async regenerateKey(overlay_path,overlay_name) {
-        OverlayDataManager.regenerateOverlayKey(window.location.origin,<%= user.id %>,overlay_path,overlay_name).then((data) => {
+        OverlayDataManager.regenerateOverlayKey(window.location.origin,dashboardApp.userID,overlay_path,overlay_name).then((data) => {
           const url = this.overlayURLs.find(x => x.path == data.overlay_path)
           if(url != null){
             url.path = data.overlay_path
@@ -479,9 +510,9 @@
       },
       async loadTournamentList() {
         try {
-          if(this.stateSelection != null) {
+          if(this.stateSelection.length > 0) {
             const key = this.apiKey
-            const stateAbbr = this.stateSelection.abbr
+            const stateAbbr = this.stateSelection
             const results = await StartGGAPI.queryTournaments(key,stateAbbr)
             this.tournamentList = results
           }
@@ -503,7 +534,7 @@
         }
 
         if(this.slug.length > 0) {
-          const result = await OverlayDataManager.saveOverlaySettings(window.location.origin,<%= user.id %>,settings)
+          const result = await OverlayDataManager.saveOverlaySettings(window.location.origin,dashboardApp.userID,settings)
           
           if(result) {
             alert('Settings successfully saved.')
@@ -521,19 +552,9 @@
       
     },
     components: {
-      "p-button": primevue.button,
-      "p-radiobutton": primevue.radiobutton,
-      "p-inputtext": primevue.inputtext,
-      "p-dropdown": primevue.dropdown,
-      "p-checkbox": primevue.checkbox,
-      "p-fileupload": primevue.fileupload,
-			"p-toast": primevue.toast,
       NavBar,
     },
-  })
-  .use(primevue.config.default)
-	.use(primevue.toastservice)
-  .mount('#app')
+  }).mount('#app')
 
 </script>
 
