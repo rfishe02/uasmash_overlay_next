@@ -11,8 +11,6 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
 
-  <link href="https://unpkg.com/primevue@^3/resources/themes/saga-blue/theme.css" rel="stylesheet">
-  <link href="https://unpkg.com/primevue/resources/primevue.min.css" rel="stylesheet">
   <link href="https://unpkg.com/primeicons/primeicons.css" rel="stylesheet">
 
   <link rel="stylesheet" href="/stylesheets/editor.css">
@@ -23,11 +21,6 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js" integrity="sha384-ODmDIVzN+pFdexxHEHFBQH3/9/vQ9uori45z4JjnFsRydbmQbmL5t1tQ0culUzyK" crossorigin="anonymous"></script>
 
   <script src="https://unpkg.com/vue@3"></script>
-
-  <script src="https://unpkg.com/primevue/core/core.min.js"></script>
-  <script src="https://unpkg.com/primevue@^3/autocomplete/autocomplete.min.js"></script>
-  <script src="https://unpkg.com/primevue@^3/selectbutton/selectbutton.min.js"></script>
-  <script src="https://unpkg.com/primevue@^3/textarea/textarea.min.js"></script>
 
   <script src="/socket.io/socket.io.js"></script>
 
@@ -40,30 +33,9 @@
 
     <div class="container" style="padding-bottom: 25px; padding-top: 15px">
 
-      <div class="row justify-content-around">
-
-        <div class="col-12 col-lg-5">
-          <div class="row mb-2">
-            <p-textarea v-model="playerEntry" :auto-resize="false" style="height: 250px;"></p-textarea>
-          </div>
-          <div class="row mb-2">
-            <p-button
-              label="Save Players"
-              class="p-button-outlined"
-              @click="loadPlayerList"
-              style="width: 150px;"
-            ></p-button>
-            <p-button
-              label="Clear List"
-              class="p-button-text"
-              @click="clearPlayerList"
-              style="width: 150px; margin-right: 7px;"
-            ></p-button>
-          </div>
-        </div>
+      <div class="row justify-content-center">
 
         <div class="col-12 col-lg-6">
-
           <div class="row mb-2">
             <div class="col border rounded" style="background-color: white;">
               <form id="overlay-edit">
@@ -73,47 +45,29 @@
     
                 <div class="row mb-2">
                   <div class="col" >
-                    <span class="p-float-label">
-                      <p-autocomplete
-                        v-model="teamOne"
-                        :suggestions="filteredPlayers"
-                        @complete="filterPlayers($event)"
-                        :dropdown="false"
-                      ></p-autocomplete>
-                      <label for="autocomplete">Left Team</label>
-                    </span>
+                    <label for="team-one-input">Left Team</label>
+                    <input type="text" class="form-control" id="team-one-input" v-model="teamOne" placeholder="">
                   </div>
     
                   <div class="col">
-                    <span class="p-float-label">
-                      <p-autocomplete
-                        v-model="teamTwo"
-                        :suggestions="filteredPlayers"
-                        @complete="filterPlayers($event)"
-                        :dropdown="false"
-                      ></p-autocomplete>
-                      <label for="autocomplete">Right Team</label>
-                    </span>
+                    <label for="team-two-input">Right Team</label>
+                    <input type="text" class="form-control" id="team-two-input" v-model="teamTwo" placeholder="">
                   </div>
                 </div>
     
                 <div class="row mb-3">
                   <div class="col mb-2">
-                    <p-selectbutton
-                      v-model="p1Score"
-                      :options="scoreOptions"
-                      option-label="name"
-                      :unselectable="false"
-                    ></p-selectbutton>
+                    <div class="form-check form-check" v-for="(item, index) of scoreOptions" :key="item">
+                      <input class="form-check-input" :id="'p1Score' + (index + 1)" type="radio" name="p1Score" :value="item.value" v-model="p1Score">
+                      <label class="form-check-label" :for="'p1Score' + (index + 1)">{{item.name}}</label>
+                    </div>
                   </div>
     
                   <div class="col">
-                    <p-selectbutton
-                      v-model="p2Score"
-                      :options="scoreOptions"
-                      option-label="name"
-                      :unselectable="false"
-                    ></p-selectbutton>
+                    <div class="form-check form-check" v-for="(item, index) of scoreOptions" :key="item">
+                      <input class="form-check-input" :id="'p2Score' + (index + 1)" type="radio" name="p2Score" :value="item.value" v-model="p2Score">
+                      <label class="form-check-label" :for="'p2Score' + (index + 1)">{{item.name}}</label>
+                    </div>
                   </div>
                 </div>
     
@@ -123,104 +77,47 @@
     
                 <div class="row mb-2">
                   <div class="col-6 col-md-4 mb-2">
-                    <p-autocomplete
-                      v-model="bracketType"
-                      :suggestions="filteredBrackets"
-                      @complete="filterBrackets($event)"
-                      :dropdown="false"
-                      placeholder="Bracket Type"
-                    ></p-autocomplete>
+                    <select class="form-select" aria-label="Bracket Type selection" v-model="bracketType">     
+                      <option value="" selected>Bracket Type</option>
+                      <template v-for="(item,index) in bracketList">
+                        <option :value="item">{{item}}</option>
+                      </template>
+                    </select>
                   </div>
                   <div class="col-6 col-md-4 mb-2">
-                    <p-autocomplete
-                      v-model="eventRound"
-                      :suggestions="filteredRounds"
-                      @complete="filterRounds($event)"
-                      :dropdown="false"
-                      placeholder="Round"
-                    ></p-autocomplete>
+                    <select class="form-select" aria-label="Round Type selection" v-model="eventRound">     
+                      <option value="" selected>Round Type</option>
+                      <template v-for="(item,index) in roundList">
+                        <option :value="item">{{item}}</option>
+                      </template>
+                    </select>
                   </div>
     
                   <div class="col-6 col-md-4 mb-2">
-                    <!--<p-selectbutton :unselectable="false" v-model="bestOf" :options="matchList" aria-labelledby=""></p-selectbutton>-->
-                    <p-dropdown
-                      class="w-100"
-                      v-model="bestOf"
-                      :options="matchList"
-                      placeholder="Best of"
-                      :editable="true"
-                    ></p-dropdown>
+                    <select class="form-select" aria-label="Best Of selection" v-model="bestOf">     
+                      <option value="" selected>Best Of</option>
+                      <template v-for="(item,index) in matchList">
+                        <option :value="item">{{item}}</option>
+                      </template>
+                    </select>
                   </div>
     
                 </div>
     
                 <div class="row justify-content-between pt-3">
                   <div class="col-8">
-                    <p-button
-                      label="Publish"
-                      class="p-button-outlined"
-                      style="width: 125px; margin-right: 10px"
-                      @click="submitOverlayForm"
-                    ></p-button>
-                    <p-button
-                      label="Clear"
-                      class="p-button-text"
-                      style="width: 125px"
-                      @click="clearOverlayForm"
-                    ></p-button>
+                    <button class="btn btn-outline-secondary" type="button" @click="submitOverlayForm" style="width: 125px;">Publish</button>
+                    &nbsp;<button class="btn btn-outline-secondary" type="button" @click="clearOverlayForm" style="width: 125px;">Clear</button>
                   </div>
                 </div>
               </form>
             </div>
           </div>
-
-          <div class="row mb-2">
-            <div class="col border rounded" style="background-color: white;">
-              <form>
-                <div class="row mb-3">
-                  <h5>Score Update</h5>
-                </div>
-    
-                <div class = "row mb-3">
-                  <div class="col">
-                    
-                    <!--<p-selectbutton v-model="p1ScoreIncrement" :unselectable="false" option-label="name" :options="scoreOptions" aria-labelledby=""></p-selectbutton>-->
-                    <p-inputtext type="number" v-model="p1ScoreIncrement" style="width: 50px;"></p-inputtext>
-
-                  </div>
-                  <div class="col">
-
-                    <!--<p-selectbutton v-model="p2ScoreIncrement" :unselectable="false" option-label="name" :options="scoreOptions" aria-labelledby=""></p-selectbutton>-->
-                    <p-inputtext type="number" v-model="p2ScoreIncrement" style="width: 50px;"></p-inputtext>
-
-                  </div>
-                </div>
-    
-                <div class="row pt-3">
-                  <div class="col">
-                    <p-button
-                      label="Update"
-                      class="p-button-outlined"
-                      style="width: 125px; margin-right: 10px"
-                      @click="submitScoreForm"
-                    ></p-button>
-                    <p-button
-                      label="Reset"
-                      class="p-button-text"
-                      style="width: 125px"
-                      @click="clearScoreForm"
-                    ></p-button>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </div>
-
         </div>
 
       </div>
 
-      <!-- TODO: Rebuild preview header -->
+      <!-- TODO: Rebuild preview header? -->
 
     </div>
 
@@ -233,7 +130,6 @@
   import Editor from '/javascripts/Editor.mjs'
 
   const { createApp} = Vue
-  const { FilterMatchMode, FilterOperator } = primevue.api;
 
   const socket = io(window.location.origin, {
     reconnectionDelayMax: 10000,
@@ -292,8 +188,8 @@
         filteredRounds: [],
         teamOne: '',
         teamTwo: '',
-        p1Score: {name: '-', value: ''},
-        p2Score: {name: '-', value: ''},
+        p1Score: "",
+        p2Score: "",
         p1ScoreIncrement: 0,
         p2ScoreIncrement: 0,
         bracketType: "",
@@ -342,7 +238,6 @@
           "Grand Final Reset",
         ],
         matchList: [
-          "",
           "Best of 3",
           "Best of 5",
         ],
@@ -373,91 +268,31 @@
         this.playerEntry = playerEntry
       }
 
+      const overlayData = localStorage.getItem('overlayData')
+
+      if(overlayData != null){
+        const parsedData = JSON.parse(overlayData)
+
+        this.teamOne     = parsedData.teamOne.name
+        this.p1Score     = parsedData.teamOne.score
+        this.teamTwo     = parsedData.teamTwo.name
+        this.p2Score     = parsedData.teamTwo.score
+        this.bracketType = parsedData.bracketType
+        this.eventRound  = parsedData.eventRound
+        this.bestOf      = parsedData.bestOf
+      }
+
     },
     methods: {
-      loadPlayerList() {
-
-        const list = this.playerEntry.split(/\r?\n/);
-        const players = []
-
-        for(var i = 0; i < list.length; i++){
-          players.push(list[i])
-        }
-
-        this.playerList = players
-
-        localStorage.setItem('playerEntry',this.playerEntry)
-        localStorage.setItem('playerList',JSON.stringify(this.playerList))
-
-      },
-      clearPlayerList() {
-
-        this.playerList = []
-        this.playerEntry = ''
-        localStorage.removeItem('playerEntry')
-        localStorage.removeItem('playerEntry')
-
-      },
-      filterPlayers(event) {
-        const items = this.playerList
-
-        if (items != null) {
-          const query = event.query
-          const _filteredItems = []
-
-          for (let i = 0; i < items.length; i++) {
-            const item = items[i]
-            if (item.toLowerCase().indexOf(query.toLowerCase()) === 0) {
-              _filteredItems.push(item)
-            }
-          }
-
-          this.filteredPlayers = _filteredItems
-        }
-      },
-      filterBrackets(event) {
-        const items = this.bracketList
-
-        if (items != null) {
-          const query = event.query
-          const _filteredItems = []
-
-          for (let i = 0; i < items.length; i++) {
-            const item = items[i]
-            if (item.toLowerCase().indexOf(query.toLowerCase()) === 0) {
-              _filteredItems.push(item)
-            }
-          }
-
-          this.filteredBrackets = _filteredItems
-        }
-      },
-      filterRounds(event) {
-        const items = this.roundList
-
-        if (items != null) {
-          const query = event.query
-          const _filteredItems = []
-
-          for (let i = 0; i < items.length; i++) {
-            const item = items[i]
-            if (item.toLowerCase().indexOf(query.toLowerCase()) >= 0) {
-              _filteredItems.push(item)
-            }
-          }
-
-          this.filteredRounds = _filteredItems
-        }
-      },
       async submitOverlayForm() {
         try {
           if (this.teamOne != null && this.p1Score != null && this.teamTwo != null && this.p2Score != null) {
 
             const form = Editor.getOverlayForm(
               this.teamOne,
-              Editor.getFormattedScore(this.p1Score),
+              this.p1Score,
               this.teamTwo,
-              Editor.getFormattedScore(this.p2Score),
+              this.p2Score,
               this.bracketType,
               this.eventRound,
               this.bestOf,
@@ -467,12 +302,12 @@
               console.log(response)
             })
 
-            // TODO: Find a way to persist data without introducing bugs. A get recent button? This should happen with user knowledge.
+            // TODO: Add confirmation to load data?
 
             this.p1ScoreIncrement = this.p1Score.value
             this.p2ScoreIncrement = this.p2Score.value
 
-            this.clearOverlayForm()
+            localStorage.setItem('overlayData',JSON.stringify(form))
 
           } else {
             // TODO: Throw error?
@@ -490,53 +325,21 @@
         this.bracketType = ""
         this.eventRound = ""
         this.bestOf = ""
+
+        localStorage.removeItem('overlayData')
       },
       clearScoreForm() {
         this.p1ScoreIncrement = 0
         this.p2ScoreIncrement = 0
       },
-      submitScoreForm() {
-
-        try {
-          const form = { p1Score: '', p2Score: '' }
-          form.p1Score = this.p1ScoreIncrement
-          form.p2Score = this.p2ScoreIncrement
-
-          this.socket.emit("score-update", {
-            content: form,
-            to: this.playerRoom,
-          })
-
-        } catch(e) {
-          console.log(e)
-        }
-
-      },
     },
     computed: {
-      getTeamOneName() {
-        return Editor.getFormattedName(this.teamOne)
-      },
-      getTeamTwoName() {
-        return Editor.getFormattedName(this.teamTwo)
-      },
-      getPlayer1Score() {
-        return Editor.getFormattedScore(this.p1Score)
-      },
-      getPlayer2Score() {
-        return Editor.getFormattedScore(this.p2Score)
-      }
+
     },
     components: {
-      "p-dropdown": primevue.dropdown,
-      "p-button": primevue.button,
-      "p-autocomplete": primevue.autocomplete,
-      "p-selectbutton": primevue.selectbutton,
-      "p-inputtext": primevue.inputtext,
-      "p-textarea": primevue.textarea,
       NavBar
     },
-  }).use(primevue.config.default).mount('#app')
+  }).mount('#app')
 
 </script>
 

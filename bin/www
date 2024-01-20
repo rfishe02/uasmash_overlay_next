@@ -73,13 +73,6 @@ io.on("connection", (socket) => {
     callback("200");
   });
 
-  socket.on("score-update", ({ content, to }) => {
-    socket.to(to).emit("score-push", {
-      content,
-      from: socket.id,
-    });
-  });
-
   socket.on("striker-update", ({ content, to }) => {
     socket.to(to).emit("striker-push", {
       content,

@@ -1,6 +1,7 @@
 
 export default {
 
+  // TODO: Remove
   getFormattedName(data) {
     if (data == null) {
       return ""
@@ -11,6 +12,7 @@ export default {
     }
   },
 
+  // TODO: Remove
   getFormattedScore(score) {
     if (score == null) {
       return ""

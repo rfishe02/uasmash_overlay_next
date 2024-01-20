@@ -108,22 +108,6 @@
     }
   })
 
-  socket.on("score-push", ({ content, from }) => {
-
-    playerOverlayApp.p1Score = content["p1Score"] == null ? "" : content["p1Score"]
-    playerOverlayApp.p2Score = content["p2Score"] == null ? "" : content["p2Score"]
-
-    if(playerOverlayApp.p1 != null) {
-      playerOverlayApp.p1.score = playerOverlayApp.p1Score
-      sessionStorage.setItem("teamOne",JSON.stringify(playerOverlayApp.p1))
-    }
-    if(playerOverlayApp.p2 != null) {
-      playerOverlayApp.p2.score = playerOverlayApp.p2Score
-      sessionStorage.setItem("teamTwo",JSON.stringify(playerOverlayApp.p2))
-    }
-
-  })
-
   socket.on("disconnect", () => {
     socket.connect()
   })
