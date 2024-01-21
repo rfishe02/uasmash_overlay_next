@@ -18,12 +18,7 @@
   <style>
     @media (min-width: 800px) {
       .modal {
-        --bs-modal-width: 75%;
-      }
-    }
-    @media (max-width: 799px) {
-      .modal {
-        --bs-modal-width: 100%;
+        --bs-modal-width: 95%;
       }
     }
   </style>
@@ -93,20 +88,46 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
+
+            <ul class="nav nav-underline">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#">Stage Selection</a> <!-- TODO: Settings tab toggle. -->
+              </li>
+            </ul>
+
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
 
-            <form class="mt-3">
-              <div class="container-fluid">
+            <div class="container-fluid" style="overflow-y: auto;">
+              <form>
+                <div class="row mb-2">
+                  <template v-for="(item,index) in stageNameList">
+
+                    <div class="col-12 col-lg-6">
+                      <div class="row">
+                        <div class="col-12 col-lg-4">
+                          <p>{{item}}</p>
+                        </div>
       
-                <!--<div class="row mb-3">
-                  <h4>Choose Stages</h4>
-                </div>-->
-      
-                <div class="row justify-content-start mb-3">
-      
-                  <div class="col-4 mb-3">
+                        <div class="col-6 col-lg-4">
+                          <div class="form-check mb-2">
+                            <input class="btn-check" type="checkbox" :value="item" :id="'starter-selection' + index" v-model="starterSelection">
+                            <label class="btn btn-outline-dark" :for="'starter-selection' + index" style="min-width: 100%;">Starter</label>
+                          </div>
+                        </div>
+                        <div class="col-6 col-lg-4">
+                          <div class="form-check mb-2">
+                            <input class="btn-check" type="checkbox" :value="item" :id="'counterpick-selection' + index" v-model="counterpickSelection">
+                            <label class="btn btn-outline-dark" :for="'counterpick-selection' + index" style="min-width: 100%;">Counterpick</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                  </template>
+  
+                  <!--<div class="col-4 mb-3">
                     <h4>Starter Selection</h4>
                     <template v-for="(item,index) in stageNameList">
                       <div class="form-check mb-2">
@@ -119,25 +140,21 @@
                     <h4>Counterpick Selection</h4>
                     <template v-for="(item,index) in stageNameList">
                       <div class="form-check mb-2">
-                        <div class="form-check mb-2">
-                          <input class="btn-check" type="checkbox" :value="item" :id="'counterpick-selection' + index" v-model="counterpickSelection">
-                          <label class="btn btn-outline-dark" :for="'counterpick-selection' + index" style="width: 250px; padding: 12px;">{{item}}</label>
-                        </div>
+                        <input class="btn-check" type="checkbox" :value="item" :id="'counterpick-selection' + index" v-model="counterpickSelection">
+                        <label class="btn btn-outline-dark" :for="'counterpick-selection' + index" style="width: 250px; padding: 12px;">{{item}}</label>
                       </div>
                     </template>
-                  </div>
-      
+                  </div>-->
                 </div>
-      
-                <div class="row mb-3">
+
+                <div class="row mb-2">
                   <div class="col-10">
                     <button class="btn btn-dark" type="button" @click="saveStrikerConfig()" style="width: 125px">Save</button>
-                    <button class="btn btn-outline-dark" type="button" @click="clearConfigStageSelections()" style="width: 125px">Clear</button>
+                    &nbsp;<button class="btn btn-outline-dark" type="button" @click="clearConfigStageSelections()" style="width: 125px">Clear</button>
                   </div>
                 </div>
-      
-              </div>
-            </form>
+              </form>
+            </div>
 
           </div>
           <!--<div class="modal-footer">S
