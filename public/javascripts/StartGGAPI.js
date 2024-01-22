@@ -517,7 +517,6 @@ export default {
       console.log(e)
     }
 
-    console.log(setQueryData)
     return setQueryData
   },
 
@@ -705,7 +704,7 @@ export default {
   },
 
   getSetData(set) {
-    const setData = {id:'', state:'', eventName: '', phaseName: '', fullRoundText: '', teamOne: '?', teamTwo: '?', preReqId1: '', preReqId2: ''}
+    const setData = {id:'', state:'', eventName: '', phaseName: '', fullRoundText: '', teamOne: '?', teamTwo: '?', preReqs: [], preReqId1: '', preReqId2: ''}
     
     setData.id = set.id
     setData.state = set.state == null ? '' : set.state

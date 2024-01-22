@@ -1,20 +1,22 @@
 export default {
 
-  refreshQueue(priorQueue, newQueueItems) {
+  refreshQueue(setQueue, newQueueItems) {
 
-    const priorQueueLookup = {}
-    const updatedQueueIdSet = new Set()
-    const removeIndexes = []
+    const setQueueLookup = {}
+    const updatedIdSet = new Set()
+    const inactiveSets = []
 
-    priorQueue.forEach(item => {
-      priorQueueLookup[item.id] = item
+    setQueue.forEach(item => {
+      setQueueLookup[item.id] = item
     })
 
     newQueueItems.forEach(item => {
-      const match = priorQueueLookup[item.id]
+      const match = setQueueLookup[item.id]
 
       if(match == null){
-        priorQueue.push(item)
+        setQueue.push(item)
+        setQueueLookup[item.id] = item
+
       } else {
         
         match.state = item.state 
@@ -26,17 +28,34 @@ export default {
 
       }
 
-      updatedQueueIdSet.add(item.id) 
+      updatedIdSet.add(item.id) 
     })
 
-    for(var i = 0; i < priorQueue.length; i++){
-      if(!updatedQueueIdSet.has(priorQueue[i].id)){
-        removeIndexes.push(i)
-      }
-    }
+    setQueue.forEach(item => {
 
-    removeIndexes.forEach(index => {
-      priorQueue.splice(index,1)
+      const setNoLongerActive = !updatedIdSet.has(item.id)
+      if(setNoLongerActive){
+        inactiveSets.push(i)
+
+      } else {
+
+        item.preReqs = []
+        const preReq1 = setQueueLookup[item.preReqId1];
+        const preReq2 = setQueueLookup[item.preReqId2];
+
+        if(preReq1 != null) {
+          item.preReqs.push(`${preReq1.teamOne} vs. ${preReq1.teamTwo}`)
+        }
+        if(preReq2 != null) {
+          item.preReqs.push(`${preReq2.teamOne} vs. ${preReq2.teamTwo}`)
+        }
+
+      }
+
+    })
+
+    inactiveSets.forEach(index => {
+      setQueue.splice(index,1)
     })
 
   }

@@ -70,7 +70,7 @@
             <template v-for="(item,index) in setList" :key="item">
               <div class="col mb-2" v-if="item.state == 1">
                 
-                <upcoming-match-card :team-one="item.teamOne" :team-two="item.teamTwo" :pre-req-id1="getPreReqMatch(item.preReqId1)" :pre-req-id2="getPreReqMatch(item.preReqId2)" :event-name="item.eventName" :full-round-text="item.fullRoundText">
+                <upcoming-match-card :team-one="item.teamOne" :team-two="item.teamTwo" :pre-reqs="item.preReqs" :event-name="item.eventName" :full-round-text="item.fullRoundText">
                 </upcoming-match-card>
 
               </div>
@@ -93,7 +93,7 @@
             <template v-for="(item,index) in setList" :key="item">
               <div class="col mb-3">
                 
-                <upcoming-match-card :team-one="item.teamOne" :team-two="item.teamTwo" :pre-req-id1="getPreReqMatch(item.preReqId1)" :pre-req-id2="getPreReqMatch(item.preReqId2)" :event-name="item.eventName" :full-round-text="item.fullRoundText">
+                <upcoming-match-card :team-one="item.teamOne" :team-two="item.teamTwo" :pre-reqs="item.preReqs" :event-name="item.eventName" :full-round-text="item.fullRoundText">
                 </upcoming-match-card>
 
               </div>
@@ -219,13 +219,6 @@
         QueueManager.refreshQueue(this.setList,sets)
 
       },
-      getPreReqMatch(id) { 
-        if(this.preReqList[id] != null) {
-          return this.preReqList[id].teamOne + " vs. " + this.preReqList[id].teamTwo
-        } else {
-          return ''
-        }
-      }
     },
     components: {
       UpcomingMatchCard,
