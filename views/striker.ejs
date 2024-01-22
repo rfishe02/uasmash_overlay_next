@@ -305,14 +305,14 @@
       this.resetOptionsAndChoices()
       this.loadStageSelectionsFromDB()
 
-      // TODO: Consider making this import only.
-
-      OverlayDataManager.importOverlayDataOrGenerate(window.location.origin,<%= user.id %>,"stage_strikes","Stage Strikes Overlay").then((data) => {
+      OverlayDataManager.importOverlayData(window.location.origin,<%= user.id %>,"stage_strikes").then((data) => {
         if(data.key_value.length > 0) {
           this.strikerRoom = data.key_value
           
           this.socket.connect()
           this.socket.emit("subscribe",data.key_value)
+        } else {
+          // TODO: Need to implement graceful failure.
         }
       })
 

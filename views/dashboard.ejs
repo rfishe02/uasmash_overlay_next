@@ -222,18 +222,16 @@
             <h3>Browser Source URLs</h3>
           </div>
 
-          <template v-for="(url, urlIndex) in overlayURLs">
-            <template v-for="type in url.types">
-              <div class="row mb-3">
-                <div class="col-12">
-                  <label :for="'url'+urlIndex"><h6>{{url.name}}</h6></label>
-                  <div class="input-group mb-3">
-                    <input type="text" class="form-control" :id="'url'+urlIndex" :value="getOverlayURL(url.path,{'type':type,'key':url.room,'startgg_key':apiKey})">
-                    <button class="btn btn-outline-secondary" type="button" @click="regenerateKey(url.path, url.name)">Refresh</button>
-                  </div>
+          <template v-for="(item, index) in overlayList">
+            <div class="row mb-3">
+              <div class="col-12">
+                <label :for="'item'+index"><h6>{{item.name}}</h6></label>
+                <div class="input-group mb-3">
+                  <input type="text" class="form-control" :id="'item'+index" :value="getOverlayURL(item.path,{'type':item.type,'key':item.room,'startgg_key':apiKey})">
+                  <button class="btn btn-outline-secondary" type="button" @click="regenerateKey(item.path, item.name)">Refresh</button>
                 </div>
               </div>
-            </template>
+            </div>
           </template>
 
         </div>
@@ -262,13 +260,7 @@
         ],
         playerOverlayRoom: "",
         strikerOverlayRoom: "",
-        overlayList: [
-          {types: [0], path: "players", name: "Player Overlay"},
-          {types: [0], path: "stage_strikes", name: "Stage Strikes Overlay"},
-          {types: [0], path: "waiting", name: "Waiting Screen"},
-          {types: [0], path: "upcoming", name: "Upcoming Matches"},
-        ],
-        overlayURLs: [],
+        overlayList: [],
         logoUrl: [],
         logoChoice: "",
         apiKey: '',
@@ -373,16 +365,9 @@
 			return { onUpload };*/
 
     },
-    mounted() {
+    mounted: async function(){
 
       this.userID = <%= user.id %>;
-
-      this.overlayList.forEach(item => {
-        OverlayDataManager.importOverlayDataOrGenerate(window.location.origin,this.userID,item.path,item.name).then((data) => {
-          const urlItem = {types: item.types, path:item.path, name:item.name, room:data.key_value}
-          this.overlayURLs.push(urlItem)
-        })
-      })
 
       const key = localStorage.getItem('apiKey')
 
@@ -392,6 +377,11 @@
       }
 
       this.getAllLogosFromDB()
+
+      const overlayData = await OverlayDataManager.importOverlayDataOrGenerate(window.location.origin,this.userID)
+      overlayData.forEach(item => {
+        this.overlayList.push(item)
+      })
 
     },
     methods: {
@@ -496,7 +486,7 @@
       },
       async regenerateKey(overlay_path,overlay_name) {
         OverlayDataManager.regenerateOverlayKey(window.location.origin,dashboardApp.userID,overlay_path,overlay_name).then((data) => {
-          const url = this.overlayURLs.find(x => x.path == data.overlay_path)
+          const url = this.overlayList.find(x => x.path == data.overlay_path)
           if(url != null){
             url.path = data.overlay_path
             url.name = data.overlay_name

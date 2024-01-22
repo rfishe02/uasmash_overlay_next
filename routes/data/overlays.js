@@ -13,7 +13,22 @@ function generateRandomString() {
   return result
 }
 
-router.get('/get_data', isLoggedIn, async function(req, res, next) {
+router.get('/get_user_data', isLoggedIn, async function(req, res, next) {
+
+  try {
+    const user_id = req.query.user_id;
+    
+    const result = await db.pool.query("SELECT * FROM user_overlays WHERE user_id = ? ORDER BY overlay_path",[user_id]);
+    res.send(result);
+
+  } catch (e) {
+    res.status(401).send("Unauthorized");
+    next(e)
+  }
+
+});
+
+router.get('/get_overlay_data', isLoggedIn, async function(req, res, next) {
 
   try {
     const user_id = req.query.user_id;
