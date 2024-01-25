@@ -72,3 +72,7 @@ docker compose down
 3. Copy the generated URL into the Browser Source URL field.
 4. Create a stream queue in Start.gg.
 5. In Start.gg, add a match to the stream queue, then start the match.
+
+# Test Instructions
+
+Mocha tests are in the ```\test``` folder. You can run ```npm test``` in the main folder to see the outcome of these tests.
